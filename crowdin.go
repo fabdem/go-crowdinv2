@@ -85,6 +85,31 @@ func (crowdin *Crowdin) SetDebug(debug bool, logWriter io.Writer) {
 }
 
 
+
+// ListProjectBuilds - List Project Builds API call. List the project builds
+// {protocol}://{host}/api/v2/projects/{projectId}/translations/builds
+func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*ResponseListProjectBuilds, error) {
+
+	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", options.ProjectId)})
+
+	if err != nil {
+		crowdin.log(err)
+		return nil, err
+	}
+
+	crowdin.log(string(response))
+
+	var responseAPI ResponseListProjectBuilds
+	err = json.Unmarshal(response, &responseAPI)
+	if err != nil {
+		crowdin.log(err)
+		return nil, err
+	}
+
+	return &responseAPI, nil
+}
+
+
 // ListProjects - List projects API call. List the projects and their respective details (incl.Id.)
 // {protocol}://{host}/api/v2/projects
 func (crowdin *Crowdin) ListProjects(options *ListProjectsOptions) (*ResponseListProjects, error) {

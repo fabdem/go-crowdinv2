@@ -3,6 +3,39 @@ import (
 	"time"
 )
 
+// ListProjectBuilds - List Project Build API call
+type ListProjectBuildsOptions struct {
+	ProjectId 			int
+	Body struct {
+		BranchId	   	int	`json:hasManagerAccess,omitempty`
+		Limit			int	`json:limit,omitempty`
+		Offset			int	`json:offset,omitempty`
+	}
+}
+
+type ResponseListProjectBuilds struct {
+	Data []struct {
+		Data struct {
+			ID          int    `json:"id"`
+			ProjectID   int    `json:"projectId"`
+			BranchID    int    `json:"branchId"`
+			LanguagesID []int  `json:"languagesId"`
+			Status      string `json:"status"`
+			Progress    struct {
+				Percent           int `json:"percent"`
+				CurrentLanguageID int `json:"currentLanguageId"`
+				CurrentFileID     int `json:"currentFileId"`
+			} `json:"progress"`
+		} `json:"data"`
+	} `json:"data"`
+	Pagination []struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
+}
+
+
+
 
 // ListProjects - List Projects API call
 type ListProjectsOptions struct {
@@ -138,7 +171,7 @@ type ResponseGetLanguageProgress struct {
 
 // BuildProjectOptions are options for BuildProject api call
 type BuildProjectOptions struct {
-	ProjectId int `json:"ProjectId"` // Project Identifier.
+	ProjectId int		 // Project Identifier.
 	Body      struct {
 		BranchId int `json:"branchId,omitempty"` // Branch Identifier. - optional
 		// Specify target languages for build.
