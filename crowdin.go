@@ -25,10 +25,10 @@ var (
 // Crowdin API V2 wrapper
 type Crowdin struct {
 	config struct {
-		apiBaseURL string
-		token      string
-		projectID  int
-		client     *http.Client
+		apiBaseURL 	string
+		token      	string
+		project		string
+		client     	*http.Client
 	}
 	debug     bool
 	logWriter io.Writer
@@ -41,7 +41,7 @@ func SetTimeouts(cnctTOinSecs, rwTOinSecs int) {
 }
 
 // New - a create new instance of Crowdin API V2.
-func New(token string, projectID int, proxy string) (*Crowdin, error) {
+func New(token string, project string, proxy string) (*Crowdin, error) {
 
 	var proxyUrl *url.URL
 	var err error
@@ -64,7 +64,7 @@ func New(token string, projectID int, proxy string) (*Crowdin, error) {
 	s := &Crowdin{}
 	s.config.apiBaseURL = apiBaseURL
 	s.config.token = token
-	s.config.projectID = projectID
+	s.config.projectID = project
 	s.config.client = &http.Client{
 		Transport: transport,
 	}

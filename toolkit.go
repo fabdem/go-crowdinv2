@@ -10,6 +10,25 @@ import (
 // Publicly available high level functions generally combining several API calls
 
 
+// Lookup buildId
+func (crowdin *Crowdin) GetBuildId(projectId int) (buildId int, err error) {
+  var opt ListProjectBuildsOptions
+  rl,err :=  crowdin.ListProjectBuilds(&opt)
+  if err != nil {
+    return 0, err
+  }
+  for _,v := range rl.Data {
+      if (v.Data.ProjectId == projectId) && (v.Data.Status == "finished") {
+        buildId = v.Data.Id
+      }
+  }
+  if buildId == 0 {
+    return 0, errors.New("Can't find a build for this project or build in progress.") 
+  }
+  return buildId, nil	
+}
+
+
 // Lookup projectId
 func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err error) {
   
@@ -31,8 +50,8 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
   return projectId, nil
 }
 
-// Build a project
-func (crowdin *Crowdin) Build(projectName string, buildTOinSec int) (projectId int, buildId int, err error) {
+// BuildAllLg - Build a project for all languages
+func (crowdin *Crowdin) BuildAllLg(projectName string, buildTOinSec int) (projectId int, buildId int, err error) {
 
   // Lookup projectId
   projectId,err = crowdin.GetProjectId(projectName)

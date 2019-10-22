@@ -16,15 +16,15 @@ type ListProjectBuildsOptions struct {
 type ResponseListProjectBuilds struct {
 	Data []struct {
 		Data struct {
-			ID          int    `json:"id"`
-			ProjectID   int    `json:"projectId"`
-			BranchID    int    `json:"branchId"`
-			LanguagesID []int  `json:"languagesId"`
+			Id          int    `json:"id"`
+			ProjectId   int    `json:"projectId"`
+			BranchId    int    `json:"branchId"`
+			LanguagesId []int  `json:"languagesId"`
 			Status      string `json:"status"`
 			Progress    struct {
 				Percent           int `json:"percent"`
-				CurrentLanguageID int `json:"currentLanguageId"`
-				CurrentFileID     int `json:"currentFileId"`
+				CurrentLanguageId int `json:"currentLanguageId"`
+				CurrentFileId     int `json:"currentFileId"`
 			} `json:"progress"`
 		} `json:"data"`
 	} `json:"data"`
