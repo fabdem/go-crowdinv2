@@ -27,7 +27,7 @@ type Crowdin struct {
 	config struct {
 		apiBaseURL 	string
 		token      	string
-		project		string
+		project			string
 		client     	*http.Client
 	}
 	debug     bool
@@ -64,7 +64,7 @@ func New(token string, project string, proxy string) (*Crowdin, error) {
 	s := &Crowdin{}
 	s.config.apiBaseURL = apiBaseURL
 	s.config.token = token
-	s.config.projectID = project
+	s.config.project = project
 	s.config.client = &http.Client{
 		Transport: transport,
 	}
@@ -72,9 +72,9 @@ func New(token string, project string, proxy string) (*Crowdin, error) {
 }
 
 // SetProject - set project details
-func (crowdin *Crowdin) SetProject(token string, projectID int) *Crowdin {
+func (crowdin *Crowdin) SetProject(token string, project string) *Crowdin {
 	crowdin.config.token = token
-	crowdin.config.projectID = projectID
+	crowdin.config.project = project
 	return crowdin
 }
 

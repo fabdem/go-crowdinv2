@@ -23,15 +23,15 @@ func (crowdin *Crowdin) GetBuildId(projectId int) (buildId int, err error) {
       }
   }
   if buildId == 0 {
-    return 0, errors.New("Can't find a build for this project or build in progress.") 
+    return 0, errors.New("Can't find a build for this project or build in progress.")
   }
-  return buildId, nil	
+  return buildId, nil
 }
 
 
 // Lookup projectId
 func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err error) {
-  
+
   fmt.Printf("")
   var opt ListProjectsOptions
   rl,err :=  crowdin.ListProjects(&opt)
@@ -45,19 +45,21 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
       }
   }
   if projectId == 0 {
-    return 0, errors.New("Can't find project.") 
+    return 0, errors.New("Can't find project.")
   }
   return projectId, nil
 }
 
 // BuildAllLg - Build a project for all languages
 func (crowdin *Crowdin) BuildAllLg(projectName string, buildTOinSec int) (projectId int, buildId int, err error) {
+  fmt.Printf("\nIn BuildAllLg()")
 
   // Lookup projectId
   projectId,err = crowdin.GetProjectId(projectName)
   if err != nil {
     return 0,0, err
   }
+  fmt.Printf("\nProjectId=%v", projectId)
 
   // Invoke build
   var bo BuildProjectOptions
@@ -69,6 +71,7 @@ func (crowdin *Crowdin) BuildAllLg(projectName string, buildTOinSec int) (projec
     return projectId, buildId, errors.New("\nBuild Err.")
   }
   buildId = rb.Data.Id
+  fmt.Printf("\nBuildId=%v", buildId)
 
   // Poll build status with a timeout
   timer := time.NewTimer(time.Duration(buildTOinSec) * time.Second)
@@ -76,10 +79,10 @@ func (crowdin *Crowdin) BuildAllLg(projectName string, buildTOinSec int) (projec
   var rp *ResponseGetBuildProgress
   for ;rp.Data.Status != "finished"; {
     time.Sleep(5 * time.Second) // delay between each call
-	rp, err = crowdin.GetBuildProgress(&GetBuildProgressOptions{projectId,buildId})
+	  rp, err = crowdin.GetBuildProgress(&GetBuildProgressOptions{projectId,buildId})
     select {
       case <-timer.C:
-        err = errors.New("Build Timeout.") 
+        err = errors.New("Build Timeout.")
 		break
     }
   }
@@ -98,7 +101,7 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, projectId int, 
   // Get URL for downloading
   rd,err := crowdin.DownloadProjectTranslations(&DownloadProjectTranslationsOptions{projectId,buildId})
   if err != nil {
-    return errors.New("\nDownloading Err.") 
+    return errors.New("\nDownloading Err.")
   }
   url := rd.Data.Url
 
