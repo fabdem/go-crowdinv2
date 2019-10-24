@@ -10,15 +10,15 @@ import (
 // Publicly available high level functions generally combining several API calls
 
 
-// Lookup buildId
-func (crowdin *Crowdin) GetBuildId(projectId int) (buildId int, err error) {
+// Lookup buildId for current project
+func (crowdin *Crowdin) GetBuildId() (buildId int, err error) {
   var opt ListProjectBuildsOptions
   rl,err :=  crowdin.ListProjectBuilds(&opt)
   if err != nil {
     return 0, err
   }
   for _,v := range rl.Data {
-      if (v.Data.ProjectId == projectId) && (v.Data.Status == "finished") {
+      if (v.Data.ProjectId == crowdin.config.projectId) && (v.Data.Status == "finished") {
         buildId = v.Data.Id
       }
   }
@@ -51,24 +51,17 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
 }
 
 // BuildAllLg - Build a project for all languages
-func (crowdin *Crowdin) BuildAllLg(projectName string, buildTOinSec int) (projectId int, buildId int, err error) {
+func (crowdin *Crowdin) BuildAllLg(buildTOinSec int) (buildId int, err error) {
   fmt.Printf("\nIn BuildAllLg()")
-
-  // Lookup projectId
-  projectId,err = crowdin.GetProjectId(projectName)
-  if err != nil {
-    return 0,0, err
-  }
-  fmt.Printf("\nProjectId=%v", projectId)
 
   // Invoke build
   var bo BuildProjectOptions
-  bo.ProjectId = projectId
-  bo.Body.BranchId = 0
-  bo.Body.Languages = nil
+  // bo.ProjectId = crowdin.config.projectId
+  bo.BranchId = 0
+  bo.Languages = nil
   rb,err := crowdin.BuildProject(&bo)
   if err != nil {
-    return projectId, buildId, errors.New("\nBuild Err.")
+    return buildId, errors.New("\nBuild Err.")
   }
   buildId = rb.Data.Id
   fmt.Printf("\nBuildId=%v", buildId)
@@ -79,7 +72,7 @@ func (crowdin *Crowdin) BuildAllLg(projectName string, buildTOinSec int) (projec
   var rp *ResponseGetBuildProgress
   for ;rp.Data.Status != "finished"; {
     time.Sleep(5 * time.Second) // delay between each call
-	  rp, err = crowdin.GetBuildProgress(&GetBuildProgressOptions{projectId,buildId})
+	  rp, err = crowdin.GetBuildProgress(&GetBuildProgressOptions{buildId})
     select {
       case <-timer.C:
         err = errors.New("Build Timeout.")
@@ -87,19 +80,18 @@ func (crowdin *Crowdin) BuildAllLg(projectName string, buildTOinSec int) (projec
     }
   }
 
-  return projectId, buildId, err
+  return buildId, err
 }
 
 
-// Download a build
-//    projectName         required if projectId is not provided
+// Download a build of the current project
 //    outputFileNamePath  required
 //    projectId           required if projectName is not provided
 //    buildId             optional
-func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, projectId int, buildId int) (err error) {
+func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (err error) {
 
   // Get URL for downloading
-  rd,err := crowdin.DownloadProjectTranslations(&DownloadProjectTranslationsOptions{projectId,buildId})
+  rd,err := crowdin.DownloadProjectTranslations(&DownloadProjectTranslationsOptions{buildId})
   if err != nil {
     return errors.New("\nDownloading Err.")
   }
