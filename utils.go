@@ -29,15 +29,11 @@ type getOptions struct {
 // fileNames - key = dir
 func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 
-	fmt.Printf("\nCreate Request:")
-	fmt.Printf("\nBody: %s", options.body)
+	crowdin.log(fmt.Sprintf("Create http request\nBody: %s", options.body))
 
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(options.body)
 	req, err := http.NewRequest("POST", options.urlStr, buf)
-
-	// var jsonStr = []byte(`{"branchId":null, "targetLanguagesId":[]}`)
-	// req, err := http.NewRequest("POST", options.urlStr, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return nil, err
 	}
@@ -45,15 +41,13 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 	// Set headers
 	req.Header.Set("Authorization", "Bearer "+crowdin.config.token)
 	req.Header.Set("Content-Type", "application/json")
-	fmt.Printf("\nHeaders: %v\n", req.Header)
+	crowdin.log(fmt.Sprintf("Headers: %s", req.Header))
 
 	dump, err := httputil.DumpRequestOut(req, true)
 	crowdin.log(dump)
-	// fmt.Printf("\nDump: %s\n", dump)
 
 	// Run the  request
 	response, err := crowdin.config.client.Do(req)
-	fmt.Printf("\nDo response: %v\n%v", response, err)
 	if err != nil {
 		return nil, err
 	}
@@ -64,9 +58,9 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 		return nil, err
 	}
 
-	if response.StatusCode != http.StatusOK {
-		return bodyResponse, APIError{What: fmt.Sprintf("Status code: %v", response.StatusCode)}
-	}
+	// if response.StatusCode != http.StatusOK {
+	// 	return bodyResponse, APIError{What: fmt.Sprintf("Status code: %v", response.StatusCode)}
+	// }
 
 	return bodyResponse, nil
 }
@@ -83,10 +77,10 @@ func (crowdin *Crowdin) get(options *getOptions) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if response.StatusCode != http.StatusOK {
-		return bodyResponse, APIError{What: fmt.Sprintf("Status code: %v", response.StatusCode)}
-	}
+	
+	// if response.StatusCode != http.StatusOK {
+	// 	return bodyResponse, APIError{What: fmt.Sprintf("Status code: %v", response.StatusCode)}
+	// }
 
 	return bodyResponse, nil
 }
@@ -106,11 +100,9 @@ func (crowdin *Crowdin) getResponse(options *getOptions) (*http.Response, error)
 	fmt.Printf("\nRequest:%v\nError:%v\n", req, err)
 
 	response, err := crowdin.config.client.Do(req)
-	fmt.Printf("\nResponse:%v\nError:%v\n", response, err)
 	if err != nil {
 		return nil, err
 	}
-
 	return response, nil
 }
 
@@ -125,19 +117,18 @@ func (crowdin *Crowdin) DownloadFile(url string, filepath string) error {
 	}
 	defer out.Close()
 
-	// Get the data
+	// Get data
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	// Write the body to file
+	// Write body to file
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -152,6 +143,7 @@ func (crowdin *Crowdin) log(a interface{}) {
 	}
 }
 
+/*
 // APIError holds data of errors returned from the API.
 type APIError struct {
 	What string
@@ -160,3 +152,4 @@ type APIError struct {
 func (e APIError) Error() string {
 	return fmt.Sprintf("%v", e.What)
 }
+*/

@@ -17,6 +17,7 @@ import (
 var (
 	apiBaseURL = "https://valve.crowdin.com/api/v2/"
 
+
 	// Default values for timeouts
 	connectionTOinSecs time.Duration = 5
 	readwriteTOinSecs  time.Duration = 40

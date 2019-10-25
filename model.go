@@ -94,8 +94,8 @@ type ResponseGetBuildProgress struct {
 		Status     string `json:"status"`
 		Progress   struct {
 			Percent           int `json:"percent"`
-			CurrentLanguageId int `json:"currentLanguageId"`
-			CurrentFileId     int `json:"currentFileId"`
+			CurrentLanguageId string `json:"currentLanguageId"`
+			CurrentFileId     string `json:"currentFileId"`
 		} `json:"progress"`
 	} `json:"data"`
 }
