@@ -17,8 +17,7 @@ import (
 var (
 	apiBaseURL = "https://valve.crowdin.com/api/v2/"
 
-
-	// Default values for timeouts
+	// Default values for timeouts in seconds
 	connectionTOinSecs time.Duration = 5
 	readwriteTOinSecs  time.Duration = 40
 )
@@ -26,13 +25,14 @@ var (
 // Crowdin API V2 wrapper
 type Crowdin struct {
 	config struct {
-		apiBaseURL 	string
-		token      	string
-		projectId			int
-		client     	*http.Client
+		apiBaseURL string
+		token      string
+		projectId  int
+		client     *http.Client
 	}
-	debug     bool
-	logWriter io.Writer
+	buildProgress  	int
+	debug     		bool
+	logWriter 		io.Writer
 }
 
 // Set connection and read/write timeouts for the subsequent new connections
@@ -40,6 +40,12 @@ func SetTimeouts(cnctTOinSecs, rwTOinSecs int) {
 	connectionTOinSecs = time.Duration(cnctTOinSecs)
 	readwriteTOinSecs = time.Duration(rwTOinSecs)
 }
+
+// Read current build status
+func (crowdin *Crowdin) ReadBuildProgress() int {
+	return crowdin.buildProgress
+}
+
 
 // New - a create new instance of Crowdin API V2.
 func New(token string, projectId int, proxy string) (*Crowdin, error) {
@@ -85,13 +91,11 @@ func (crowdin *Crowdin) SetDebug(debug bool, logWriter io.Writer) {
 	crowdin.logWriter = logWriter
 }
 
-
-
 // ListProjectBuilds - List Project Builds API call. List the project builds
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds
 func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*ResponseListProjectBuilds, error) {
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", crowdin.config.projectId),body: options})
+	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", crowdin.config.projectId), body: options})
 
 	if err != nil {
 		crowdin.log(err)
@@ -110,12 +114,11 @@ func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*R
 	return &responseAPI, nil
 }
 
-
 // ListProjects - List projects API call. List the projects and their respective details (incl.Id.)
 // {protocol}://{host}/api/v2/projects
 func (crowdin *Crowdin) ListProjects(options *ListProjectsOptions) (*ResponseListProjects, error) {
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects")})
+	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL + "projects")})
 
 	if err != nil {
 		crowdin.log(err)
@@ -134,12 +137,11 @@ func (crowdin *Crowdin) ListProjects(options *ListProjectsOptions) (*ResponseLis
 	return &responseAPI, nil
 }
 
-
 // DownloadProjectTranslations - Download Project Translations api call
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds/{buildId}/download
 func (crowdin *Crowdin) DownloadProjectTranslations(options *DownloadProjectTranslationsOptions) (*ResponseDownloadProjectTranslations, error) {
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds/%v/download", crowdin.config.projectId,options.BuildId)})
+	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds/%v/download", crowdin.config.projectId, options.BuildId)})
 
 	if err != nil {
 		crowdin.log(err)
@@ -157,7 +159,6 @@ func (crowdin *Crowdin) DownloadProjectTranslations(options *DownloadProjectTran
 
 	return &responseAPI, nil
 }
-
 
 // GetProjectBuilds - List Project Builds api call
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds

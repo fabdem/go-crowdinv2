@@ -1,4 +1,5 @@
 package crowdin
+
 import (
 	"time"
 )
@@ -7,9 +8,9 @@ import (
 type ListProjectBuildsOptions struct {
 	// ProjectId 			int
 	// Body struct {
-		BranchId	   	int	`json:hasManagerAccess,omitempty`
-		Limit			int	`json:limit,omitempty`
-		Offset			int	`json:offset,omitempty`
+	BranchId int `json:hasManagerAccess,omitempty`
+	Limit    int `json:limit,omitempty`
+	Offset   int `json:offset,omitempty`
 	//}
 }
 
@@ -34,15 +35,12 @@ type ResponseListProjectBuilds struct {
 	} `json:"pagination"`
 }
 
-
-
-
 // ListProjects - List Projects API call
 type ListProjectsOptions struct {
-	GroupId 						int	`json:groupId,omitempty`
-	HasManagerAccess   	int	`json:hasManagerAccess,omitempty`
-	Limit								int	`json:limit,omitempty`
-	Offset							int	`json:offset,omitempty`
+	GroupId          int `json:groupId,omitempty`
+	HasManagerAccess int `json:hasManagerAccess,omitempty`
+	Limit            int `json:limit,omitempty`
+	Offset           int `json:offset,omitempty`
 }
 
 type ResponseListProjects struct {
@@ -77,12 +75,11 @@ type ResponseListProjects struct {
 	} `json:"pagination"`
 }
 
-
 // GetProjectBuildProgressOptions are options for Check Project Build Status api call
 type GetBuildProgressOptions struct {
 	// Project Identifier.
 	// ProjectId int
-	BuildId   int
+	BuildId int
 }
 
 type ResponseGetBuildProgress struct {
@@ -93,13 +90,12 @@ type ResponseGetBuildProgress struct {
 		LanguageId []int  `json:"languageId"`
 		Status     string `json:"status"`
 		Progress   struct {
-			Percent           int `json:"percent"`
+			Percent           int    `json:"percent"`
 			CurrentLanguageId string `json:"currentLanguageId"`
 			CurrentFileId     string `json:"currentFileId"`
 		} `json:"progress"`
 	} `json:"data"`
 }
-
 
 // DownloadProjectTranslationsOptions are options for  DownloadProjectTranslations api call
 type DownloadProjectTranslationsOptions struct {
@@ -110,34 +106,33 @@ type DownloadProjectTranslationsOptions struct {
 }
 
 type ResponseDownloadProjectTranslations struct {
-  Data struct {
-    Url 			string `json:"url"`
-    ExpireIn 	string `json:"expireIn"`
-  } `json: "data"`
+	Data struct {
+		Url      string `json:"url"`
+		ExpireIn string `json:"expireIn"`
+	} `json: "data"`
 }
 
 // GetProjectBuilds api call
 type ResponseGetProjectBuilds struct {
 	Data []struct {
-    Data struct {
-      Id 					int 		`json:"id"`
-			ProjectId 	int 		`json:"projectId"`
-			BranchId 		int 		`json:"branchId"`
-			LanguageId 	[]int		`json:"languageId"`
-      Status 			string 	`json:"status"`
-      Progress struct {
-	        Percent 					int	`json:"percent"`
-	        CurrentLanguageId int	`json:"currentLanguageId"`
-			    CurrentFileId 		int	`json:"currentFileId"`
+		Data struct {
+			Id         int    `json:"id"`
+			ProjectId  int    `json:"projectId"`
+			BranchId   int    `json:"branchId"`
+			LanguageId []int  `json:"languageId"`
+			Status     string `json:"status"`
+			Progress   struct {
+				Percent           int `json:"percent"`
+				CurrentLanguageId int `json:"currentLanguageId"`
+				CurrentFileId     int `json:"currentFileId"`
 			} `json:"progress"`
-    } `json:"data"`
-  }  `json:"data"`
-  Pagination []struct {
-      Offset 			int	`json:"offset"`
-      Limit 			int	`json:"limit"`
-  } `json:"pagination"`
+		} `json:"data"`
+	} `json:"data"`
+	Pagination []struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
 }
-
 
 // GetLanguageProgress api call
 type ResponseGetLanguageProgress struct {
@@ -161,14 +156,12 @@ type ResponseGetLanguageProgress struct {
 type BuildProjectOptions struct {
 	// ProjectId int		 // Project Identifier.
 	// Body      struct {
-		BranchId int `json:"branchId,omitempty"` // Branch Identifier. - optional
-		// Specify target languages for build.
-		// Leave this field empty to build all target languages
-		Languages []string `json:"targetLanguagesId,omitempty"`
+	BranchId int `json:"branchId,omitempty"` // Branch Identifier. - optional
+	// Specify target languages for build.
+	// Leave this field empty to build all target languages
+	Languages []string `json:"targetLanguagesId,omitempty"`
 	// }
 }
-
-
 
 type ResponseBuildProject struct {
 	Data struct {
