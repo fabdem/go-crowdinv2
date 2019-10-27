@@ -41,8 +41,9 @@ func SetTimeouts(cnctTOinSecs, rwTOinSecs int) {
 	readwriteTOinSecs = time.Duration(rwTOinSecs)
 }
 
-// Read current build status
-func (crowdin *Crowdin) ReadBuildProgress() int {
+// Read current build progress status from Crowdin structure
+// That value is updated when a build is running and GetBuildProgress() polled.
+func (crowdin *Crowdin) GetPercentBuildProgress() int {
 	return crowdin.buildProgress
 }
 
@@ -203,6 +204,8 @@ func (crowdin *Crowdin) GetBuildProgress(options *GetBuildProgressOptions) (*Res
 		return nil, err
 	}
 
+	crowdin.buildProgress = responseAPI.Data.Progress.Percent // Keep a record of progress
+
 	return &responseAPI, nil
 }
 
@@ -240,7 +243,6 @@ func (crowdin *Crowdin) BuildProject(options *BuildProjectOptions) (*ResponseBui
 	response, err := crowdin.post(&p)
 
 	if err != nil {
-		fmt.Printf("\ncrowdinV2 - result = %s \n err=", response, err)
 		crowdin.log(err)
 		return nil, err
 	}

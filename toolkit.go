@@ -34,7 +34,6 @@ func (crowdin *Crowdin) GetBuildId() (buildId int, err error) {
 // Lookup projectId
 func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err error) {
 
-	fmt.Printf("")
 	var opt ListProjectsOptions
 	rl, err := crowdin.ListProjects(&opt)
 	if err != nil {
@@ -81,7 +80,6 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int) (buildId int, err error) {
 		if err != nil {
 			break
 		}
-		crowdin.buildProgress = rb.Data.Progress.Percent // Record current progress
 		select {
 		case <-timer.C:
 			err = errors.New("Build Timeout.")
@@ -89,7 +87,7 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int) (buildId int, err error) {
 		default:
 		}
 	}
-	
+
 	if rp.Data.Status != "finished" {
 		err =  errors.New(fmt.Sprintf("Build Error:%s",rp.Data.Status))
 	}
