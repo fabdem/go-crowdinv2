@@ -21,7 +21,7 @@ func (crowdin *Crowdin) GetBuildId() (buildId int, err error) {
 		return 0, err
 	}
 	for _, v := range rl.Data {
-		if (v.Data.ProjectId == crowdin.config.projectId) && (v.Data.Status == "finished") {
+		if (v.Data.Id == crowdin.config.projectId) && (v.Data.Status == "finished") {
 			buildId = v.Data.Id
 		}
 	}

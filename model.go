@@ -14,7 +14,7 @@ type ListProjectBuildsOptions struct {
 	//}
 }
 
-type ResponseListProjectBuilds struct {
+/* type ResponseListProjectBuilds struct {
 	Data []struct {
 		Data struct {
 			Id          int    `json:"id"`
@@ -30,6 +30,27 @@ type ResponseListProjectBuilds struct {
 		} `json:"data"`
 	} `json:"data"`
 	Pagination []struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
+} */
+
+type ResponseListProjectBuilds struct {
+	Data []struct {
+		Data struct {
+			Id         int    `json:"id"`
+			ProjectId   int    `json:"projectId"`
+			Status     string `json:"status"`
+			Progress   int    `json:"progress"`
+			Attributes struct {
+				BranchId             int      `json:"branchId,omitempty"`
+				TargetLanguageIds    []int	  `json:"targetLanguageIds,omitempty"`
+				ExportTranslatedOnly bool     `json:"exportTranslatedOnly"`
+				ExportApprovedOnly   bool     `json:"exportApprovedOnly"`
+			} `json:"attributes"`
+		} `json:"data"`
+	} `json:"data"`
+	Pagination struct {
 		Offset int `json:"offset"`
 		Limit  int `json:"limit"`
 	} `json:"pagination"`

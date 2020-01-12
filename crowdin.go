@@ -99,6 +99,7 @@ func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*R
 	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", crowdin.config.projectId), body: options})
 
 	if err != nil {
+		fmt.Printf("\nREPONSE:%s\n",response)
 		crowdin.log(err)
 		return nil, err
 	}
