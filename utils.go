@@ -25,6 +25,11 @@ type getOptions struct {
 	body   interface{}
 }
 
+type delOptions struct {
+	urlStr string
+	body   interface{}
+}
+
 // params - extra params
 // fileNames - key = dir
 func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
@@ -61,9 +66,43 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 	// if response.StatusCode != http.StatusOK {
 	// 	return bodyResponse, APIError{What: fmt.Sprintf("Status code: %v", response.StatusCode)}
 	// }
+	
+	return bodyResponse, nil
+}
+
+// params - extra params
+// fileNames - key = dir
+func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
+
+	crowdin.log(fmt.Sprintf("Create http request\nBody: %s", options.body))
+
+	buf := new(bytes.Buffer)
+	json.NewEncoder(buf).Encode(options.body)
+	req, err := http.NewRequest("DEL", options.urlStr, buf)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set headers
+	req.Header.Set("Authorization", "Bearer "+crowdin.config.token)
+	req.Header.Set("Content-Type", "application/json")
+	crowdin.log(fmt.Sprintf("Headers: %s", req.Header))
+
+	// Run the  request
+	response, err := crowdin.config.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	bodyResponse, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
 
 	return bodyResponse, nil
 }
+
 
 func (crowdin *Crowdin) get(options *getOptions) ([]byte, error) {
 

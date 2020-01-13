@@ -103,18 +103,19 @@ type GetBuildProgressOptions struct {
 	BuildId int
 }
 
+// {"data":{"id":47,"projectId":17,"status":"inProgress","progress":11,"attributes":{"branchId":null,"targetLanguageIds":[],"exportTranslatedOnly":false,"exportApprovedOnly":false}}}
 type ResponseGetBuildProgress struct {
 	Data struct {
 		Id         int    `json:"id"`
 		ProjectId  int    `json:"projectId"`
-		BranchId   int    `json:"branchId"`
-		LanguageId []int  `json:"languageId"`
 		Status     string `json:"status"`
-		Progress   struct {
-			Percent           int    `json:"percent"`
-			CurrentLanguageId string `json:"currentLanguageId"`
-			CurrentFileId     string `json:"currentFileId"`
-		} `json:"progress"`
+		Progress   int    `json:"progress"`
+		Attributes struct {
+			BranchId             int      `json:"branchId,omitempty"`
+			TargetLanguageIds    []int	  `json:"targetLanguageIds,omitempty"`
+			ExportTranslatedOnly bool     `json:"exportTranslatedOnly"`
+			ExportApprovedOnly   bool     `json:"exportApprovedOnly"`
+		} `json:"attributes"`
 	} `json:"data"`
 }
 
@@ -197,6 +198,57 @@ type ResponseBuildProject struct {
 			CurrentFileId     int `json:"currentFileId"`
 		} `json:"progress"`
 	} `json:"data"`
+}
+
+// ListStoragesOptions are options for ListStorages api call
+type ListStoragesOptions struct {
+	Limit int `json:"limit,omitempty"` // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset int `json:"offset,omitempty"` // Offset in collection - optional
+}
+
+// ResponseListStorages are response for ListStorages api call
+type ResponseListStorages struct {
+	Data []struct {
+		Data struct {
+			Id       int    `json:"id"`
+			FileName string `json:"fileName"`
+		} `json:"data"`
+	} `json:"data"`
+	Pagination []struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
+}
+
+// AddStorageOptions are options for AddStorage api call
+type AddStorageOptions struct {
+	FileName string `json:"filename"` // Filename and path of hte file to upload to storage
+}
+
+// ResponseAddStorage are response for AddStorage api call
+type ResponseAddStorage struct {
+	Data struct {
+		Id       int    `json:"id"`
+		FileName string `json:"fileName"`
+	} `json:"data"`
+}
+
+// GetStorageOptions are options for GetStorage api call
+type GetStorageOptions struct {
+	StorageId int `json:"storageid"`
+}
+
+// ResponseGetStorage are response for ListStorages api call
+type ResponseGetStorage struct {
+	Data struct {
+		Id       int    `json:"id"`
+		FileName string `json:"fileName"`
+	} `json:"data"`
+}
+
+// DelStorageOptions are options for DelStorage api call
+type DeleteStorageOptions struct {
+	StorageId int `json:"storageid"`
 }
 
 type responseGeneral struct {

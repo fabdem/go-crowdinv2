@@ -205,7 +205,7 @@ func (crowdin *Crowdin) GetBuildProgress(options *GetBuildProgressOptions) (*Res
 		return nil, err
 	}
 
-	crowdin.buildProgress = responseAPI.Data.Progress.Percent // Keep a record of progress
+	crowdin.buildProgress = responseAPI.Data.Progress // Keep track % of progress
 
 	return &responseAPI, nil
 }
