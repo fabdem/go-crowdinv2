@@ -251,6 +251,38 @@ type DeleteStorageOptions struct {
 	StorageId int `json:"storageid"`
 }
 
+// ListDirectoriesOptions are options for ListDirectories api call
+type ListDirectoriesOptions struct {
+	BranchId      	int     `json:"branchId,omitempty"`
+	DirectoryId   	int     `json:"directoryId,omitempty"`
+	Recursion		int     `json:"recursion,omitempty"`
+	Limit 			int		`json:"limit,omitempty"` // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset 			int		`json:"offset,omitempty"` // Offset in collection - optional
+}
+
+// ResponseListDirectories are response for ListDirectories api call
+type ResponseListDirectories struct {
+	Data []struct {
+		Data struct {
+			Id            int       `json:"id"`
+			ProjectId     int       `json:"projectId"`
+			BranchId      int       `json:"branchId"`
+			DirectoryId   int       `json:"directoryId"`
+			Name          string    `json:"name"`
+			Title         string    `json:"title"`
+			ExportPattern string    `json:"exportPattern"`
+			Priority      string    `json:"priority"`
+			CreatedAt     time.Time `json:"createdAt"`
+			UpdatedAt     time.Time `json:"updatedAt"`
+		} `json:"data"`
+	} `json:"data"`
+	Pagination []struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
+}
+
+
 type responseGeneral struct {
 	Success bool `json:"success"`
 }
