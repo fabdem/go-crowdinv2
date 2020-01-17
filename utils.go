@@ -106,7 +106,8 @@ func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 
 func (crowdin *Crowdin) get(options *getOptions) ([]byte, error) {
 
-	response, err := crowdin.getResponse(options)
+	// Get request with authorization
+	response, err := crowdin.getResponse(options, true)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +125,8 @@ func (crowdin *Crowdin) get(options *getOptions) ([]byte, error) {
 	return bodyResponse, nil
 }
 
-func (crowdin *Crowdin) getResponse(options *getOptions) (*http.Response, error) {
+// Get request with or without authorization token depending on flag
+func (crowdin *Crowdin) getResponse(options *getOptions, authorization bool) (*http.Response, error) {
 
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(options.body)
@@ -134,7 +136,9 @@ func (crowdin *Crowdin) getResponse(options *getOptions) (*http.Response, error)
 		return nil, err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+crowdin.config.token)
+	if authorization {
+		req.Header.Set("Authorization", "Bearer "+crowdin.config.token)
+	}
 
 	fmt.Printf("\nRequest:%v\nError:%v\n", req, err)
 
@@ -146,6 +150,7 @@ func (crowdin *Crowdin) getResponse(options *getOptions) (*http.Response, error)
 }
 
 // DownloadFile will download a url and store it in local filepath.
+// No autorization token required here for this operation.
 // It writes to the destination file as it downloads it, without
 // loading the entire file into memory.
 func (crowdin *Crowdin) DownloadFile(url string, filepath string) error {
@@ -156,9 +161,12 @@ func (crowdin *Crowdin) DownloadFile(url string, filepath string) error {
 	}
 	defer out.Close()
 
-	// Get data
-	resp, err := http.Get(url)
+	// Get request - no authorization
+	resp, err := crowdin.getResponse(&getOptions{urlStr: url}, false)
+	// resp, err := http.Get(url)
 	if err != nil {
+		fmt.Printf("\nDownload error:%s\n",resp)
+		crowdin.log(err)
 		return err
 	}
 	defer resp.Body.Close()
