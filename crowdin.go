@@ -30,9 +30,9 @@ type Crowdin struct {
 		projectId  int
 		client     *http.Client
 	}
-	buildProgress  	int
-	debug     		bool
-	logWriter 		io.Writer
+	buildProgress int
+	debug         bool
+	logWriter     io.Writer
 }
 
 // Set connection and read/write timeouts for the subsequent new connections
@@ -46,7 +46,6 @@ func SetTimeouts(cnctTOinSecs, rwTOinSecs int) {
 func (crowdin *Crowdin) GetPercentBuildProgress() int {
 	return crowdin.buildProgress
 }
-
 
 // New - a create new instance of Crowdin API V2.
 func New(token string, projectId int, proxy string) (*Crowdin, error) {
@@ -99,7 +98,7 @@ func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*R
 	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", crowdin.config.projectId), body: options})
 
 	if err != nil {
-		fmt.Printf("\nREPONSE:%s\n",response)
+		fmt.Printf("\nREPONSE:%s\n", response)
 		crowdin.log(err)
 		return nil, err
 	}

@@ -10,19 +10,19 @@ import (
 	//"os"
 	//"strconv"
 	// "time"
-
 	// "github.com/mreiferson/go-httpclient"
 )
-
 
 // ListStorages - List existing storages
 // {protocol}://{host}/api/v2/storages
 func (crowdin *Crowdin) ListStorages(options *ListStoragesOptions) (*ResponseListStorages, error) {
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"storages"), body: options})
+	crowdin.log("ListStorages()")
+
+	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL + "storages"), body: options})
 
 	if err != nil {
-		fmt.Printf("\nREPONSE:%s\n",response)
+		fmt.Printf("\nREPONSE:%s\n", response)
 		crowdin.log(err)
 		return nil, err
 	}
@@ -43,9 +43,11 @@ func (crowdin *Crowdin) ListStorages(options *ListStoragesOptions) (*ResponseLis
 // {protocol}://{host}/api/v2/storages
 func (crowdin *Crowdin) AddStorage(options *AddStorageOptions) (*ResponseAddStorage, error) {
 
+	crowdin.log("AddStorage()")
+
 	// Prepare URL and params
 	var p postOptions
-	p.urlStr = fmt.Sprintf(crowdin.config.apiBaseURL+"storages")
+	p.urlStr = fmt.Sprintf(crowdin.config.apiBaseURL + "storages")
 	p.body = options
 	response, err := crowdin.post(&p)
 
@@ -70,10 +72,12 @@ func (crowdin *Crowdin) AddStorage(options *AddStorageOptions) (*ResponseAddStor
 // {protocol}://{host}/api/v2/storages/{storageId}
 func (crowdin *Crowdin) GetStorage(options *GetStorageOptions) (*ResponseGetStorage, error) {
 
+	crowdin.log("GetStorage()")
+
 	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"storages/%v", options.StorageId)})
 
 	if err != nil {
-		fmt.Printf("\nREPONSE:%s\n",response)
+		fmt.Printf("\nREPONSE:%s\n", response)
 		crowdin.log(err)
 		return nil, err
 	}
@@ -92,12 +96,14 @@ func (crowdin *Crowdin) GetStorage(options *GetStorageOptions) (*ResponseGetStor
 
 // deleteStorage - Delete a storage
 // {protocol}://{host}/api/v2/storages/{storageId}
-func (crowdin *Crowdin) DeleteStorage(options *DeleteStorageOptions) (error) {
+func (crowdin *Crowdin) DeleteStorage(options *DeleteStorageOptions) error {
+
+	crowdin.log("DeleteStorage()")
 
 	response, err := crowdin.del(&delOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"storages/%v", options.StorageId)})
 
 	if err != nil {
-		fmt.Printf("\nREPONSE:%s\n",response)
+		//fmt.Printf("\nREPONSE:%s\n",response)
 		crowdin.log(err)
 		return err
 	}

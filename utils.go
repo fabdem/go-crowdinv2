@@ -9,7 +9,7 @@ import (
 	"log"
 	//"mime/multipart"
 	"net/http"
-	"net/http/httputil"
+	// "net/http/httputil"
 
 	"os"
 	"time"
@@ -34,7 +34,7 @@ type delOptions struct {
 // fileNames - key = dir
 func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 
-	crowdin.log(fmt.Sprintf("Create http request\nBody: %s", options.body))
+	crowdin.log(fmt.Sprintf("Create POST http request\nBody: %s", options.body))
 
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(options.body)
@@ -48,8 +48,9 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 	req.Header.Set("Content-Type", "application/json")
 	crowdin.log(fmt.Sprintf("Headers: %s", req.Header))
 
-	dump, err := httputil.DumpRequestOut(req, true)
-	crowdin.log(dump)
+	// DEBUG
+	// dump, err := httputil.DumpRequestOut(req, true)
+	// crowdin.log(dump)
 
 	// Run the  request
 	response, err := crowdin.config.client.Do(req)
@@ -66,7 +67,7 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 	// if response.StatusCode != http.StatusOK {
 	// 	return bodyResponse, APIError{What: fmt.Sprintf("Status code: %v", response.StatusCode)}
 	// }
-	
+
 	return bodyResponse, nil
 }
 
@@ -74,7 +75,7 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 // fileNames - key = dir
 func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 
-	crowdin.log(fmt.Sprintf("Create http request\nBody: %s", options.body))
+	crowdin.log(fmt.Sprintf("Create DEL http request\nBody: %s", options.body))
 
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(options.body)
@@ -103,8 +104,9 @@ func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 	return bodyResponse, nil
 }
 
-
 func (crowdin *Crowdin) get(options *getOptions) ([]byte, error) {
+
+	crowdin.log(fmt.Sprintf("Create GET http request\nBody: %s", options.body))
 
 	// Get request with authorization
 	response, err := crowdin.getResponse(options, true)
@@ -128,6 +130,8 @@ func (crowdin *Crowdin) get(options *getOptions) ([]byte, error) {
 // Get request with or without authorization token depending on flag
 func (crowdin *Crowdin) getResponse(options *getOptions, authorization bool) (*http.Response, error) {
 
+	crowdin.log(fmt.Sprintf("getResponse() body:%s\n", options.body))
+
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(options.body)
 
@@ -139,8 +143,6 @@ func (crowdin *Crowdin) getResponse(options *getOptions, authorization bool) (*h
 	if authorization {
 		req.Header.Set("Authorization", "Bearer "+crowdin.config.token)
 	}
-
-	fmt.Printf("\nRequest:%v\nError:%v\n", req, err)
 
 	response, err := crowdin.config.client.Do(req)
 	if err != nil {
@@ -154,9 +156,13 @@ func (crowdin *Crowdin) getResponse(options *getOptions, authorization bool) (*h
 // It writes to the destination file as it downloads it, without
 // loading the entire file into memory.
 func (crowdin *Crowdin) DownloadFile(url string, filepath string) error {
+
+	crowdin.log(fmt.Sprintf("DownloadFile() %s", filepath))
+
 	// Create the file
 	out, err := os.Create(filepath)
 	if err != nil {
+		crowdin.log(fmt.Sprintf("	Download error - open file error:\n %s\n"))
 		return err
 	}
 	defer out.Close()
@@ -165,8 +171,8 @@ func (crowdin *Crowdin) DownloadFile(url string, filepath string) error {
 	resp, err := crowdin.getResponse(&getOptions{urlStr: url}, false)
 	// resp, err := http.Get(url)
 	if err != nil {
-		fmt.Printf("\nDownload error:%s\n",resp)
-		crowdin.log(err)
+		//fmt.Printf("\nDownload error:%s\n",resp)
+		crowdin.log(fmt.Sprintf("	Download error - Get retunrs:\n %s \n", err.Error()))
 		return err
 	}
 	defer resp.Body.Close()
@@ -174,6 +180,8 @@ func (crowdin *Crowdin) DownloadFile(url string, filepath string) error {
 	// Write body to file
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
+		// log.Println("	Download error\n", resp)
+		crowdin.log(fmt.Sprintf("	Download error - write to file error:\n %s \n", err.Error()))
 		return err
 	}
 	return nil

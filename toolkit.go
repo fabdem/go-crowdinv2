@@ -3,6 +3,7 @@ package crowdin
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -10,11 +11,11 @@ import (
 
 const polldelaysec = 5 // Defines delay between each api call when polling a progress status
 
-
-
-
 // Lookup buildId for current project
 func (crowdin *Crowdin) GetBuildId() (buildId int, err error) {
+
+	crowdin.log("GetBuildId()")
+
 	var opt ListProjectBuildsOptions
 	rl, err := crowdin.ListProjectBuilds(&opt)
 	if err != nil {
@@ -33,6 +34,8 @@ func (crowdin *Crowdin) GetBuildId() (buildId int, err error) {
 
 // Lookup projectId
 func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err error) {
+
+	crowdin.log("GetProjectId()")
 
 	var opt ListProjectsOptions
 	rl, err := crowdin.ListProjects(&opt)
@@ -54,10 +57,9 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
 // BuildAllLg - Build a project for all languages
 // Update buildProgress
 func (crowdin *Crowdin) BuildAllLg(buildTOinSec int) (buildId int, err error) {
-	crowdin.log("In BuildAllLg()")
+	crowdin.log("BuildAllLg()")
 
 	// Invoke build
-	crowdin.log("Invoke build crowdin.BuildProject()")
 	var bo BuildProjectOptions
 	// bo.ProjectId = crowdin.config.projectId
 	bo.BranchId = 0
@@ -67,10 +69,10 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int) (buildId int, err error) {
 		return buildId, errors.New("\nBuild Err.")
 	}
 	buildId = rb.Data.Id
-	crowdin.log(fmt.Sprintf("BuildId=%d", buildId))
+	crowdin.log(fmt.Sprintf("	BuildId=%d", buildId))
 
 	// Poll build status with a timeout
-	crowdin.log("Poll build status crowdin.GetBuildProgress()")
+	crowdin.log("	Poll build status crowdin.GetBuildProgress()")
 	timer := time.NewTimer(time.Duration(buildTOinSec) * time.Second)
 	defer timer.Stop()
 	rp := &ResponseGetBuildProgress{}
@@ -89,7 +91,7 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int) (buildId int, err error) {
 	}
 
 	if rp.Data.Status != "finished" {
-		err =  errors.New(fmt.Sprintf("Build Error:%s",rp.Data.Status))
+		err = errors.New(fmt.Sprintf("	Build Error:%s", rp.Data.Status))
 	}
 	return buildId, err
 }
@@ -103,7 +105,7 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (e
 	// Get URL for downloading
 	rd, err := crowdin.DownloadProjectTranslations(&DownloadProjectTranslationsOptions{buildId})
 	if err != nil {
-		return errors.New("Error getting URL for download.")
+		return errors.New("DownloadBuild() - Error getting URL for download.")
 	}
 	url := rd.Data.Url
 
@@ -111,4 +113,26 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (e
 	err = crowdin.DownloadFile(url, outputFileNamePath)
 
 	return err
+}
+
+// Update a file of the current project
+//    outputFileNamePath  required
+//    crowdinFileNamePath required
+func (crowdin *Crowdin) UpdateFile(localFileNamePath string, crowdinFileNamePath string) (err error) {
+
+/* to compile
+	// Get a list of all the project folders
+	listDir, err := crowdin.ListDirectories(&ListDirectoriesOptions{Limit: 500})
+	if err != nil {
+		return errors.New("UpdateFile() - Error listing project directories.")
+	}
+*/
+	// Lookup fileId
+	// Parse Crowdin directory tree
+	crowdinFile := strings.Split(localFileNamePath, "/")
+
+	fmt.Printf( crowdinFile[0])
+
+	return err
+
 }

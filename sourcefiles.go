@@ -10,32 +10,51 @@ import (
 	//"os"
 	//"strconv"
 	// "time"
-
 	// "github.com/mreiferson/go-httpclient"
 )
 
-
-// ListDirectories - List directories in a given project 
-// {protocol}://{host}/api/v2/projects/{projectId}/directories
+// ListFiles - List directories in a given project
+// {protocol}://{host}/api/v2/projects/{projectId}/files
 func (crowdin *Crowdin) ListDirectories(options *ListDirectoriesOptions) (*ResponseListDirectories, error) {
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/directories",crowdin.config.projectId), body: options})
+	crowdin.log(fmt.Sprintf("ListDirectories()\n"))
+
+	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/directories", crowdin.config.projectId), body: options})
 
 	if err != nil {
-		fmt.Printf("\nREPONSE:%s\n",response)
-		crowdin.log(err)
+		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))
 		return nil, err
 	}
-
-	crowdin.log(string(response))
 
 	var responseAPI ResponseListDirectories
 	err = json.Unmarshal(response, &responseAPI)
 	if err != nil {
-		crowdin.log(err)
+		crowdin.log(fmt.Sprintf("	Error - unmarshalling:%s\n%s\n", response, err))
 		return nil, err
 	}
 
 	return &responseAPI, nil
 }
 
+// ListFiles - List directories in a given project
+// {protocol}://{host}/api/v2/projects/{projectId}/files
+func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles, error) {
+
+	crowdin.log(fmt.Sprintf("ListFiles()\n"))
+
+	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files", crowdin.config.projectId), body: options})
+
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))
+		return nil, err
+	}
+
+	var responseAPI ResponseListFiles
+	err = json.Unmarshal(response, &responseAPI)
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - unmarshalling:%s\n%s\n", response, err))
+		return nil, err
+	}
+
+	return &responseAPI, nil
+}

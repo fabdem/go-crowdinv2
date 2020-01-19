@@ -39,14 +39,14 @@ type ResponseListProjectBuilds struct {
 	Data []struct {
 		Data struct {
 			Id         int    `json:"id"`
-			ProjectId   int    `json:"projectId"`
+			ProjectId  int    `json:"projectId"`
 			Status     string `json:"status"`
 			Progress   int    `json:"progress"`
 			Attributes struct {
-				BranchId             int      `json:"branchId,omitempty"`
-				TargetLanguageIds    []int	  `json:"targetLanguageIds,omitempty"`
-				ExportTranslatedOnly bool     `json:"exportTranslatedOnly"`
-				ExportApprovedOnly   bool     `json:"exportApprovedOnly"`
+				BranchId             int   `json:"branchId,omitempty"`
+				TargetLanguageIds    []int `json:"targetLanguageIds,omitempty"`
+				ExportTranslatedOnly bool  `json:"exportTranslatedOnly"`
+				ExportApprovedOnly   bool  `json:"exportApprovedOnly"`
 			} `json:"attributes"`
 		} `json:"data"`
 	} `json:"data"`
@@ -111,10 +111,10 @@ type ResponseGetBuildProgress struct {
 		Status     string `json:"status"`
 		Progress   int    `json:"progress"`
 		Attributes struct {
-			BranchId             int      `json:"branchId,omitempty"`
-			TargetLanguageIds    []int	  `json:"targetLanguageIds,omitempty"`
-			ExportTranslatedOnly bool     `json:"exportTranslatedOnly"`
-			ExportApprovedOnly   bool     `json:"exportApprovedOnly"`
+			BranchId             int   `json:"branchId,omitempty"`
+			TargetLanguageIds    []int `json:"targetLanguageIds,omitempty"`
+			ExportTranslatedOnly bool  `json:"exportTranslatedOnly"`
+			ExportApprovedOnly   bool  `json:"exportApprovedOnly"`
 		} `json:"attributes"`
 	} `json:"data"`
 }
@@ -202,7 +202,7 @@ type ResponseBuildProject struct {
 
 // ListStoragesOptions are options for ListStorages api call
 type ListStoragesOptions struct {
-	Limit int `json:"limit,omitempty"` // Maximum number of items to retrieve (25 default, max 500) - optional
+	Limit  int `json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
 	Offset int `json:"offset,omitempty"` // Offset in collection - optional
 }
 
@@ -253,11 +253,11 @@ type DeleteStorageOptions struct {
 
 // ListDirectoriesOptions are options for ListDirectories api call
 type ListDirectoriesOptions struct {
-	BranchId      	int     `json:"branchId,omitempty"`
-	DirectoryId   	int     `json:"directoryId,omitempty"`
-	Recursion		int     `json:"recursion,omitempty"`
-	Limit 			int		`json:"limit,omitempty"` // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset 			int		`json:"offset,omitempty"` // Offset in collection - optional
+	BranchId    int `json:"branchId,omitempty"`
+	DirectoryId int `json:"directoryId,omitempty"`
+	Recursion   int `json:"recursion,omitempty"`
+	Limit       int `json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset      int `json:"offset,omitempty"` // Offset in collection - optional
 }
 
 // ResponseListDirectories are response for ListDirectories api call
@@ -282,6 +282,57 @@ type ResponseListDirectories struct {
 	} `json:"pagination"`
 }
 
+// ListFilesOptions are options for ListFiles api call
+type ListFilesOptions struct {
+	BranchId    int `json:"branchId,omitempty"`
+	DirectoryId int `json:"directoryId,omitempty"`
+	Recursion   int `json:"recursion,omitempty"`
+	Limit       int `json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset      int `json:"offset,omitempty"` // Offset in collection - optional
+}
+
+// ResponseListFiles are response for ListFiles api call
+type ResponseListFiles struct {
+	Data []struct {
+		Data struct {
+			Id          int    `json:"id"`
+			ProjectId   int    `json:"projectId"`
+			BranchId    int    `json:"branchId"`
+			DirectoryId int    `json:"directoryId"`
+			Name        string `json:"name"`
+			Title       string `json:"title"`
+			Type        string `json:"type"`
+			RevisionId  int    `json:"revisionId"`
+			Status      string `json:"status"`
+			Priority    string `json:"priority"`
+			Attributes  struct {
+				MimeType string `json:"mimeType"`
+				FileSize int    `json:"fileSize"`
+			} `json:"attributes"`
+			ImportOptions struct {
+				FirstLineContainsHeader bool `json:"firstLineContainsHeader"`
+				ImportTranslations      bool `json:"importTranslations"`
+				Scheme                  struct {
+					Identifier   int `json:"identifier"`
+					SourcePhrase int `json:"sourcePhrase"`
+					En           int `json:"en"`
+					De           int `json:"de"`
+				} `json:"scheme"`
+			} `json:"importOptions"`
+			ExportOptions struct {
+				ExportPattern string `json:"exportPattern"`
+			} `json:"exportOptions"`
+			ExportPattern string    `json:"exportPattern"`
+			CreatedAt     time.Time `json:"createdAt"`
+			UpdatedAt     time.Time `json:"updatedAt"`
+			Revision      int       `json:"revision"`
+		} `json:"data"`
+	} `json:"data"`
+	Pagination []struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
+}
 
 type responseGeneral struct {
 	Success bool `json:"success"`
