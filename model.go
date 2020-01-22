@@ -267,7 +267,7 @@ type ResponseListDirectories struct {
 			Id            int       `json:"id"`
 			ProjectId     int       `json:"projectId"`
 			BranchId      int       `json:"branchId"`
-			DirectoryId   int       `json:"directoryId"`
+			DirectoryId   int       `json:"directoryId"`  // Actually parentId
 			Name          string    `json:"name"`
 			Title         string    `json:"title"`
 			ExportPattern string    `json:"exportPattern"`
@@ -276,7 +276,7 @@ type ResponseListDirectories struct {
 			UpdatedAt     time.Time `json:"updatedAt"`
 		} `json:"data"`
 	} `json:"data"`
-	Pagination []struct {
+	Pagination struct {
 		Offset int `json:"offset"`
 		Limit  int `json:"limit"`
 	} `json:"pagination"`
@@ -328,7 +328,7 @@ type ResponseListFiles struct {
 			Revision      int       `json:"revision"`
 		} `json:"data"`
 	} `json:"data"`
-	Pagination []struct {
+	Pagination struct {
 		Offset int `json:"offset"`
 		Limit  int `json:"limit"`
 	} `json:"pagination"`
