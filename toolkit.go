@@ -117,17 +117,18 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (e
 }
 
 // Update a file of the current project
-//    outputFileNamePath  required
+//    localFileNamePath  required
 //    crowdinFileNamePath required
-func (crowdin *Crowdin) UpdateFile(localFileNamePath string, crowdinFileNamePath string) (err error) {
+func (crowdin *Crowdin) UpdateFile(crowdinFileNamePath string, localFileNamePath string) (err error) {
 
 	// Lookup fileId in Crowdin
-	// var dirId int
-	crowdinFile := strings.Split(localFileNamePath, "/")
+	dirId := 0
+	crowdinFile := strings.Split(crowdinFileNamePath, "/")
+
 	switch l := len(crowdinFile); l {
 	case 0:
 		return errors.New("UpdateFile() - Crowdin file name should not be null.")
-	case 1: // no directory so dirId is null
+	case 1: // no directory so dirId is 0
 	default: // l > 1
 		// Lookup end directoryId
 		// Get a list of all the project folders
@@ -135,14 +136,29 @@ func (crowdin *Crowdin) UpdateFile(localFileNamePath string, crowdinFileNamePath
 		if err != nil {
 			return errors.New("UpdateFile() - Error listing project directories.")
 		}
-		//
+		
 		if len(listDir.Data) > 0 {
-			// Lookup end directoryId
-			for i, v := range listDir.Data {
-				fmt.Printf("val[%d]= %d, %s %d\n", i, v.Data.Id, v.Data.Name, v.Data.DirectoryId)
+			// Lookup last directory's Id
+			dirId = 0
+			for i, dirName := range crowdinFile {
+				if i < len(crowdinFile) - 1 { // We're done once we reach the file name (last item of the slice).
+					for _, crwdPrjctDirName := range listDir.Data {
+						if crwdPrjctDirName.Data.DirectoryId == dirId && crwdPrjctDirName.Data.Name == dirName {
+							dirId = crwdPrjctDirName.Data.Id  // Bingo get that Id
+						}
+					}
+				}
 			}
-		} // else dirId is null
+		} else {
+			return errors.New("UpdateFile() - Error: mismatch between # of folder found and # of folder expected.")
+		}
 	}
+
+	// Get file name
+	crowdinFilename := crowdinFile[len(crowdinFile) - 1]
+ 	fmt.Printf("Directory Id = %d, filename= %s \n", dirId, crowdinFilename)
+
+
 
 	return err
 }
