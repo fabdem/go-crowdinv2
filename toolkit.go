@@ -121,32 +121,28 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (e
 //    crowdinFileNamePath required
 func (crowdin *Crowdin) UpdateFile(localFileNamePath string, crowdinFileNamePath string) (err error) {
 
-
 	// Lookup fileId in Crowdin
-	var dirId int
+	// var dirId int
 	crowdinFile := strings.Split(localFileNamePath, "/")
-	switch l := len(crowdinFile) {
-	case l = 0:
+	switch l := len(crowdinFile); l {
+	case 0:
 		return errors.New("UpdateFile() - Crowdin file name should not be null.")
-	case l = 1: // no directory so dirId is null
-	case l > 1: //
+	case 1: // no directory so dirId is null
+	default: // l > 1
 		// Lookup end directoryId
 		// Get a list of all the project folders
 		listDir, err := crowdin.ListDirectories(&ListDirectoriesOptions{Limit: 500})
 		if err != nil {
 			return errors.New("UpdateFile() - Error listing project directories.")
 		}
+		//
+		if len(listDir.Data) > 0 {
+			// Lookup end directoryId
+			for i, v := range listDir.Data {
+				fmt.Printf("val[%d]= %d, %s %d\n", i, v.Data.Id, v.Data.Name, v.Data.DirectoryId)
+			}
+		} // else dirId is null
 	}
 
-	if len(listDir.Data) > 0 {
-		// Lookup end directoryId
-		for i, v := range listDir.Data {
-			fmt.Printf("val[%d]= %d, %s %d\n", i, v.Data.Id, v.Data.Name, v.Data.DirectoryId)
-		}
-	} // else dirId is null
-
-	fmt.Printf( crowdinFile[0])
-
 	return err
-
 }
