@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	apiBaseURL = "https://valve.crowdin.com/api/v2/"
+	apiBaseURL = "https://crowdin.com/api/v2/"
 
 	// Default values for timeouts in seconds
 	connectionTOinSecs time.Duration = 5
@@ -48,10 +48,14 @@ func (crowdin *Crowdin) GetPercentBuildProgress() int {
 }
 
 // New - a create new instance of Crowdin API V2.
-func New(token string, projectId int, proxy string) (*Crowdin, error) {
+func New(token string, projectId int, apiurl string, proxy string) (*Crowdin, error) {
 
 	var proxyUrl *url.URL
 	var err error
+
+	if len(apiurl) > 0 { // If a specific URL is defined (Crowdin Enterprise) insert it in the URL
+		apiBaseURL = apiurl
+	}
 
 	if len(proxy) > 0 { // If a proxy is defined
 		proxyUrl, err = url.Parse(proxy)
