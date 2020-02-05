@@ -15,6 +15,7 @@ import (
 )
 
 var (
+	// Default value for API URL
 	apiBaseURL = "https://crowdin.com/api/v2/"
 
 	// Default values for timeouts in seconds
@@ -192,8 +193,9 @@ func (crowdin *Crowdin) GetProjectBuilds() (*ResponseGetProjectBuilds, error) {
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds/{buildId}
 func (crowdin *Crowdin) GetBuildProgress(options *GetBuildProgressOptions) (*ResponseGetBuildProgress, error) {
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds/%v", crowdin.config.projectId, options.BuildId)})
+	crowdin.log("GetBuildProgress()")
 
+	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds/%v", crowdin.config.projectId, options.BuildId)})
 	if err != nil {
 		crowdin.log(err)
 		return nil, err

@@ -14,26 +14,6 @@ type ListProjectBuildsOptions struct {
 	//}
 }
 
-/* type ResponseListProjectBuilds struct {
-	Data []struct {
-		Data struct {
-			Id          int    `json:"id"`
-			ProjectId   int    `json:"projectId"`
-			BranchId    int    `json:"branchId"`
-			LanguagesId []int  `json:"languagesId"`
-			Status      string `json:"status"`
-			Progress    struct {
-				Percent           int `json:"percent"`
-				CurrentLanguageId int `json:"currentLanguageId"`
-				CurrentFileId     int `json:"currentFileId"`
-			} `json:"progress"`
-		} `json:"data"`
-	} `json:"data"`
-	Pagination []struct {
-		Offset int `json:"offset"`
-		Limit  int `json:"limit"`
-	} `json:"pagination"`
-} */
 
 type ResponseListProjectBuilds struct {
 	Data []struct {

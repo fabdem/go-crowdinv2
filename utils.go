@@ -130,7 +130,7 @@ func (crowdin *Crowdin) get(options *getOptions) ([]byte, error) {
 // Get request with or without authorization token depending on flag
 func (crowdin *Crowdin) getResponse(options *getOptions, authorization bool) (*http.Response, error) {
 
-	crowdin.log(fmt.Sprintf("getResponse() body:%s\n", options.body))
+	crowdin.log(fmt.Sprintf("getResponse() body:%v\n", options.body))
 
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(options.body)
@@ -187,13 +187,15 @@ func (crowdin *Crowdin) DownloadFile(url string, filepath string) error {
 	return nil
 }
 
+// Log writer
 func (crowdin *Crowdin) log(a interface{}) {
 	if crowdin.debug {
-		log.Println(a)
 		if crowdin.logWriter != nil {
 			timestamp := time.Now().Format(time.RFC3339)
 			msg := fmt.Sprintf("%v: %v", timestamp, a)
 			fmt.Fprintln(crowdin.logWriter, msg)
+		} else {
+			log.Println(a)
 		}
 	}
 }

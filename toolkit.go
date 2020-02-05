@@ -80,6 +80,7 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int) (buildId int, err error) {
 		time.Sleep(polldelaysec * time.Second) // delay between each call
 		rp, err = crowdin.GetBuildProgress(&GetBuildProgressOptions{BuildId: buildId})
 		if err != nil {
+			crowdin.log(fmt.Sprintf(" Error GetBuildProgress()=%s", err))
 			break
 		}
 		select {
@@ -136,7 +137,7 @@ func (crowdin *Crowdin) UpdateFile(crowdinFileNamePath string, localFileNamePath
 		if err != nil {
 			return errors.New("UpdateFile() - Error listing project directories.")
 		}
-		
+
 		if len(listDir.Data) > 0 {
 			// Lookup last directory's Id
 			dirId = 0
