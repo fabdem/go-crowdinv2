@@ -120,7 +120,7 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (e
 // Update a file of the current project
 //    localFileNamePath  required
 //    crowdinFileNamePath required
-func (crowdin *Crowdin) UpdateFile(crowdinFileNamePath string, localFileNamePath string) (err error) {
+func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath string) (err error) {
 
 	// Lookup fileId in Crowdin
 	dirId := 0
@@ -158,6 +158,7 @@ func (crowdin *Crowdin) UpdateFile(crowdinFileNamePath string, localFileNamePath
 	// Get file name
 	crowdinFilename := crowdinFile[len(crowdinFile) - 1]
  	fmt.Printf("Directory Id = %d, filename= %s \n", dirId, crowdinFilename)
+
 
 
 

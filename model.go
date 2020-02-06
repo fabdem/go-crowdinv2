@@ -76,6 +76,51 @@ type ResponseListProjects struct {
 	} `json:"pagination"`
 }
 
+// UpdateFile - Update a file API call
+type UpdateFileOptions struct {
+	StorageId        				int 			`json:"storageId"`
+	UpdateOption     				string		`json:"updateOption,omitempty"` //
+	ImportOptions struct {
+		ContentSegmentation 	bool 			`json:"contentSegmentation,omitempty"`
+		TranslateContent 			bool 			`json:"translateContent,omitempty"`
+		TranslateAttributes 	bool 			`json:"translateAttributes,omitempty"`
+		TranslatableElements  []string  `json:"translatableElements,omitempty"`
+	}	 `json:"importOptions,omitempty"`
+	ExportOptions struct {
+		ContentSegmentation 	bool 			`json:"contentSegmentation,omitempty"`
+	}	 `json:"exportOptions,omitempty"`
+}
+
+type ResponseUpdateFile struct {
+	Data struct {
+		Id            int    `json:"id"`
+		ProjectId     int    `json:"projectId"`
+		BranchId      int    `json:"branchId"`
+		DirectoryId   int    `json:"directoryId"`
+		Name          string `json:"name"`
+		Title         string `json:"title"`
+		Type          string `json:"type"`
+		RevisionId    int    `json:"revisionId"`
+		Status        string `json:"status"`
+		Priority      string `json:"priority"`
+		ImportOptions struct {
+			FirstLineContainsHeader bool `json:"firstLineContainsHeader"`
+			ImportTranslations      bool `json:"importTranslations"`
+			Scheme                  struct {
+				Identifier   int `json:"identifier"`
+				SourcePhrase int `json:"sourcePhrase"`
+				En           int `json:"en"`
+				De           int `json:"de"`
+			} `json:"scheme"`
+		} `json:"importOptions"`
+		ExportOptions struct {
+			ExportPattern string `json:"exportPattern"`
+		} `json:"exportOptions"`
+		CreatedAt time.Time `json:"createdAt"`
+		UpdatedAt time.Time `json:"updatedAt"`
+	} `json:"data"`
+}
+
 // GetProjectBuildProgressOptions are options for Check Project Build Status api call
 type GetBuildProgressOptions struct {
 	// Project Identifier.

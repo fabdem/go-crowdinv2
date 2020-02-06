@@ -36,7 +36,7 @@ func (crowdin *Crowdin) ListDirectories(options *ListDirectoriesOptions) (*Respo
 	return &responseAPI, nil
 }
 
-// ListFiles - List directories in a given project
+// ListFiles - List files in a given project
 // {protocol}://{host}/api/v2/projects/{projectId}/files
 func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles, error) {
 
@@ -50,6 +50,30 @@ func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles
 	}
 
 	var responseAPI ResponseListFiles
+	err = json.Unmarshal(response, &responseAPI)
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - unmarshalling:%s\n%s\n", response, err))
+		return nil, err
+	}
+
+	return &responseAPI, nil
+}
+
+
+// UpdateFile - Update a specific file
+// {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}
+func (crowdin *Crowdin) UpdateFile(options *UpdateFileOptions) (*ResponseUpdateFile, error) {
+
+	crowdin.log(fmt.Sprintf("UpdateFile()\n"))
+
+	response, err := crowdin.put(&putOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v", crowdin.config.projectId), body: options})
+
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))
+		return nil, err
+	}
+
+	var responseAPI ResponseUpdateFile
 	err = json.Unmarshal(response, &responseAPI)
 	if err != nil {
 		crowdin.log(fmt.Sprintf("	Error - unmarshalling:%s\n%s\n", response, err))
