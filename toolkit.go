@@ -146,8 +146,12 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 					for _, crwdPrjctDirName := range listDir.Data {
 						if crwdPrjctDirName.Data.DirectoryId == dirId && crwdPrjctDirName.Data.Name == dirName {
 							dirId = crwdPrjctDirName.Data.Id  // Bingo get that Id
+							break **** check that
 						}
 					}
+				}
+				if dirId > 0 { // If dir found lets get out
+					break  **** and check that
 				}
 			}
 		} else {
@@ -157,10 +161,34 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 
 	// Get file name
 	crowdinFilename := crowdinFile[len(crowdinFile) - 1]
- 	fmt.Printf("Directory Id = %d, filename= %s \n", dirId, crowdinFilename)
+
+	// Send local file to storageId
+	addStor, err := crowdin.AddStorage(&AddStorageOptions{FileName: localFileNamePath})
+	if err != nil {
+		return errors.New("UpdateFile() - Error adding file to storage.")
+	}
+	storageId := addStor.Data.Id
+
+	fmt.Printf("Directory Id = %d, filename= %s storageId= %d\n", dirId, crowdinFilename, storageId)
+
+	// Look up file
+	listFiles, err := crowdin.ListFiles(&ListFilesOptions{DirectoryId: dirId, Limit: 500})
+	if err != nil {
+		return errors.New("UpdateFile() - Error listing files.")
+	}
+
+	for _, list := range listFiles {
+		if list.Data.Name == crowdinFilename {
+**** To be continuated
+		}
+	}
 
 
-
+	// Update file
+	updt, err := crowdin.UpdateFile(***fileId***, &UpdateFileOptions{StorageId: storageId, UpdateOption: "clear_translations_and_approvals"})
+	if err != nil {
+		return errors.New("UpdateFile() - Error updating file.")
+	}
 
 	return err
 }
