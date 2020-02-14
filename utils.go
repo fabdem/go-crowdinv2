@@ -18,8 +18,7 @@ import (
 type postOptions struct {
 	urlStr 		string
 	body   		interface{}
-	fileName  string
-
+	fileName 	string
 }
 
 type delOptions struct {
@@ -43,22 +42,51 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 
 	crowdin.log(fmt.Sprintf("Create POST http request\nBody: %s", options.body))
 
+	var {
+		rq http.Request
+		err error
+	}
 	buf := new(bytes.Buffer)
-	json.NewEncoder(buf).Encode(options.body)
-	req, err := http.NewRequest("POST", options.urlStr, buf)
-	if err != nil {
-		return nil, err
-	}
 
-	// Set headers
-	req.Header.Set("Authorization", "Bearer "+crowdin.config.token)
-	if postOptions.fileName != nil {
-		req.Header.Set("Content-Type", "application/octet-stream")
-	else {
+	if fileName == nil {	// Doesn't include a file upload	
+		json.NewEncoder(buf).Encode(options.body)
+		req, err = http.NewRequest("POST", options.urlStr, buf)
+		if err != nil {
+			crowdin.log(fmt.Sprintf("Post() - can't create a http request %s", req))
+			return nil, err
+		}
+	
+		// Set headers
+		req.Header.Set("Authorization", "Bearer "+crowdin.config.token)
 		req.Header.Set("Content-Type", "application/json")
-	}
-	crowdin.log(fmt.Sprintf("Headers: %s", req.Header))
+	
+		
+	} else {   // There is a file to upload				
+		openfile, err := os.Open(options.fileName)
+		defer openfile.Close()
+		if err != nil {
+			crowdin.log(fmt.Sprintf("Post() - can't open %s", options.fileName))
+			return nil, err
+		}
+		fileStat, _ := openfile.Stat()                     //Get info from file
+		fileSize := strconv.FormatInt(fileStat.Size(), 10) //Get file size as a string
 
+		req, err = http.NewRequest("POST", options.urlStr, ioutil.NopCloser(openfile))
+		if err != nil {
+			crowdin.log(fmt.Sprintf("Post() - can't create a http request %s", req))
+			return nil, err
+		}
+		
+		// Set headers
+		req.Header.Set("Authorization", "Bearer "+crowdin.config.token)
+		req.Header.Set("Content-Type", "application/octet-stream")
+		req.Header.Set("Crowdin-API-FileName", options.fileName)
+		// req.Header.Set("Content-Length", FileSize)
+
+		// ******* Find a way to stream the file... ******
+	}
+
+	crowdin.log(fmt.Sprintf("Headers: %s", req.Header))
 	// DEBUG
 	// dump, err := httputil.DumpRequestOut(req, true)
 	// crowdin.log(dump)
@@ -66,12 +94,14 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 	// Run the  request
 	response, err := crowdin.config.client.Do(req)
 	if err != nil {
+		crowdin.log(fmt.Sprintf("Post() - Do() returned an error %s", response))
 		return nil, err
 	}
 	defer response.Body.Close()
 
 	bodyResponse, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		crowdin.log(fmt.Sprintf("Post() - Error while reading request response %s", err))
 		return nil, err
 	}
 

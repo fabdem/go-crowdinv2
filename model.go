@@ -80,15 +80,15 @@ type ResponseListProjects struct {
 type UpdateFileOptions struct {
 	StorageId        				int 			`json:"storageId"`
 	UpdateOption     				string		`json:"updateOption,omitempty"` //
-//	ImportOptions struct {
-//		ContentSegmentation 	bool 			`json:"contentSegmentation,omitempty"`
-//		TranslateContent 			bool 			`json:"translateContent,omitempty"`
-//		TranslateAttributes 	bool 			`json:"translateAttributes,omitempty"`
-//		TranslatableElements  []string  `json:"translatableElements,omitempty"`
-//	}	 `json:"importOptions,omitempty"`
-//	ExportOptions struct {
-//		ContentSegmentation 	bool 			`json:"contentSegmentation,omitempty"`
-//	}	 `json:"exportOptions,omitempty"`
+	ImportOptions struct {
+		ContentSegmentation 	bool 			`json:"contentSegmentation,omitempty"`
+		TranslateContent 			bool 			`json:"translateContent,omitempty"`
+		TranslateAttributes 	bool 			`json:"translateAttributes,omitempty"`
+		TranslatableElements  []string  `json:"translatableElements,omitempty"`
+	}	 `json:"importOptions,omitempty"`
+	ExportOptions struct {
+		ContentSegmentation 	bool 			`json:"contentSegmentation,omitempty"`
+	}	 `json:"exportOptions,omitempty"`
 }
 
 type ResponseUpdateFile struct {

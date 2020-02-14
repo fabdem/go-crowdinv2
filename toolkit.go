@@ -141,14 +141,17 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 		if len(listDir.Data) > 0 {
 			// Lookup last directory's Id
 			dirId = 0
-			for i, dirName := range crowdinFile { // Go down the directory branch
+			for i, dirName := range crowdinFile {
 				if i < len(crowdinFile) - 1 { // We're done once we reach the file name (last item of the slice).
-					for _, crwdPrjctDirName := range listDir.Data { // Look up in ist of project dirs the right one
+					for _, crwdPrjctDirName := range listDir.Data {
 						if crwdPrjctDirName.Data.DirectoryId == dirId && crwdPrjctDirName.Data.Name == dirName {
 							dirId = crwdPrjctDirName.Data.Id  // Bingo get that Id
-							break // Done for that one
+							break **** check that
 						}
 					}
+				}
+				if dirId > 0 { // If dir found lets get out
+					break  **** and check that
 				}
 			}
 		} else {
@@ -165,8 +168,8 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 		return errors.New("UpdateFile() - Error adding file to storage.")
 	}
 	storageId := addStor.Data.Id
-	fmt.Printf("loca fie name= %s\n",localFileNamePath)
-	fmt.Printf("File in storage= %s\n",addStor.Data.FileName)
+
+	fmt.Printf("Directory Id = %d, filename= %s storageId= %d\n", dirId, crowdinFilename, storageId)
 
 	// Look up file
 	listFiles, err := crowdin.ListFiles(&ListFilesOptions{DirectoryId: dirId, Limit: 500})
@@ -174,18 +177,15 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 		return errors.New("UpdateFile() - Error listing files.")
 	}
 
-	fileId := 0
-	for _, list := range listFiles.Data {
+	for _, list := range listFiles {
 		if list.Data.Name == crowdinFilename {
-			fileId = list.Data.Id
+**** To be continuated
 		}
 	}
 
-	fmt.Printf("Directory Id = %d, filename= %s, fileId %d storageId= %d\n", dirId, crowdinFilename, fileId, storageId)
 
 	// Update file
-	upd, err := crowdin.UpdateFile(fileId, &UpdateFileOptions{StorageId: storageId, UpdateOption: "clear_translations_and_approvals"})
-	fmt.Printf("\nupt=%s",upd)
+	updt, err := crowdin.UpdateFile(***fileId***, &UpdateFileOptions{StorageId: storageId, UpdateOption: "clear_translations_and_approvals"})
 	if err != nil {
 		return errors.New("UpdateFile() - Error updating file.")
 	}
