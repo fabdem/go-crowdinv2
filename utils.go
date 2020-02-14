@@ -16,8 +16,10 @@ import (
 )
 
 type postOptions struct {
-	urlStr string
-	body   interface{}
+	urlStr 		string
+	body   		interface{}
+	fileName  string
+
 }
 
 type delOptions struct {
@@ -50,7 +52,11 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 
 	// Set headers
 	req.Header.Set("Authorization", "Bearer "+crowdin.config.token)
-	req.Header.Set("Content-Type", "application/json")
+	if postOptions.fileName != nil {
+		req.Header.Set("Content-Type", "application/octet-stream")
+	else {
+		req.Header.Set("Content-Type", "application/json")
+	}
 	crowdin.log(fmt.Sprintf("Headers: %s", req.Header))
 
 	// DEBUG

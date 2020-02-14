@@ -17,7 +17,7 @@ import (
 // {protocol}://{host}/api/v2/projects/{projectId}/files
 func (crowdin *Crowdin) ListDirectories(options *ListDirectoriesOptions) (*ResponseListDirectories, error) {
 
-	crowdin.log(fmt.Sprintf("ListDirectories()\n"))
+	crowdin.log(fmt.Sprintf("\nListDirectories()"))
 
 	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/directories", crowdin.config.projectId), body: options})
 
@@ -40,7 +40,7 @@ func (crowdin *Crowdin) ListDirectories(options *ListDirectoriesOptions) (*Respo
 // {protocol}://{host}/api/v2/projects/{projectId}/files
 func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles, error) {
 
-	crowdin.log(fmt.Sprintf("ListFiles()\n"))
+	crowdin.log(fmt.Sprintf("\nListFiles()"))
 
 	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files", crowdin.config.projectId), body: options})
 
@@ -64,7 +64,7 @@ func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles
 // {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}
 func (crowdin *Crowdin) UpdateFile(fileId int, options *UpdateFileOptions) (*ResponseUpdateFile, error) {
 
-	crowdin.log(fmt.Sprintf("UpdateFile()\n"))
+	crowdin.log(fmt.Sprintf("\nUpdateFile()"))
 
 	response, err := crowdin.put(&putOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v", crowdin.config.projectId, fileId), body: options})
 
