@@ -43,16 +43,17 @@ func (crowdin *Crowdin) ListStorages(options *ListStoragesOptions) (*ResponseLis
 // {protocol}://{host}/api/v2/storages
 func (crowdin *Crowdin) AddStorage(options *AddStorageOptions) (*ResponseAddStorage, error) {
 
-	crowdin.log("AddStorage()")
+	crowdin.log("\nAddStorage()")
 
 	// Prepare URL and params
 	var p postOptions
 	p.urlStr = fmt.Sprintf(crowdin.config.apiBaseURL + "storages")
-	p.body = options
+	p.body = nil
+	p.fileName = options.FileName
+	crowdin.log(fmt.Sprintf("\n	postOptions:%s", p))
 	response, err := crowdin.post(&p)
-
 	if err != nil {
-		crowdin.log(err)
+		crowdin.log(fmt.Sprintf("\n	post() error:%s\n%s", err, response))
 		return nil, err
 	}
 
