@@ -121,6 +121,36 @@ type ResponseUpdateFile struct {
 	} `json:"data"`
 }
 
+type ResponseUpdate struct {
+	Data struct {
+		Id            int    `json:"id"`
+		ProjectId     int    `json:"projectId"`
+		BranchId      int    `json:"branchId"`
+		DirectoryId   int    `json:"directoryId"`
+		Name          string `json:"name"`
+		Title         string `json:"title"`
+		Type          string `json:"type"`
+		RevisionId    int    `json:"revisionId"`
+		Status        string `json:"status"`
+		Priority      string `json:"priority"`
+		ImportOptions struct {
+			FirstLineContainsHeader bool `json:"firstLineContainsHeader"`
+			ImportTranslations      bool `json:"importTranslations"`
+			Scheme                  struct {
+				Identifier   int `json:"identifier"`
+				SourcePhrase int `json:"sourcePhrase"`
+				En           int `json:"en"`
+				De           int `json:"de"`
+			} `json:"scheme"`
+		} `json:"importOptions"`
+		ExportOptions struct {
+			ExportPattern string `json:"exportPattern"`
+		} `json:"exportOptions"`
+		CreatedAt time.Time `json:"createdAt"`
+		UpdatedAt time.Time `json:"updatedAt"`
+	} `json:"data"`
+}
+
 // GetProjectBuildProgressOptions are options for Check Project Build Status api call
 type GetBuildProgressOptions struct {
 	// Project Identifier.
@@ -361,4 +391,42 @@ type ResponseListFiles struct {
 
 type responseGeneral struct {
 	Success bool `json:"success"`
+}
+
+
+// ListFilesOptions are options for ListFileRevisions api call
+type ListFileRevisionsOptions struct {
+	Limit       int `json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset      int `json:"offset,omitempty"` // Offset in collection - optional
+}
+
+// ResponseListFiles are response for ListFiles api call
+type ResponseListFileRevisions struct {
+	Data []struct {
+		Data struct {
+			Id                int `json:"id"`
+			ProjectId         int `json:"projectId"`
+			FileId            int `json:"fileId"`
+			RestoreToRevision int `json:"restoreToRevision"`
+			Info              struct {
+				Added struct {
+					Strings int `json:"strings"`
+					Words   int `json:"words"`
+				} `json:"added"`
+				Deleted struct {
+					Strings int `json:"strings"`
+					Words   int `json:"words"`
+				} `json:"deleted"`
+				Updated struct {
+					Strings int `json:"strings"`
+					Words   int `json:"words"`
+				} `json:"updated"`
+			} `json:"info"`
+			Date time.Time `json:"date"`
+		} `json:"data"`
+	} `json:"data"`
+	Pagination struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
 }

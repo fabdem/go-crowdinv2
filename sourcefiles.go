@@ -60,6 +60,30 @@ func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles
 }
 
 
+// ListFileRevisions - List all revisions for a file in current project
+// {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}/revisions
+func (crowdin *Crowdin) ListFileRevisions(options *ListFileRevisionsOptions, fileId int) (*ResponseListFileRevisions, error) {
+
+	crowdin.log(fmt.Sprintf("ListFileRevision()\n"))
+
+	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v/revisions", crowdin.config.projectId, fileId), body: options})
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))
+		return nil, err
+	}
+
+	var responseAPI ResponseListFileRevisions
+	err = json.Unmarshal(response, &responseAPI)
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - unmarshalling:%s\n%s\n", response, err))
+		return nil, err
+	}
+	crowdin.log(fmt.Sprintf("	Unmarshalled:%s\n", response))
+
+	return &responseAPI, nil
+}
+
+
 // UpdateFile - Update a specific file
 // {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}
 func (crowdin *Crowdin) UpdateFile(fileId int, options *UpdateFileOptions) (*ResponseUpdateFile, error) {

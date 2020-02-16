@@ -117,10 +117,13 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (e
 	return err
 }
 
-// Update a file of the current project
-//    localFileNamePath  required
-//    crowdinFileNamePath required
-func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath string) (err error) {
+
+// Lookup fileId in current project
+//    crowdinFileNamePath required - full Crowdin path to file
+//		Returns Id and crowdin file name
+func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name string, err error) {
+
+	crowdin.log(fmt.Sprintf("LookupFileId()\n"))
 
 	// Lookup fileId in Crowdin
 	dirId := 0
@@ -128,14 +131,14 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 
 	switch l := len(crowdinFile); l {
 	case 0:
-		return errors.New("UpdateFile() - Crowdin file name should not be null.")
+		return 0, "", errors.New("LookupFileId() - Crowdin file name should not be null.")
 	case 1: // no directory so dirId is 0
 	default: // l > 1
 		// Lookup end directoryId
 		// Get a list of all the project folders
 		listDir, err := crowdin.ListDirectories(&ListDirectoriesOptions{Limit: 500})
 		if err != nil {
-			return errors.New("UpdateFile() - Error listing project directories.")
+ 			return 0, "", errors.New("LookupFileId() - Error listing project directories.")
 		}
 
 		if len(listDir.Data) > 0 {
@@ -152,41 +155,60 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 				}
 			}
 		} else {
-			return errors.New("UpdateFile() - Error: mismatch between # of folder found and # of folder expected.")
+			return 0, "", errors.New("UpdateFile() - Error: mismatch between # of folder found and # of folder expected.")
 		}
 	}
 
-	// Get file name
-	crowdinFilename := crowdinFile[len(crowdinFile) - 1]
-
-	// Send local file to storageId
-	addStor, err := crowdin.AddStorage(&AddStorageOptions{FileName: localFileNamePath})
-	if err != nil {
-		return errors.New("UpdateFile() - Error adding file to storage.")
-	}
-	storageId := addStor.Data.Id
+	crowdinFilename := crowdinFile[len(crowdinFile) - 1]   // Get file name
 
 	// Look up file
 	listFiles, err := crowdin.ListFiles(&ListFilesOptions{DirectoryId: dirId, Limit: 500})
 	if err != nil {
-		return errors.New("UpdateFile() - Error listing files.")
+		return 0, "", errors.New("UpdateFile() - Error listing files.")
 	}
 
 	fileId := 0
 	for _, list := range listFiles.Data {
 		if list.Data.Name == crowdinFilename {
 			fileId = list.Data.Id
+			break   // found it
 		}
 	}
+	return fileId, crowdinFilename, nil
+}
 
-	fmt.Printf("Directory Id = %d, filename= %s, fileId %d storageId= %d\n", dirId, crowdinFilename, fileId, storageId)
+// Update a file of the current project
+//    localFileNamePath  required
+//    crowdinFileNamePath required
+//		Returns file Id
+func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath string) (id int, err error) {
 
-	// Update file
-	upd, err := crowdin.UpdateFile(fileId, &UpdateFileOptions{StorageId: storageId, UpdateOption: "clear_translations_and_approvals"})
-	fmt.Printf("\nupt=%s",upd)
+	crowdin.log(fmt.Sprintf("Update()\n"))
+
+	// Lookup fileId in Crowdin
+	fileId, crowdinFilename, err := crowdin.LookupFileId(crowdinFileNamePath)
 	if err != nil {
-		return errors.New("UpdateFile() - Error updating file.")
+		return 0, errors.New("UpdateFile() - Can't find file in Crowdin.")
 	}
 
-	return err
+	crowdin.log(fmt.Sprintf("Update() fileId=%d fileName=%s\n", fileId, crowdinFilename))
+
+	// Send local file to storageId
+	addStor, err := crowdin.AddStorage(&AddStorageOptions{FileName: localFileNamePath})
+	if err != nil {
+		return 0, errors.New("UpdateFile() - Error adding file to storage.")
+	}
+	storageId := addStor.Data.Id
+
+	// fmt.Printf("Directory Id = %d, filename= %s, fileId %d storageId= %d\n", dirId, crowdinFilename, fileId, storageId)
+
+	// Update file
+	updres, err := crowdin.UpdateFile(fileId, &UpdateFileOptions{StorageId: storageId, UpdateOption: "clear_translations_and_approvals"})
+	if err != nil {
+		return 0, errors.New("UpdateFile() - Error updating file.")
+	}
+
+	crowdin.log(fmt.Sprintf("UpdateFile() - result %v", updres))
+
+	return fileId, nil
 }
