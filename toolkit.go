@@ -204,8 +204,17 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 
 	// Update file
 	updres, err := crowdin.UpdateFile(fileId, &UpdateFileOptions{StorageId: storageId, UpdateOption: "clear_translations_and_approvals"})
+
+	// Delete storage
+	err1 := crowdin.DeleteStorage(&DeleteStorageOptions{StorageId: storageId})
+
 	if err != nil {
-		return 0, errors.New("UpdateFile() - Error updating file.")
+		crowdin.log(fmt.Sprintf("UpdateFile() - error updating file %v", updres))
+		return 0, errors.New("UpdateFile() - Error updating file.") //
+	}
+
+	if err1 != nil {
+		crowdin.log(fmt.Sprintf("UpdateFile() - error deleting storage %v", err1))
 	}
 
 	crowdin.log(fmt.Sprintf("UpdateFile() - result %v", updres))

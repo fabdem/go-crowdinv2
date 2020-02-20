@@ -37,8 +37,7 @@ type getOptions struct {
 	body   interface{}
 }
 
-// params - extra params
-// fileNames - key = dir
+// POST request
 func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 
 	crowdin.log(fmt.Sprintf("Create POST http request\nBody: %s", options.body))
@@ -113,8 +112,7 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 }
 
 
-// params - extra params
-// fileNames - key = dir
+// PUT request
 func (crowdin *Crowdin) put(options *putOptions) ([]byte, error) {
 
 	crowdin.log(fmt.Sprintf("Create PUT http request\nBody: %s", options.body))
@@ -162,8 +160,7 @@ func (crowdin *Crowdin) put(options *putOptions) ([]byte, error) {
 }
 
 
-// params - extra params
-// fileNames - key = dir
+// DEl request
 func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 
 	crowdin.log(fmt.Sprintf("Create DEL http request\nBody: %s", options.body))
@@ -192,7 +189,7 @@ func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 		return nil, err
 	}
 
-	if response.StatusCode != http.StatusNoContent {
+	if response.StatusCode != http.StatusMovedPermanently {
 		return bodyResponse, APIError{What: fmt.Sprintf("Status code: %v", response.StatusCode)}
 	}
 
@@ -200,6 +197,7 @@ func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 }
 
 
+// GET request
 func (crowdin *Crowdin) get(options *getOptions) ([]byte, error) {
 
 	crowdin.log(fmt.Sprintf("Create GET http request Body: %v", options.body))
