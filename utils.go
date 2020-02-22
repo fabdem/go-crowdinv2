@@ -167,7 +167,7 @@ func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(options.body)
-	req, err := http.NewRequest("DEL", options.urlStr, buf)
+	req, err := http.NewRequest("DELETE", options.urlStr, buf)
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 		return nil, err
 	}
 
-	if response.StatusCode != http.StatusMovedPermanently {
+	if response.StatusCode != http.StatusNoContent {
 		return bodyResponse, APIError{What: fmt.Sprintf("Status code: %v", response.StatusCode)}
 	}
 
