@@ -13,6 +13,7 @@ import (
 
 	"os"
 	//"strconv"
+	"strings"
 	"time"
 )
 
@@ -284,12 +285,35 @@ func (crowdin *Crowdin) DownloadFile(url string, filepath string) error {
 }
 
 // Log writer
+// Hide keys by overwriting with XXX
 func (crowdin *Crowdin) log(a interface{}) {
 	if crowdin.debug {
 		if crowdin.logWriter != nil {
 			timestamp := time.Now().Format(time.RFC3339)
 			msg := fmt.Sprintf("%v: %v", timestamp, a)
-			fmt.Fprintln(crowdin.logWriter, msg)
+			token := "Authorization:[Bearer "  // prefix for key
+			var purged string // Build the purged string in here
+			list1 := strings.Split(msg,token)
+			if len(list1) > 1 {
+				for k1,v1 := range list1 {
+					if k1 > 0 {  // The 1st v1 is empty or doesn't include a key
+						list2 := strings.Fields(v1) // Split strings seprated by spaces
+						if len(list2) > 0 {
+							v2 := list2[0]  // Supposedly the secret key
+							purgedsubstr := v2[0:2] + strings.Repeat("X",len(v2)-7) + v2[len(v2)-5:len(v2)] // Keep the 1st 2 and last 4 digits and ]
+							purged += (token + purgedsubstr)
+							for i := 1; i < len(list2); i++ { // Add the remaining of the substrings
+								purged += (" " + list2[i])
+							}
+						}
+					} else {
+						purged += v1
+					}
+				}
+			} else {
+				purged = msg
+			}
+			fmt.Fprintln(crowdin.logWriter, purged)
 		} else {
 			log.Println(a)
 		}
