@@ -305,6 +305,8 @@ func (crowdin *Crowdin) log(a interface{}) {
 							for i := 1; i < len(list2); i++ { // Add the remaining of the substrings
 								purged += (" " + list2[i])
 							}
+						}  else {
+							purged += token
 						}
 					} else {
 						purged += v1
