@@ -7,12 +7,9 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	//"mime/multipart"
 	"net/http"
-	// "net/http/httputil"
-
+	"path/filepath"
 	"os"
-	//"strconv"
 	"strings"
 	"time"
 )
@@ -87,7 +84,7 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 		// Set headers
 		req.Header.Set("Authorization", "Bearer "+crowdin.config.token)
 		req.Header.Set("Content-Type", "application/octet-stream")
-		req.Header.Set("Crowdin-API-FileName", options.fileName)
+		req.Header.Set("Crowdin-API-FileName", filepath.Base(options.fileName)) // Extract file name - at this point there has to be one...
 		// req.Header.Set("Content-Length", FileSize)
 	}
 
