@@ -8,7 +8,7 @@ import (
 	// "net/http"
 	// "net/url"
 	//"os"
-	//"strconv"
+	"strconv"
 	// "time"
 	// "github.com/mreiferson/go-httpclient"
 )
@@ -19,7 +19,41 @@ func (crowdin *Crowdin) ListDirectories(options *ListDirectoriesOptions) (*Respo
 
 	crowdin.log(fmt.Sprintf("ListDirectories()\n"))
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/directories", crowdin.config.projectId), body: options})
+	var branchId string
+	if options.BranchId >0 {
+		branchId = strconv.Itoa(options.BranchId)
+	}
+	
+	var directoryId string
+	if options.DirectoryId >0 {
+		directoryId = strconv.Itoa(options.DirectoryId)
+	}
+	
+	var recursion string
+	if options.Recursion >0 {
+		recursion = strconv.Itoa(options.Recursion)
+	}
+	
+	var limit string
+	if options.Limit >0 {
+		limit = strconv.Itoa(options.Limit)
+	}
+	
+	var offset string
+	if options.Offset >0 {
+		offset = strconv.Itoa(options.Offset)
+	}
+
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/directories", crowdin.config.projectId),
+		params: map[string]string{ 
+			"branchId"		: branchId,
+			"directoryId"	: directoryId,
+			"recursion"		: recursion,
+			"limit"			: limit,
+			"offset"		: offset,
+		},
+	})
 
 	if err != nil {
 		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))
@@ -42,7 +76,41 @@ func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles
 
 	crowdin.log(fmt.Sprintf("ListFiles()\n"))
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files", crowdin.config.projectId), body: options})
+	var branchId string
+	if options.BranchId >0 {
+		branchId = strconv.Itoa(options.BranchId)
+	}
+	
+	var directoryId string
+	if options.DirectoryId >0 {
+		directoryId = strconv.Itoa(options.DirectoryId)
+	}
+	
+	var recursion string
+	if options.Recursion >0 {
+		recursion = strconv.Itoa(options.Recursion)
+	}
+	
+	var limit string
+	if options.Limit >0 {
+		limit = strconv.Itoa(options.Limit)
+	}
+	
+	var offset string
+	if options.Offset >0 {
+		offset = strconv.Itoa(options.Offset)
+	}
+
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files", crowdin.config.projectId),
+		params: map[string]string{ 
+			"branchId"		: branchId,
+			"directoryId"	: directoryId,
+			"recursion"		: recursion,
+			"limit"			: limit,
+			"offset"		: offset,
+		},
+	})
 
 	if err != nil {
 		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))
@@ -66,7 +134,10 @@ func (crowdin *Crowdin) ListFileRevisions(options *ListFileRevisionsOptions, fil
 
 	crowdin.log(fmt.Sprintf("ListFileRevision()\n"))
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v/revisions", crowdin.config.projectId, fileId), body: options})
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v/revisions", crowdin.config.projectId, fileId),
+//		body: options,
+	})
 	if err != nil {
 		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))
 		return nil, err

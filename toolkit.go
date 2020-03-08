@@ -127,6 +127,7 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 
 	// Lookup fileId in Crowdin
 	dirId := 0
+	var dirCrowdinName string // for debug
 	crowdinFile := strings.Split(crowdinFileNamePath, "/")
 
 	switch l := len(crowdinFile); l {
@@ -140,19 +141,23 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 		if err != nil {
  			return 0, "", errors.New("LookupFileId() - Error listing project directories.")
 		}
-
 		if len(listDir.Data) > 0 {
+crowdin.log(fmt.Sprintf("\n\ndirs=%v", listDir.Data))
 			// Lookup last directory's Id
 			dirId = 0
 			for i, dirName := range crowdinFile { // Go down the directory branch
 				if i < len(crowdinFile) - 1 { // We're done once we reach the file name (last item of the slice).
-					for _, crwdPrjctDirName := range listDir.Data { // Look up in ist of project dirs the right one
+					for _, crwdPrjctDirName := range listDir.Data { // Look up in list of project dirs the right one
 						if crwdPrjctDirName.Data.DirectoryId == dirId && crwdPrjctDirName.Data.Name == dirName {
 							dirId = crwdPrjctDirName.Data.Id  // Bingo get that Id
+							dirCrowdinName = crwdPrjctDirName.Data.Name
 							break // Done for that one
 						}
 					}
 				}
+			}
+			if dirId == 0 {
+				return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Error: can't match directory names with Crowdin path. Last checked Crowdin Name: %s", dirCrowdinName))
 			}
 		} else {
 			return 0, "", errors.New("UpdateFile() - Error: mismatch between # of folder found and # of folder expected.")
@@ -160,6 +165,7 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 	}
 
 	crowdinFilename := crowdinFile[len(crowdinFile) - 1]   // Get file name
+	crowdin.log(fmt.Sprintf("  dirId=%d Crowdin Name %s crowdinFilename %s\n", dirId, dirCrowdinName, crowdinFilename))
 
 	// Look up file
 	listFiles, err := crowdin.ListFiles(&ListFilesOptions{DirectoryId: dirId, Limit: 500})
@@ -174,6 +180,12 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 			break   // found it
 		}
 	}
+
+	if fileId == 0 {
+		return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Can't find file %s in Crowdin.", crowdinFilename))
+	}
+	
+	crowdin.log(fmt.Sprintf("  fileId=%d\n", fileId))
 	return fileId, crowdinFilename, nil
 }
 

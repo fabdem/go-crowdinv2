@@ -308,11 +308,11 @@ type DeleteStorageOptions struct {
 
 // ListDirectoriesOptions are options for ListDirectories api call
 type ListDirectoriesOptions struct {
-	BranchId    int `json:"branchId,omitempty"`
-	DirectoryId int `json:"directoryId,omitempty"`
-	Recursion   int `json:"recursion,omitempty"`
-	Limit       int `json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset      int `json:"offset,omitempty"` // Offset in collection - optional
+	BranchId    int 
+	DirectoryId int 
+	Recursion   int 
+	Limit       int // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset      int // Offset in collection - optional
 }
 
 // ResponseListDirectories are response for ListDirectories api call

@@ -19,7 +19,10 @@ func (crowdin *Crowdin) ListStorages(options *ListStoragesOptions) (*ResponseLis
 
 	crowdin.log("\nListStorages()")
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL + "storages"), body: options})
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL + "storages"),
+//		body: options,
+	})
 
 	if err != nil {
 		fmt.Printf("\nREPONSE:%s\n", response)
@@ -75,7 +78,9 @@ func (crowdin *Crowdin) GetStorage(options *GetStorageOptions) (*ResponseGetStor
 
 	crowdin.log("\nGetStorage()")
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"storages/%v", options.StorageId)})
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"storages/%v", options.StorageId),
+	})
 
 	if err != nil {
 		fmt.Printf("\nREPONSE:%s\n", response)

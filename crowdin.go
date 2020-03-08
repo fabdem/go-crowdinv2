@@ -100,7 +100,10 @@ func (crowdin *Crowdin) SetDebug(debug bool, logWriter io.Writer) {
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds
 func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*ResponseListProjectBuilds, error) {
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", crowdin.config.projectId), body: options})
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", crowdin.config.projectId),
+//		body: options,
+	})
 
 	if err != nil {
 		fmt.Printf("\nREPONSE:%s\n", response)
@@ -124,7 +127,9 @@ func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*R
 // {protocol}://{host}/api/v2/projects
 func (crowdin *Crowdin) ListProjects(options *ListProjectsOptions) (*ResponseListProjects, error) {
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL + "projects")})
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL + "projects"),
+	})
 
 	if err != nil {
 		crowdin.log(err)
@@ -147,7 +152,9 @@ func (crowdin *Crowdin) ListProjects(options *ListProjectsOptions) (*ResponseLis
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds/{buildId}/download
 func (crowdin *Crowdin) DownloadProjectTranslations(options *DownloadProjectTranslationsOptions) (*ResponseDownloadProjectTranslations, error) {
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds/%v/download", crowdin.config.projectId, options.BuildId)})
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds/%v/download", crowdin.config.projectId, options.BuildId),
+	})
 
 	if err != nil {
 		crowdin.log(err)
@@ -170,7 +177,9 @@ func (crowdin *Crowdin) DownloadProjectTranslations(options *DownloadProjectTran
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds
 func (crowdin *Crowdin) GetProjectBuilds() (*ResponseGetProjectBuilds, error) {
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", crowdin.config.projectId)})
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", crowdin.config.projectId),
+	})
 
 	if err != nil {
 		crowdin.log(err)
@@ -195,7 +204,9 @@ func (crowdin *Crowdin) GetBuildProgress(options *GetBuildProgressOptions) (*Res
 
 	crowdin.log("GetBuildProgress()")
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds/%v", crowdin.config.projectId, options.BuildId)})
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds/%v", crowdin.config.projectId, options.BuildId),
+	})
 	if err != nil {
 		crowdin.log(err)
 		return nil, err
@@ -219,7 +230,9 @@ func (crowdin *Crowdin) GetBuildProgress(options *GetBuildProgressOptions) (*Res
 // {protocol}://{host}/api/v2/projects/{projectId}/languages/progress
 func (crowdin *Crowdin) GetLanguageProgress() (*ResponseGetLanguageProgress, error) {
 
-	response, err := crowdin.get(&getOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/languages/progress", crowdin.config.projectId)})
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/languages/progress", crowdin.config.projectId),
+	})
 
 	if err != nil {
 		crowdin.log(err)

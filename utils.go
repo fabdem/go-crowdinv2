@@ -32,7 +32,8 @@ type putOptions struct {
 
 type getOptions struct {
 	urlStr string
-	body   interface{}
+	params map[string]string	
+//	body   interface{}
 }
 
 // POST request
@@ -198,7 +199,7 @@ func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 // GET request
 func (crowdin *Crowdin) get(options *getOptions) ([]byte, error) {
 
-	crowdin.log(fmt.Sprintf("Create GET http request Body: %v", options.body))
+	crowdin.log(fmt.Sprintf("Create GET http request Params: %v", options.params))
 
 	// Get request with authorization
 	response, err := crowdin.getResponse(options, true)
@@ -222,12 +223,23 @@ func (crowdin *Crowdin) get(options *getOptions) ([]byte, error) {
 // Get request with or without authorization token depending on flag
 func (crowdin *Crowdin) getResponse(options *getOptions, authorization bool) (*http.Response, error) {
 
-	crowdin.log(fmt.Sprintf("getResponse() body:%v", options.body))
+	crowdin.log(fmt.Sprintf("getResponse()"))
 
-	buf := new(bytes.Buffer)
-	json.NewEncoder(buf).Encode(options.body)
+	if options != nil && options.params != nil {
+		addParam := "?"
+		for k, v := range options.params {
+			if v != "" {
+				options.urlStr += addParam + k + "=" + v
+				addParam = "&"
+			}
+		}
+	}
 
-	req, err := http.NewRequest("GET", options.urlStr, buf)
+	// buf := new(bytes.Buffer)
+	// json.NewEncoder(buf).Encode(options.body)
+	crowdin.log(fmt.Sprintf("url=%s",options.urlStr))
+
+	req, err := http.NewRequest("GET", options.urlStr, nil)
 	if err != nil {
 		return nil, err
 	}
