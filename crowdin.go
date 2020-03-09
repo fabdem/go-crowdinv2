@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	//"os"
-	//"strconv"
+	"strconv"
 	"time"
 
 	"github.com/mreiferson/go-httpclient"
@@ -100,9 +100,28 @@ func (crowdin *Crowdin) SetDebug(debug bool, logWriter io.Writer) {
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds
 func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*ResponseListProjectBuilds, error) {
 
+		var branchId string
+		if options.BranchId >0 {
+			branchId = strconv.Itoa(options.BranchId)
+		}
+
+		var limit string
+		if options.Limit >0 {
+			limit = strconv.Itoa(options.Limit)
+		}
+
+		var offset string
+		if options.Offset >0 {
+			offset = strconv.Itoa(options.Offset)
+		}
+
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", crowdin.config.projectId),
-//		body: options,
+		params: map[string]string{
+			"branchId"		: branchId,
+			"limit"			: limit,
+			"offset"		: offset,
+		},
 	})
 
 	if err != nil {
@@ -127,8 +146,36 @@ func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*R
 // {protocol}://{host}/api/v2/projects
 func (crowdin *Crowdin) ListProjects(options *ListProjectsOptions) (*ResponseListProjects, error) {
 
+		crowdin.log(fmt.Sprintf("ListProjects()"))
+
+		var groupId string
+		if options.GroupId >0 {
+			groupId = strconv.Itoa(options.GroupId)
+		}
+
+		var hasManagerAccess string
+		if options.HasManagerAccess >0 {
+			hasManagerAccess = strconv.Itoa(options.HasManagerAccess)
+		}
+
+		var limit string
+		if options.Limit >0 {
+			limit = strconv.Itoa(options.Limit)
+		}
+
+		var offset string
+		if options.Offset >0 {
+			offset = strconv.Itoa(options.Offset)
+		}
+
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL + "projects"),
+		params: map[string]string{
+			"groupId"						: groupId,
+			"hasManagerAccess"	: hasManagerAccess,
+			"limit"							: limit,
+			"offset"						: offset,
+		},
 	})
 
 	if err != nil {
@@ -175,10 +222,32 @@ func (crowdin *Crowdin) DownloadProjectTranslations(options *DownloadProjectTran
 
 // GetProjectBuilds - List Project Builds api call
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds
-func (crowdin *Crowdin) GetProjectBuilds() (*ResponseGetProjectBuilds, error) {
+func (crowdin *Crowdin) GetProjectBuilds(options *GetProjectBuildsOptions) (*ResponseGetProjectBuilds, error) {
+
+		crowdin.log(fmt.Sprintf("GetProjectBuilds\n"))
+
+		var branchId string
+		if options.BranchId >0 {
+			branchId = strconv.Itoa(options.BranchId)
+		}
+
+		var limit string
+		if options.Limit >0 {
+			limit = strconv.Itoa(options.Limit)
+		}
+
+		var offset string
+		if options.Offset >0 {
+			offset = strconv.Itoa(options.Offset)
+		}
 
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", crowdin.config.projectId),
+		params: map[string]string{
+			"branchId"		: branchId,
+			"limit"			: limit,
+			"offset"		: offset,
+		},
 	})
 
 	if err != nil {
@@ -228,10 +297,31 @@ func (crowdin *Crowdin) GetBuildProgress(options *GetBuildProgressOptions) (*Res
 
 // GetLanguageProgress() - Get progress info per language API call
 // {protocol}://{host}/api/v2/projects/{projectId}/languages/progress
-func (crowdin *Crowdin) GetLanguageProgress() (*ResponseGetLanguageProgress, error) {
+func (crowdin *Crowdin) GetLanguageProgress(options *GetLanguageProgressOptions) (*ResponseGetLanguageProgress, error) {
+	crowdin.log(fmt.Sprintf("GetLanguageProgress()\n"))
+
+	var languageIds string
+	if len(options.LanguageIds) > 0 {
+		languageIds = options.LanguageIds
+	}
+
+	var limit string
+	if options.Limit >0 {
+		limit = strconv.Itoa(options.Limit)
+	}
+
+	var offset string
+	if options.Offset >0 {
+		offset = strconv.Itoa(options.Offset)
+	}
 
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/languages/progress", crowdin.config.projectId),
+		params: map[string]string{
+			"languageIds"		: languageIds,
+			"limit"					: limit,
+			"offset"				: offset,
+		},
 	})
 
 	if err != nil {

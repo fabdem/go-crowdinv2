@@ -8,9 +8,9 @@ import (
 type ListProjectBuildsOptions struct {
 	// ProjectId 			int
 	// Body struct {
-	BranchId int `json:hasManagerAccess,omitempty`
-	Limit    int `json:limit,omitempty`
-	Offset   int `json:offset,omitempty`
+	BranchId int
+	Limit    int
+	Offset   int
 	//}
 }
 
@@ -38,10 +38,10 @@ type ResponseListProjectBuilds struct {
 
 // ListProjects - List Projects API call
 type ListProjectsOptions struct {
-	GroupId          int `json:groupId,omitempty`
-	HasManagerAccess int `json:hasManagerAccess,omitempty`
-	Limit            int `json:limit,omitempty`
-	Offset           int `json:offset,omitempty`
+	GroupId          int
+	HasManagerAccess int
+	Limit            int
+	Offset           int
 }
 
 type ResponseListProjects struct {
@@ -190,6 +190,13 @@ type ResponseDownloadProjectTranslations struct {
 }
 
 // GetProjectBuilds api call
+type GetProjectBuildsOptions struct {
+	BranchId	int
+	Limit			int
+	Offset		int
+}
+
+// GetProjectBuilds api call
 type ResponseGetProjectBuilds struct {
 	Data []struct {
 		Data struct {
@@ -210,6 +217,16 @@ type ResponseGetProjectBuilds struct {
 		Limit  int `json:"limit"`
 	} `json:"pagination"`
 }
+
+
+// GetLanguageProgress - options for Language Progress API call
+type GetLanguageProgressOptions struct {
+	LanguageIds      string
+	HasManagerAccess int
+	Limit            int
+	Offset           int
+}
+
 
 // GetLanguageProgress api call
 type ResponseGetLanguageProgress struct {
@@ -308,9 +325,9 @@ type DeleteStorageOptions struct {
 
 // ListDirectoriesOptions are options for ListDirectories api call
 type ListDirectoriesOptions struct {
-	BranchId    int 
-	DirectoryId int 
-	Recursion   int 
+	BranchId    int
+	DirectoryId int
+	Recursion   int
 	Limit       int // Maximum number of items to retrieve (25 default, max 500) - optional
 	Offset      int // Offset in collection - optional
 }
