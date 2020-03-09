@@ -60,11 +60,11 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int) (buildId int, err error) {
 	crowdin.log("BuildAllLg()")
 
 	// Invoke build
-	var bo BuildProjectOptions
+	var bo BuildProjectTranslationOptions
 	// bo.ProjectId = crowdin.config.projectId
 	bo.BranchId = 0
 	bo.Languages = nil
-	rb, err := crowdin.BuildProject(&bo)
+	rb, err := crowdin.BuildProjectTranslation(&bo)
 	if err != nil {
 		return buildId, errors.New("\nBuild Err.")
 	}
@@ -72,15 +72,15 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int) (buildId int, err error) {
 	crowdin.log(fmt.Sprintf("	BuildId=%d", buildId))
 
 	// Poll build status with a timeout
-	crowdin.log("	Poll build status crowdin.GetBuildProgress()")
+	crowdin.log("	Poll build status crowdin.CheckProjectBuildStatus()")
 	timer := time.NewTimer(time.Duration(buildTOinSec) * time.Second)
 	defer timer.Stop()
-	rp := &ResponseGetBuildProgress{}
+	rp := &ResponseCheckProjectBuildStatus{}
 	for rp.Data.Status = rb.Data.Status; rp.Data.Status != "finished" && rp.Data.Status != "canceled"; { // initial value is read from previous API call
 		time.Sleep(polldelaysec * time.Second) // delay between each call
-		rp, err = crowdin.GetBuildProgress(&GetBuildProgressOptions{BuildId: buildId})
+		rp, err = crowdin.CheckProjectBuildStatus(&CheckProjectBuildStatusOptions{BuildId: buildId})
 		if err != nil {
-			crowdin.log(fmt.Sprintf(" Error GetBuildProgress()=%s", err))
+			crowdin.log(fmt.Sprintf(" Error CheckProjectBuildStatus()=%s", err))
 			break
 		}
 		select {
@@ -127,7 +127,6 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 
 	// Lookup fileId in Crowdin
 	dirId := 0
-	var dirCrowdinName string // for debug
 	crowdinFile := strings.Split(crowdinFileNamePath, "/")
 
 	switch l := len(crowdinFile); l {
@@ -137,27 +136,31 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 	default: // l > 1
 		// Lookup end directoryId
 		// Get a list of all the project folders
-		listDir, err := crowdin.ListDirectories(&ListDirectoriesOptions{Limit: 500})
+		listDirs, err := crowdin.ListDirectories(&ListDirectoriesOptions{Limit: 500})
 		if err != nil {
  			return 0, "", errors.New("LookupFileId() - Error listing project directories.")
 		}
-		if len(listDir.Data) > 0 {
-crowdin.log(fmt.Sprintf("\n\ndirs=%v", listDir.Data))
+		if len(listDirs.Data) > 0 {
 			// Lookup last directory's Id
 			dirId = 0
 			for i, dirName := range crowdinFile { // Go down the directory branch
-				if i < len(crowdinFile) - 1 { // We're done once we reach the file name (last item of the slice).
-					for _, crwdPrjctDirName := range listDir.Data { // Look up in list of project dirs the right one
+				crowdin.log(fmt.Sprintf("  idx %d dirName %s len %d dirId %d", i, dirName, len(crowdinFile), dirId))
+				if i > 1 && i < len(crowdinFile) - 1 { // Skip project name and we're done once we reach the file name (last item of the slice).
+					for _, crwdPrjctDirName := range listDirs.Data { // Look up in list of project dirs the right one
+						crowdin.log(fmt.Sprintf("  check -> crwdPrjctDirName.Data.DirectoryId %d crwdPrjctDirName.Data.Name %s", crwdPrjctDirName.Data.DirectoryId, crwdPrjctDirName.Data.Name))
 						if crwdPrjctDirName.Data.DirectoryId == dirId && crwdPrjctDirName.Data.Name == dirName {
 							dirId = crwdPrjctDirName.Data.Id  // Bingo get that Id
-							dirCrowdinName = crwdPrjctDirName.Data.Name
+							crowdin.log(fmt.Sprintf("  BINGO dirId=%d Crowdin dir name %s", dirId, crwdPrjctDirName.Data.Name))
 							break // Done for that one
 						}
+					}
+					if dirId == 0 {
+						return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Error: can't match directory names with Crowdin path."))					
 					}
 				}
 			}
 			if dirId == 0 {
-				return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Error: can't match directory names with Crowdin path. Last checked Crowdin Name: %s", dirCrowdinName))
+				return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Error: can't match directory names with Crowdin path."))
 			}
 		} else {
 			return 0, "", errors.New("UpdateFile() - Error: mismatch between # of folder found and # of folder expected.")
@@ -165,7 +168,7 @@ crowdin.log(fmt.Sprintf("\n\ndirs=%v", listDir.Data))
 	}
 
 	crowdinFilename := crowdinFile[len(crowdinFile) - 1]   // Get file name
-	crowdin.log(fmt.Sprintf("  dirId=%d Crowdin Name %s crowdinFilename %s\n", dirId, dirCrowdinName, crowdinFilename))
+	crowdin.log(fmt.Sprintf("  crowdinFilename %s\n", crowdinFilename))
 
 	// Look up file
 	listFiles, err := crowdin.ListFiles(&ListFilesOptions{DirectoryId: dirId, Limit: 500})
@@ -175,8 +178,10 @@ crowdin.log(fmt.Sprintf("\n\ndirs=%v", listDir.Data))
 
 	fileId := 0
 	for _, list := range listFiles.Data {
+		crowdin.log(fmt.Sprintf("  check -> list.Data.Name %s", list.Data.Name))
 		if list.Data.Name == crowdinFilename {
 			fileId = list.Data.Id
+			crowdin.log(fmt.Sprintf("  BINGO fileId=%d File name %s", fileId, crowdinFilename))
 			break   // found it
 		}
 	}

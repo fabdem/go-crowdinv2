@@ -13,7 +13,7 @@ import (
 	// "github.com/mreiferson/go-httpclient"
 )
 
-// ListFiles - List directories in a given project
+// ListDirectories - List directories in a given project
 // {protocol}://{host}/api/v2/projects/{projectId}/files
 func (crowdin *Crowdin) ListDirectories(options *ListDirectoriesOptions) (*ResponseListDirectories, error) {
 

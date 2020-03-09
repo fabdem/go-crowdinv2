@@ -2,15 +2,8 @@ package crowdin
 
 import (
 	"encoding/json"
-	//"errors"
 	"fmt"
-	// "io"
-	// "net/http"
-	// "net/url"
-	//"os"
-	//"strconv"
-	// "time"
-	// "github.com/mreiferson/go-httpclient"
+	"strconv"
 )
 
 // ListStorages - List existing storages
@@ -19,9 +12,22 @@ func (crowdin *Crowdin) ListStorages(options *ListStoragesOptions) (*ResponseLis
 
 	crowdin.log("\nListStorages()")
 
+	var limit string
+	if options.Limit >0 {
+		limit = strconv.Itoa(options.Limit)
+	}
+	
+	var offset string
+	if options.Offset >0 {
+		offset = strconv.Itoa(options.Offset)
+	}
+
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL + "storages"),
-//		body: options,
+		params: map[string]string{ 
+			"limit"			: limit,
+			"offset"		: offset,
+		},
 	})
 
 	if err != nil {
