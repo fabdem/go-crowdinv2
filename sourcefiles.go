@@ -2,7 +2,7 @@ package crowdin
 
 import (
 	"encoding/json"
-	//"errors"
+	"errors"
 	"fmt"
 	// "io"
 	// "net/http"
@@ -157,9 +157,20 @@ func (crowdin *Crowdin) ListFileRevisions(options *ListFileRevisionsOptions, fil
 
 // UpdateFile - Update a specific file
 // {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}
+// Default update mode is explicitely clear_translations_and_approvals
 func (crowdin *Crowdin) UpdateFile(fileId int, options *UpdateFileOptions) (*ResponseUpdateFile, error) {
 
 	crowdin.log(fmt.Sprintf("UpdateFile()\n"))
+	
+	if len(options.UpdateOption) > 0 {
+		// Check that update options are valid
+		if !(options.UpdateOption == "clear_translations_and_approvals" || options.UpdateOption == "keep_translations"  || options.UpdateOption == "keep_translations_and_approvals") {
+			crowdin.log(fmt.Sprintf("	Error - Update Option is not valid:%s\n",options.UpdateOption ))
+			return nil, errors.New("Invalid update option.")
+		}
+	} else {
+		options.UpdateOption = "clear_translations_and_approvals"  // Default behavior
+	}
 
 	response, err := crowdin.put(&putOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v", crowdin.config.projectId, fileId), body: options})
 

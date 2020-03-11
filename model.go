@@ -14,7 +14,6 @@ type ListProjectBuildsOptions struct {
 	//}
 }
 
-
 type ResponseListProjectBuilds struct {
 	Data []struct {
 		Data struct {
@@ -78,17 +77,17 @@ type ResponseListProjects struct {
 
 // UpdateFile - Update a file API call
 type UpdateFileOptions struct {
-	StorageId        				int 			`json:"storageId"`
-	UpdateOption     				string		`json:"updateOption,omitempty"` //
+	StorageId     int    `json:"storageId"`
+	UpdateOption  string `json:"updateOption,omitempty"` // needs to be either: "clear_translations_and_approvals" "keep_translations" "keep_translations_and_approvals"
 	ImportOptions struct {
-		ContentSegmentation 	bool 			`json:"contentSegmentation,omitempty"`
-		TranslateContent 			bool 			`json:"translateContent,omitempty"`
-		TranslateAttributes 	bool 			`json:"translateAttributes,omitempty"`
-		TranslatableElements  []string  `json:"translatableElements,omitempty"`
-	}	 `json:"importOptions,omitempty"`
+		ContentSegmentation  bool     `json:"contentSegmentation,omitempty"`
+		TranslateContent     bool     `json:"translateContent,omitempty"`
+		TranslateAttributes  bool     `json:"translateAttributes,omitempty"`
+		TranslatableElements []string `json:"translatableElements,omitempty"`
+	} `json:"importOptions,omitempty"`
 	ExportOptions struct {
-		ContentSegmentation 	bool 			`json:"contentSegmentation,omitempty"`
-	}	 `json:"exportOptions,omitempty"`
+		ContentSegmentation bool `json:"contentSegmentation,omitempty"`
+	} `json:"exportOptions,omitempty"`
 }
 
 type ResponseUpdateFile struct {
@@ -189,8 +188,6 @@ type ResponseDownloadProjectTranslations struct {
 	} `json: "data"`
 }
 
-
-
 // GetFileProgress - options for Language Progress API call
 type GetFileProgressOptions struct {
 	LanguageIds      string
@@ -198,7 +195,6 @@ type GetFileProgressOptions struct {
 	Limit            int
 	Offset           int
 }
-
 
 // GetFileProgress api call
 type ResponseGetFileProgress struct {
@@ -311,7 +307,7 @@ type ResponseListDirectories struct {
 			Id            int       `json:"id"`
 			ProjectId     int       `json:"projectId"`
 			BranchId      int       `json:"branchId"`
-			DirectoryId   int       `json:"directoryId"`  // Actually parentId
+			DirectoryId   int       `json:"directoryId"` // Actually parentId
 			Name          string    `json:"name"`
 			Title         string    `json:"title"`
 			ExportPattern string    `json:"exportPattern"`
@@ -382,11 +378,10 @@ type responseGeneral struct {
 	Success bool `json:"success"`
 }
 
-
 // ListFilesOptions are options for ListFileRevisions api call
 type ListFileRevisionsOptions struct {
-	Limit       int `json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset      int `json:"offset,omitempty"` // Offset in collection - optional
+	Limit  int `json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset int `json:"offset,omitempty"` // Offset in collection - optional
 }
 
 // ResponseListFiles are response for ListFiles api call

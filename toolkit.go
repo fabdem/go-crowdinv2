@@ -197,8 +197,9 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 // Update a file of the current project
 //    localFileNamePath  required
 //    crowdinFileNamePath required
+//    updateOption required needs to be either: clear_translations_and_approvals, keep_translations or keep_translations_and_approvals
 //		Returns file Id
-func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath string) (id int, err error) {
+func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath string, updateOption string) (id int, err error) {
 
 	crowdin.log(fmt.Sprintf("Update()\n"))
 
@@ -220,7 +221,7 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 	// fmt.Printf("Directory Id = %d, filename= %s, fileId %d storageId= %d\n", dirId, crowdinFilename, fileId, storageId)
 
 	// Update file
-	updres, err := crowdin.UpdateFile(fileId, &UpdateFileOptions{StorageId: storageId, UpdateOption: "clear_translations_and_approvals"})
+	updres, err := crowdin.UpdateFile(fileId, &UpdateFileOptions{StorageId: storageId, UpdateOption: updateOption})
 
 	// Delete storage
 	err1 := crowdin.DeleteStorage(&DeleteStorageOptions{StorageId: storageId})
