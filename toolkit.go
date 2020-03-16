@@ -119,7 +119,7 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (e
 
 
 // Lookup fileId in current project
-//    crowdinFileNamePath required - full Crowdin path to file
+//    crowdinFileNamePath required - full Crowdin path to file (To be noted: does not include the project name)
 //		Returns Id and crowdin file name
 func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name string, err error) {
 
@@ -129,10 +129,15 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 	dirId := 0
 	crowdinFile := strings.Split(crowdinFileNamePath, "/")
 
+	crowdin.log(fmt.Sprintf("  len=%d\n", len(crowdinFile) ))
+	crowdin.log(fmt.Sprintf("  crowdinFile %v\n", crowdinFile ))
+	// crowdin.log(fmt.Sprintf("  crowdinFile[1] %s\n", crowdinFile[1] ))
+
 	switch l := len(crowdinFile); l {
 	case 0:
 		return 0, "", errors.New("LookupFileId() - Crowdin file name should not be null.")
-	case 1: // no directory so dirId is 0
+	case 1: // no directory so dirId is 0 - value is like "a_file_name"
+	case 2: // no directory so dirId is 0 - value is like "/a_file_name"
 	default: // l > 1
 		// Lookup end directoryId
 		// Get a list of all the project folders
@@ -145,7 +150,7 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 			dirId = 0
 			for i, dirName := range crowdinFile { // Go down the directory branch
 				crowdin.log(fmt.Sprintf("  idx %d dirName %s len %d dirId %d", i, dirName, len(crowdinFile), dirId))
-				if i > 1 && i < len(crowdinFile) - 1 { // Skip project name and we're done once we reach the file name (last item of the slice).
+				if i > 0 && i < len(crowdinFile) - 1 { // 1st entry is empty and we're done once we reach the file name (last item of the slice).
 					for _, crwdPrjctDirName := range listDirs.Data { // Look up in list of project dirs the right one
 						crowdin.log(fmt.Sprintf("  check -> crwdPrjctDirName.Data.DirectoryId %d crwdPrjctDirName.Data.Name %s", crwdPrjctDirName.Data.DirectoryId, crwdPrjctDirName.Data.Name))
 						if crwdPrjctDirName.Data.DirectoryId == dirId && crwdPrjctDirName.Data.Name == dirName {
@@ -206,7 +211,8 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 	// Lookup fileId in Crowdin
 	fileId, crowdinFilename, err := crowdin.LookupFileId(crowdinFileNamePath)
 	if err != nil {
-		return 0, errors.New("UpdateFile() - Can't find file in Crowdin.")
+		crowdin.log(fmt.Sprintf("  err=%s\n", err))
+		return 0, err
 	}
 
 	crowdin.log(fmt.Sprintf("Update() fileId=%d fileName=%s\n", fileId, crowdinFilename))
