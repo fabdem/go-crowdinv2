@@ -380,8 +380,8 @@ type responseGeneral struct {
 
 // ListFilesOptions are options for ListFileRevisions api call
 type ListFileRevisionsOptions struct {
-	Limit  int `json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset int `json:"offset,omitempty"` // Offset in collection - optional
+	Limit  int  // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset int  // Offset in collection - optional
 }
 
 // ResponseListFiles are response for ListFiles api call

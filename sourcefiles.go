@@ -133,10 +133,23 @@ func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles
 func (crowdin *Crowdin) ListFileRevisions(options *ListFileRevisionsOptions, fileId int) (*ResponseListFileRevisions, error) {
 
 	crowdin.log(fmt.Sprintf("ListFileRevision()\n"))
+	
+	var limit string
+	if options.Limit >0 {
+		limit = strconv.Itoa(options.Limit)
+	}
+	
+	var offset string
+	if options.Offset >0 {
+		offset = strconv.Itoa(options.Offset)
+	}
 
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v/revisions", crowdin.config.projectId, fileId),
-//		body: options,
+		params: map[string]string{ 
+			"limit"			: limit,
+			"offset"		: offset,
+		},
 	})
 	if err != nil {
 		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))
