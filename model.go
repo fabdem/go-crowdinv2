@@ -384,7 +384,7 @@ type ListFileRevisionsOptions struct {
 	Offset int  // Offset in collection - optional
 }
 
-// ResponseListFiles are response for ListFiles api call
+// ResponseListFileRevisions are response for ListFileRevisions api call
 type ResponseListFileRevisions struct {
 	Data []struct {
 		Data struct {
@@ -413,4 +413,30 @@ type ResponseListFileRevisions struct {
 		Offset int `json:"offset"`
 		Limit  int `json:"limit"`
 	} `json:"pagination"`
+}
+
+
+// ResponseGetFileRevision are response for GetFileRevision api call
+type ResponseGetFileRevision struct {
+	Data struct {
+		Id                int `json:"id"`
+		ProjectId         int `json:"projectId"`
+		FileId            int `json:"fileId"`
+		RestoreToRevision int `json:"restoreToRevision"`
+		Info              struct {
+			Added struct {
+				Strings int `json:"strings"`
+				Words   int `json:"words"`
+			} `json:"added"`
+			Deleted struct {
+				Strings int `json:"strings"`
+				Words   int `json:"words"`
+			} `json:"deleted"`
+			Updated struct {
+				Strings int `json:"strings"`
+				Words   int `json:"words"`
+			} `json:"updated"`
+		} `json:"info"`
+		Date time.Time `json:"date"`
+	} `json:"data"`
 }

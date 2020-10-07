@@ -204,7 +204,7 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 //    crowdinFileNamePath required
 //    updateOption required needs to be either: clear_translations_and_approvals, keep_translations or keep_translations_and_approvals
 //		Returns file Id
-func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath string, updateOption string) (id int, err error) {
+func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath string, updateOption string) (fileId int, revId int, err error) {
 
 	crowdin.log(fmt.Sprintf("Update()\n"))
 
@@ -212,7 +212,7 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 	fileId, crowdinFilename, err := crowdin.LookupFileId(crowdinFileNamePath)
 	if err != nil {
 		crowdin.log(fmt.Sprintf("  err=%s\n", err))
-		return 0, err
+		return 0, 0, err
 	}
 
 	crowdin.log(fmt.Sprintf("Update() fileId=%d fileName=%s\n", fileId, crowdinFilename))
@@ -220,7 +220,7 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 	// Send local file to storageId
 	addStor, err := crowdin.AddStorage(&AddStorageOptions{FileName: localFileNamePath})
 	if err != nil {
-		return 0, errors.New("UpdateFile() - Error adding file to storage.")
+		return 0, 0, errors.New("UpdateFile() - Error adding file to storage.")
 	}
 	storageId := addStor.Data.Id
 
@@ -234,14 +234,16 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 
 	if err != nil {
 		crowdin.log(fmt.Sprintf("UpdateFile() - error updating file %v", updres))
-		return 0, errors.New("UpdateFile() - Error updating file.") //
+		return 0, 0, errors.New("UpdateFile() - Error updating file.") //
 	}
 
 	if err1 != nil {
 		crowdin.log(fmt.Sprintf("UpdateFile() - error deleting storage %v", err1))
 	}
+	
+	revId = updres.Data.RevisionId
 
 	crowdin.log(fmt.Sprintf("UpdateFile() - result %v", updres))
 
-	return fileId, nil
+	return fileId, revId, nil
 }

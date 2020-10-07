@@ -132,7 +132,7 @@ func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles
 // {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}/revisions
 func (crowdin *Crowdin) ListFileRevisions(options *ListFileRevisionsOptions, fileId int) (*ResponseListFileRevisions, error) {
 
-	crowdin.log(fmt.Sprintf("ListFileRevision()\n"))
+	crowdin.log(fmt.Sprintf("ListFileRevisions()\n"))
 	
 	var limit string
 	if options.Limit >0 {
@@ -157,6 +157,32 @@ func (crowdin *Crowdin) ListFileRevisions(options *ListFileRevisionsOptions, fil
 	}
 
 	var responseAPI ResponseListFileRevisions
+	err = json.Unmarshal(response, &responseAPI)
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - unmarshalling:%s\n%s\n", response, err))
+		return nil, err
+	}
+	crowdin.log(fmt.Sprintf("	Unmarshalled:%s\n", response))
+
+	return &responseAPI, nil
+}
+
+
+// GetFileRevision - List a specific revision details for a file in current project
+// {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}/revisions/{revisionId}
+func (crowdin *Crowdin) GetFileRevision(fileId int, revId int) (*ResponseGetFileRevision, error) {
+
+	crowdin.log(fmt.Sprintf("GetFileRevision()\n"))
+
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v/revisions/%v", crowdin.config.projectId, fileId, revId),
+	})
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))
+		return nil, err
+	}
+
+	var responseAPI ResponseGetFileRevision
 	err = json.Unmarshal(response, &responseAPI)
 	if err != nil {
 		crowdin.log(fmt.Sprintf("	Error - unmarshalling:%s\n%s\n", response, err))
