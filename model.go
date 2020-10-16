@@ -380,11 +380,11 @@ type responseGeneral struct {
 
 // ListFilesOptions are options for ListFileRevisions api call
 type ListFileRevisionsOptions struct {
-	Limit  int  // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset int  // Offset in collection - optional
+	Limit  int // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset int // Offset in collection - optional
 }
 
-// ResponseListFileRevisions are response for ListFileRevisions api call
+// ResponseListFiles are response for ListFiles api call
 type ResponseListFileRevisions struct {
 	Data []struct {
 		Data struct {
@@ -415,6 +415,16 @@ type ResponseListFileRevisions struct {
 	} `json:"pagination"`
 }
 
+// ListStringsOptions are options for ListStrings api call
+type ListStringsOptions struct {
+	FileId                  int
+	DenormalizePlaceholders int
+	LabelIds                string
+	Filter                  string
+	Scope                   string
+	Limit                   int // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset                  int // Offset in collection - optional
+}
 
 // ResponseGetFileRevision are response for GetFileRevision api call
 type ResponseGetFileRevision struct {
@@ -439,4 +449,30 @@ type ResponseGetFileRevision struct {
 		} `json:"info"`
 		Date time.Time `json:"date"`
 	} `json:"data"`
+}
+
+// ResponseListStrings are response for ListStrings api call
+type ResponseListStrings struct {
+	Data []struct {
+		Data struct {
+			ID         int       `json:"id"`
+			ProjectID  int       `json:"projectId"`
+			FileID     int       `json:"fileId"`
+			Identifier string    `json:"identifier"`
+			Text       string    `json:"text"`
+			Type       string    `json:"type"`
+			Context    string    `json:"context"`
+			MaxLength  int       `json:"maxLength"`
+			IsHidden   bool      `json:"isHidden"`
+			Revision   int       `json:"revision"`
+			HasPlurals bool      `json:"hasPlurals"`
+			IsIcu      bool      `json:"isIcu"`
+			CreatedAt  time.Time `json:"createdAt"`
+			UpdatedAt  time.Time `json:"updatedAt"`
+		} `json:"data"`
+	} `json:"data"`
+	Pagination struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
 }
