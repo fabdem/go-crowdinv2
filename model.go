@@ -380,8 +380,8 @@ type responseGeneral struct {
 
 // ListFilesOptions are options for ListFileRevisions api call
 type ListFileRevisionsOptions struct {
-	Limit  int // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset int // Offset in collection - optional
+	Limit  int  // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset int  // Offset in collection - optional
 }
 
 // ResponseListFiles are response for ListFiles api call
@@ -417,13 +417,13 @@ type ResponseListFileRevisions struct {
 
 // ListStringsOptions are options for ListStrings api call
 type ListStringsOptions struct {
-	FileId                  int
+	FileId									int
 	DenormalizePlaceholders int
-	LabelIds                string
-	Filter                  string
-	Scope                   string
-	Limit                   int // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset                  int // Offset in collection - optional
+	LabelIds   							string
+	Filter									string
+	Scope										string
+	Limit       						int // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset      						int // Offset in collection - optional
 }
 
 // ResponseGetFileRevision are response for GetFileRevision api call
@@ -475,4 +475,31 @@ type ResponseListStrings struct {
 		Offset int `json:"offset"`
 		Limit  int `json:"limit"`
 	} `json:"pagination"`
+}
+
+
+// EditString - Edit a source string API call
+type EditStringsOptions []struct {
+			Value         interface{}	`json:"value"`  // type depends on path value
+			Op						string    	`json:"op"`
+			Path					string			`json:"path"`
+}
+
+type ResponseEditStrings struct {
+	Data struct {
+		ID         int       `json:"id"`
+		ProjectID  int       `json:"projectId"`
+		FileID     int       `json:"fileId"`
+		Identifier string    `json:"identifier"`
+		Text       string    `json:"text"`
+		Type       string    `json:"type"`
+		Context    string    `json:"context"`
+		MaxLength  int       `json:"maxLength"`
+		IsHidden   bool      `json:"isHidden"`
+		Revision   int       `json:"revision"`
+		HasPlurals bool      `json:"hasPlurals"`
+		IsIcu      bool      `json:"isIcu"`
+		CreatedAt  time.Time `json:"createdAt"`
+		UpdatedAt  time.Time `json:"updatedAt"`
+	} `json:"data"`
 }

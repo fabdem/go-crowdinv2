@@ -2,7 +2,7 @@ package crowdin
 
 import (
 	"encoding/json"
-	// "errors"
+	"errors"
 	"fmt"
 	// "io"
 	// "net/http"
@@ -12,6 +12,53 @@ import (
 	// "time"
 	// "github.com/mreiferson/go-httpclient"
 )
+
+// EditStrings - Edit Source Strings
+// {protocol}://{host}/api/v2/projects/{projectId}/strings/{stringId}
+//
+// Validate EditStringOptions.Value type to prevent panic
+// but relies on the API for the validation of the other parameters.
+
+func (crowdin *Crowdin) EditStrings(options *EditStringsOptions, stringId int) (*ResponseEditStrings, error) {
+
+	crowdin.log(fmt.Sprintf("EditString()\n"))
+
+	if len(*options) > 0 {  // Need at least 1 set of parameters
+		// Check that the interface underlying type is string, int or boolean.
+		for _, val := range *options {
+			switch t := val.Value.(type) {
+			case bool:
+			case int:
+			case string:
+			default:
+				crowdin.log(fmt.Sprintf("	Error - param type not allowed:%v\n",t))
+				return nil, errors.New("Parameters type not allowed.")
+			}
+		}
+	} else { // No params?!
+		crowdin.log(fmt.Sprintf("	Error - at least one set of parameters is needed\n"))
+		return nil, errors.New("No parameters found.")
+	}
+
+	response, err := crowdin.patch(&patchOptions{
+					urlStr:		fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/strings/%v", crowdin.config.projectId, stringId),
+		 			body:			options})
+
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))
+		return nil, err
+	}
+
+	var responseAPI ResponseEditStrings
+	err = json.Unmarshal(response, &responseAPI)
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - unmarshalling:%s\n%s\n", response, err))
+		return nil, err
+	}
+
+	return &responseAPI, nil
+
+}
 
 // ListStrings - List Source Strings
 // {protocol}://{host}/api/v2/projects/{projectId}/strings

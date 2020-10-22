@@ -19,6 +19,8 @@ var (
 	readwriteTOinSecs  time.Duration = 40
 )
 
+const MAX_RESULTS = 1000000  // 1M lines
+
 // Crowdin API V2 wrapper
 type Crowdin struct {
 	config struct {
@@ -91,6 +93,3 @@ func (crowdin *Crowdin) SetDebug(debug bool, logWriter io.Writer) {
 	crowdin.debug = debug
 	crowdin.logWriter = logWriter
 }
-
-
-

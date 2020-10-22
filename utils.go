@@ -25,6 +25,11 @@ type delOptions struct {
 	body   interface{}
 }
 
+type patchOptions struct {
+	urlStr string
+	body   interface{}
+}
+
 type putOptions struct {
 	urlStr string
 	body   interface{}
@@ -32,7 +37,7 @@ type putOptions struct {
 
 type getOptions struct {
 	urlStr string
-	params map[string]string	
+	params map[string]string
 //	body   interface{}
 }
 
@@ -148,6 +153,54 @@ func (crowdin *Crowdin) put(options *putOptions) ([]byte, error) {
 	bodyResponse, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		crowdin.log(fmt.Sprintf("Put() - Error while reading request response %s", err))
+		return nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return bodyResponse, APIError{What: fmt.Sprintf("Status code: %v", response.StatusCode)}
+	}
+
+	return bodyResponse, nil
+}
+
+
+// PATCH request
+func (crowdin *Crowdin) patch(options *patchOptions) ([]byte, error) {
+
+	crowdin.log(fmt.Sprintf("Create PATCH http request\nBody: %s", options.body))
+
+	var	req *http.Request
+	var	err error
+
+	buf := new(bytes.Buffer)
+
+	json.NewEncoder(buf).Encode(options.body)
+	req, err = http.NewRequest("PATCH", options.urlStr, buf)
+	if err != nil {
+		crowdin.log(fmt.Sprintf("patch() - can't create a http request %s", req))
+		return nil, err
+	}
+
+	// Set headers
+	req.Header.Set("Authorization", "Bearer "+crowdin.config.token)
+	req.Header.Set("Content-Type", "application/json")
+	crowdin.log(fmt.Sprintf("Headers: %s", req.Header))
+
+	// DEBUG
+	// dump, err := httputil.DumpRequestOut(req, true)
+	// crowdin.log(dump)
+
+	// Run the  request
+	response, err := crowdin.config.client.Do(req)
+	if err != nil {
+		crowdin.log(fmt.Sprintf("patch() - Do() returned an error %s", response))
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	bodyResponse, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		crowdin.log(fmt.Sprintf("patch() - Error while reading request response %s", err))
 		return nil, err
 	}
 

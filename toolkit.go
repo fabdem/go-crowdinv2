@@ -160,7 +160,7 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 						}
 					}
 					if dirId == 0 {
-						return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Error: can't match directory names with Crowdin path."))					
+						return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Error: can't match directory names with Crowdin path."))
 					}
 				}
 			}
@@ -194,7 +194,7 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 	if fileId == 0 {
 		return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Can't find file %s in Crowdin.", crowdinFilename))
 	}
-	
+
 	crowdin.log(fmt.Sprintf("  fileId=%d\n", fileId))
 	return fileId, crowdinFilename, nil
 }
@@ -240,10 +240,65 @@ func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath str
 	if err1 != nil {
 		crowdin.log(fmt.Sprintf("UpdateFile() - error deleting storage %v", err1))
 	}
-	
+
 	revId = updres.Data.RevisionId
 
 	crowdin.log(fmt.Sprintf("UpdateFile() - result %v", updres))
 
 	return fileId, revId, nil
+}
+
+
+// Obtain a list of string Ids for a given file of the current project.
+// Use a filter on "identifier" "text" or "context"
+// Parameters:
+//  - provide path/filename
+//	- a filter string (empty mean "all")
+//	- filter on "identifier" "text" or "context"
+// Returns:
+//	- string IDs in a slice of ints if results found
+//	- err (nil if no error)
+//
+func (crowdin *Crowdin) GetStringIDs(fileName string, filter string, filterType string)(list []int, err error) {
+
+	crowdin.log(fmt.Sprintf("GetStringIDs(%s, %s, %s)\n",fileName, filter, filterType))
+
+	// Lookup fileId in Crowdin
+	fileId, _, err := crowdin.LookupFileId(fileName)
+	if err != nil {
+		crowdin.log(fmt.Sprintf("  err=%s\n", err))
+		return list, err
+	}
+
+	// Get the string IDs
+	limit := 500
+	opt := ListStringsOptions{
+			FileId:	fileId,
+			Scope:	filterType,
+			Filter:	filter,
+			Limit:	limit,
+		}
+
+	// Pull ListStrings as long as it returns data
+	for offset := 0; offset < MAX_RESULTS; offset += limit {
+		opt.Offset = offset
+
+		res,err := crowdin.ListStrings(&opt)
+		if err != nil {
+			crowdin.log(fmt.Sprintf("  err=%s\n", err))
+			return list, err
+		}
+
+		if len(res.Data) <= 0 {
+			break
+		}
+
+		crowdin.log(fmt.Sprintf(" - Page of results #%d\n",(offset/limit)+1))
+
+		for _,v := range res.Data {
+			list = append(list, v.Data.ID) // Add data to slice
+		}
+	}
+
+	return list,nil
 }
