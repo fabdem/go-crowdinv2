@@ -55,8 +55,11 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
 }
 
 // BuildAllLg - Build a project for all languages
+// Options to export:
+//   - translated strings only Y/N
+//   - approved strings only Y/N
 // Update buildProgress
-func (crowdin *Crowdin) BuildAllLg(buildTOinSec int) (buildId int, err error) {
+func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, approvedOnly bool) (buildId int, err error) {
 	crowdin.log("BuildAllLg()")
 
 	// Invoke build
@@ -64,6 +67,11 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int) (buildId int, err error) {
 	// bo.ProjectId = crowdin.config.projectId
 	bo.BranchId = 0
 	bo.Languages = nil
+	bo.SkipUntranslatedStrings = translatedOnly
+	bo.ExportApprovedOnly = approvedOnly
+	if approvedOnly {
+		bo.ExportWithMinApprovalsCount = 1 // Enterprise
+	}
 	rb, err := crowdin.BuildProjectTranslation(&bo)
 	if err != nil {
 		return buildId, errors.New("\nBuild Err.")

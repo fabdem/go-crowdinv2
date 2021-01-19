@@ -218,10 +218,14 @@ type ResponseGetFileProgress struct {
 type BuildProjectTranslationOptions struct {
 	// ProjectId int		 // Project Identifier.
 	// Body      struct {
-	BranchId int `json:"branchId,omitempty"` // Branch Identifier. - optional
+	BranchId					int			`json:"branchId,omitempty"` // Branch Identifier. - optional
 	// Specify target languages for build.
 	// Leave this field empty to build all target languages
-	Languages []string `json:"targetLanguagesId,omitempty"`
+	Languages 					[]string	`json:"targetLanguagesId,omitempty"`
+	SkipUntranslatedStrings		bool		`json:"skipUntranslatedStrings"`
+	SkipUntranslatedFiles		bool		`json:"skipUntranslatedFiles"`
+	ExportApprovedOnly			bool		`json:"exportApprovedOnly"`
+	ExportWithMinApprovalsCount int			`json:"exportWithMinApprovalsCount"` 
 	// }
 }
 
