@@ -52,7 +52,6 @@ func (crowdin *Crowdin) BuildProjectTranslation(options *BuildProjectTranslation
 		return nil, err
 	}
 
-	crowdin.log("res:")
 	crowdin.log(string(response))
 
 	var responseAPI ResponseBuildProjectTranslation

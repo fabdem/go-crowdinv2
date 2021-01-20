@@ -60,7 +60,7 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
 //   - approved strings only Y/N
 // Update buildProgress
 func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, approvedOnly bool) (buildId int, err error) {
-	crowdin.log("BuildAllLang()")
+	crowdin.log("BuildAllLg()")
 
 	// Invoke build
 	var bo BuildProjectTranslationOptions

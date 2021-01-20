@@ -253,13 +253,13 @@ type ResponseBuildProjectTranslation struct {
 		ProjectID  int    `json:"projectId"`
 		Status     string `json:"status"`
 		Progress   int    `json:"progress"`
-		Attributes []struct {
-			BranchID                    int      `json:"branchId,omitempty"`
-			TargetLanguageIDs           []string `json:"targetLanguageIds,omitempty"`
+		Attributes struct {
+			BranchID                    int      `json:"branchId"`
+			TargetLanguageIDs           []string `json:"targetLanguageIds"`
 			SkipUntranslatedStrings     bool     `json:"skipUntranslatedStrings"`
 			SkipUntranslatedFiles       bool     `json:"skipUntranslatedFiles"`
-			ExportApprovedOnly       	bool     `json:"exportApprovedOnly,omitempty"`
-			ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount,omitempty"`
+			ExportApprovedOnly       	bool     `json:"exportApprovedOnly"`
+			ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount"`
 		} `json:"attributes"`
 	} `json:"data"`
 }
