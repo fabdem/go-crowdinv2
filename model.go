@@ -180,7 +180,7 @@ type ResponseCheckProjectBuildStatus struct {
 		ProjectId  int    `json:"projectId"`
 		Status     string `json:"status"`
 		Progress   int    `json:"progress"`
-		Attributes []struct {
+		Attributes struct {
 			BranchId                    int      `json:"branchId,omitempty"`
 			TargetLanguageIds           []string `json:"targetLanguageIds,omitempty"`
 			SkipUntranslatedStrings     bool     `json:"skipUntranslatedStrings"`

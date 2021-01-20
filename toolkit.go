@@ -93,7 +93,8 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, approv
 		rp, err = crowdin.CheckProjectBuildStatus(&CheckProjectBuildStatusOptions{BuildId: buildId})
 		if err != nil {
 			crowdin.log(fmt.Sprintf(" Error CheckProjectBuildStatus()=%s", err))
-			break
+			return buildId, err
+			// break
 		}
 		select {
 		case <-timer.C:
