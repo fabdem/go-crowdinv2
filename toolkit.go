@@ -64,14 +64,18 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, approv
 
 	// Invoke build
 	var bo BuildProjectTranslationOptions
-	// bo.ProjectId = crowdin.config.projectId
-	bo.BranchId = 0
+	// keep bo.BranchId nil
 	bo.Languages = nil
+	
 	bo.SkipUntranslatedStrings = translatedOnly
-	bo.ExportApprovedOnly = approvedOnly
-	if approvedOnly {
-		bo.ExportWithMinApprovalsCount = 1 // Enterprise
+	if crowdin.config.apiBaseURL == API_CROWDINDOTCOM { 
+		bo.ExportApprovedOnly = approvedOnly  // crowdin.com
+	} else {
+		if approvedOnly {
+			bo.ExportWithMinApprovalsCount = 1 // Enterprise
+		}
 	}
+	
 	rb, err := crowdin.BuildProjectTranslation(&bo)
 	if err != nil {
 		return buildId, errors.New("\nBuild Err.")

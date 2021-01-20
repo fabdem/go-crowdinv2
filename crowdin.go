@@ -10,16 +10,18 @@ import (
 	"github.com/mreiferson/go-httpclient"
 )
 
+const MAX_RESULTS = 1000000  // 1M lines
+const API_CROWDINDOTCOM = "https://crowdin.com/api/v2/"  // url for crowdin.com (non Enterprise version)
+
 var (
 	// Default value for API URL
-	apiBaseURL = "https://crowdin.com/api/v2/"
+	apiBaseURL = API_CROWDINDOTCOM
 
 	// Default values for timeouts in seconds
 	connectionTOinSecs time.Duration = 5
 	readwriteTOinSecs  time.Duration = 40
 )
 
-const MAX_RESULTS = 1000000  // 1M lines
 
 // Crowdin API V2 wrapper
 type Crowdin struct {
