@@ -58,6 +58,7 @@ func (crowdin *Crowdin) BuildProjectTranslation(options *BuildProjectTranslation
 	err = json.Unmarshal(response, &responseAPI)
 	if err != nil {
 		crowdin.log(err)
+		return nil, err
 	}
 
 	return &responseAPI, nil
