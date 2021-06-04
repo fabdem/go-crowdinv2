@@ -528,3 +528,22 @@ type ResponseEditStrings struct {
 		UpdatedAt  time.Time `json:"updatedAt"`
 	} `json:"data"`
 }
+
+
+// Upload translations API call
+type UploadTranslationsOptions []struct {
+	StorageID           int  `json:"storageId"`
+	FileID              int  `json:"fileId"`
+	ImportEqSuggestions bool `json:"importEqSuggestions,omitempty"`
+	AutoApproveImported bool `json:"autoApproveImported,omitempty"`
+	TranslateHidden     bool `json:"translateHidden,omitempty"`
+}
+
+type ResponseUploadTranslations struct {
+	Data struct {
+		ProjectID  int    `json:"projectId"`
+		StorageID  int    `json:"storageId"`
+		LanguageID string `json:"languageId"`
+		FileID     int    `json:"fileId"`
+	} `json:"data"`
+}

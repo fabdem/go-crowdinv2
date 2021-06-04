@@ -51,7 +51,6 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 
 	buf := new(bytes.Buffer)
 
-
 	if options.fileName == "" {	// Doesn't include a file to upload
 		json.NewEncoder(buf).Encode(options.body)
 		req, err = http.NewRequest("POST", options.urlStr, buf)

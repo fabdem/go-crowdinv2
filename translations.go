@@ -135,3 +135,39 @@ func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*R
 	return &responseAPI, nil
 }
 
+
+// UploadTranslations() - Upload translations into a file API call
+// {protocol}://{host}/api/v2/projects/{projectId}/translations/{languageId}
+func (crowdin *Crowdin) UploadTranslations(LanguageId string, options *UploadTranslationsOptions) (*ResponseUploadTranslations, error) {
+	crowdin.log(fmt.Sprintf("UploadTranslations(%s, %v)\n", LanguageId, options ))
+
+	// Prepare URL and params
+	var p postOptions
+	p.urlStr = fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/%v", crowdin.config.projectId, LanguageId)
+	p.body = options
+	response, err := crowdin.post(&p)
+
+	if err != nil {
+		crowdin.log(err)
+		return nil, err
+	}
+
+	crowdin.log(string(response))
+
+	if err != nil {
+		crowdin.log(err)
+		return nil, err
+	}
+
+	crowdin.log(string(response))
+
+	var responseAPI ResponseUploadTranslations
+	err = json.Unmarshal(response, &responseAPI)
+	if err != nil {
+		crowdin.log(err)
+		return nil, err
+	}
+
+	return &responseAPI, nil
+}
+	

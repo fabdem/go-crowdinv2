@@ -216,7 +216,7 @@ func (crowdin *Crowdin) LookupFileId(crowdinFileNamePath string) (id int, name s
 //    localFileNamePath  required
 //    crowdinFileNamePath required
 //    updateOption required needs to be either: clear_translations_and_approvals, keep_translations or keep_translations_and_approvals
-//		Returns file Id
+//		Returns file Id and rev
 func (crowdin *Crowdin) Update(crowdinFileNamePath string, localFileNamePath string, updateOption string) (fileId int, revId int, err error) {
 
 	crowdin.log(fmt.Sprintf("Update()\n"))
@@ -314,4 +314,66 @@ func (crowdin *Crowdin) GetStringIDs(fileName string, filter string, filterType 
 	}
 
 	return list,nil
+}
+
+
+type T_UploadTranslationFileParams {
+	LocalFileNamePath	string		// File containing the translations to upload
+	CrowdinFileNamePath	string		// File in Crowdin where the translations will end up
+	LanguageId			string		// Langugage ID as per Crowdin spec and defined as target in the project
+	ImportEqSuggestions	bool		// Defines whether to add translation if it's the same as the source string
+	AutoApproveImported	bool		// Mark uploaded translations as approved
+	TranslateHidden		bool		// Allow translations upload to hidden source strings
+}
+
+// Upload a translation file
+//  localFileNamePath  	required
+//  crowdinFileNamePath required
+//  languageId			required
+//  upload options:
+//		- importEqSuggestions	boolean
+//		- autoApproveImported	boolean
+//		- translateHidden		boolean
+//	Returns err != nil if error
+func (crowdin *Crowdin) (params T_UploadTranslationFileParams) (err error) {
+	crowdin.log(fmt.Sprintf("UploadTranslationFile(%v)\n",params))
+
+	// Lookup fileId in Crowdin
+	fileId, crowdinFilename, err := crowdin.LookupFileId(crowdinFileNamePath)
+	if err != nil {
+		crowdin.log(fmt.Sprintf("  err=%s\n", err))
+		return err
+	}
+
+	crowdin.log(fmt.Sprintf("UploadTranslationFile() fileId=%d fileName=%s\n", fileId, crowdinFilename))
+
+	// Send local file to storageId
+	addStor, err := crowdin.AddStorage(&AddStorageOptions{FileName: localFileNamePath})
+	if err != nil {
+		return errors.New("UploadTranslationFile() - Error adding file to storage.")
+	}
+	storageId := addStor.Data.Id
+
+	// fmt.Printf("Directory Id = %d, filename= %s, fileId %d storageId= %d\n", dirId, crowdinFilename, fileId, storageId)
+
+	// Update file
+	updres, err := crowdin.UploadTranslations(params.LanguageId, &UploadTranslationsOptions{StorageId: storageId, FileId: fileId, ImportEqSuggestions: params.ImportEqSuggestions, AutoApproveImported: params.AutoApproveImported,TranslateHidden: params.TranslateHidden})
+
+	// Delete storage
+	err1 := crowdin.DeleteStorage(&DeleteStorageOptions{StorageId: storageId})
+
+	if err != nil {
+		crowdin.log(fmt.Sprintf("UploadTranslationFile() - error updating file %v", updres))
+		return errors.New("UploadTranslationFile() - Error updating file.") //
+	}
+
+	if err1 != nil {
+		crowdin.log(fmt.Sprintf("UploadTranslationFile() - error deleting storage %v", err1))
+	}
+
+	revId = updres.Data.RevisionId
+
+	crowdin.log(fmt.Sprintf("UploadTranslationFile() - result %v", updres))
+
+	return nil
 }
