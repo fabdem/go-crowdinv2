@@ -46,34 +46,45 @@ type ListProjectsOptions struct {
 type ResponseListProjects struct {
 	Data []struct {
 		Data struct {
-			Id                   int       `json:"id"`
-			GroupId              int       `json:"groupId"`
-			UserId               int       `json:"userId"`
-			SourceLanguageId     int       `json:"sourceLanguageId"`
-			TargetLanguageIds    []int     `json:"targetLanguageIds"`
-			JoinPolicy           string    `json:"joinPolicy"`
+			ID                   int       `json:"id"`
+			UserID               int       `json:"userId"`
+			SourceLanguageID     string    `json:"sourceLanguageId"`
+			TargetLanguageIds    []string  `json:"targetLanguageIds"`
 			LanguageAccessPolicy string    `json:"languageAccessPolicy"`
-			Type                 int       `json:"type"`
 			Name                 string    `json:"name"`
 			Cname                string    `json:"cname"`
 			Identifier           string    `json:"identifier"`
 			Description          string    `json:"description"`
 			Visibility           string    `json:"visibility"`
-			Logo                 []byte    `json:"logo"`
-			Background           string    `json:"background"`
-			IsExternal           bool      `json:"isExternal"`
-			ExternalType         string    `json:"externalType"`
-			AdvancedWorkflowId   int       `json:"advancedWorkflowId"`
-			HasCrowdsourcing     bool      `json:"hasCrowdsourcing"`
+			Logo                 string    `json:"logo"`
+			PublicDownloads      bool      `json:"publicDownloads"`
 			CreatedAt            time.Time `json:"createdAt"`
 			UpdatedAt            time.Time `json:"updatedAt"`
+			LastActivity         time.Time `json:"lastActivity"`
+			TargetLanguages      []struct {
+				ID                  string   `json:"id"`
+				Name                string   `json:"name"`
+				EditorCode          string   `json:"editorCode"`
+				TwoLettersCode      string   `json:"twoLettersCode"`
+				ThreeLettersCode    string   `json:"threeLettersCode"`
+				Locale              string   `json:"locale"`
+				AndroidCode         string   `json:"androidCode"`
+				OsxCode             string   `json:"osxCode"`
+				OsxLocale           string   `json:"osxLocale"`
+				PluralCategoryNames []string `json:"pluralCategoryNames"`
+				PluralRules         string   `json:"pluralRules"`
+				PluralExamples      []string `json:"pluralExamples"`
+				TextDirection       string   `json:"textDirection"`
+				DialectOf           int		   `json:"dialectOf"`
+			} `json:"targetLanguages"`
 		} `json:"data"`
 	} `json:"data"`
-	Pagination []struct {
+	Pagination struct {
 		Offset int `json:"offset"`
 		Limit  int `json:"limit"`
 	} `json:"pagination"`
 }
+
 
 // UpdateFile - Update a file API call
 type UpdateFileOptions struct {
@@ -531,7 +542,7 @@ type ResponseEditStrings struct {
 
 
 // Upload translations API call
-type UploadTranslationsOptions []struct {
+type UploadTranslationsOptions struct {
 	StorageID           int  `json:"storageId"`
 	FileID              int  `json:"fileId"`
 	ImportEqSuggestions bool `json:"importEqSuggestions,omitempty"`
