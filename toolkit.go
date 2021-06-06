@@ -324,16 +324,20 @@ type T_UploadTranslationFileParams struct {
 	ImportEqSuggestions	bool		// Defines whether to add translation if it's the same as the source string
 	AutoApproveImported	bool		// Mark uploaded translations as approved
 	TranslateHidden			bool		// Allow translations upload to hidden source strings
+	ResponseTimeOut			int			// in seconds. The upload operation can take several minutes.
+															// The original TO will be restored after operation finishes (ok or not)
 }
 
 // Upload a translation file
-//  LocalFileName  	required
-//  CrowdinFileName required
-//  languageId			required
-//  upload options:
-//		- importEqSuggestions	boolean
-//		- autoApproveImported	boolean
-//		- translateHidden			boolean
+// Params:
+// 	- File containing the translations to upload
+// 	- File in Crowdin where the translations will end up
+// 	- Langsugage ID as per Crowdin spec and defined as target in the project
+// 	- Defines whether to add translation if it's the same as the source string
+// 	- Mark uploaded translations as approved
+// 	- Allow translations upload to hidden source strings
+// 	- in seconds. The upload operation can take several minutes. 0 means no change.
+// 		The original TO will be restored after operation finishes (ok or not)
 //	Returns err != nil if error
 func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFileParams) (err error) {
 	crowdin.log(fmt.Sprintf("UploadTranslationFile(%v)\n",params))
@@ -358,6 +362,10 @@ func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFilePara
 	// fmt.Printf("Directory Id = %d, filename= %s, fileId %d storageId= %d\n", dirId, crowdinFilename, fileId, storageId)
 
 	// Upload file
+	if params.ResponseTimeOut > 0 { // If a specific to has been defined
+		crowdin.PushTimeouts() //  Backup comm timeouts
+		crowdin.SetTimeouts(0, params.ResponseTimeOut) // Set new TO for this call
+	}
 	upldres, err := crowdin.UploadTranslations(params.LanguageId,
 																						&UploadTranslationsOptions{
 																							 StorageID:						storageId,
@@ -366,6 +374,9 @@ func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFilePara
 																							 AutoApproveImported:	params.AutoApproveImported,
 																							 TranslateHidden:			params.TranslateHidden,
 																						 })
+	if params.ResponseTimeOut > 0 { // If a specific to has been defined
+		crowdin.PopTimeouts() // Restore current timeouts
+	}
 
 	// Delete storage
 	err1 := crowdin.DeleteStorage(&DeleteStorageOptions{StorageId: storageId})

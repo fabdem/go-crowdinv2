@@ -107,7 +107,7 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 		return nil, err
 	}
 
-	if response.StatusCode != http.StatusCreated {
+	if response.StatusCode < http.StatusOK || response.StatusCode > http.StatusIMUsed  {
 		return bodyResponse, APIError{What: fmt.Sprintf("Status code: %v", response.StatusCode)}
 	}
 

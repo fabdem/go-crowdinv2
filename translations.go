@@ -147,19 +147,12 @@ func (crowdin *Crowdin) UploadTranslations(LanguageId string, options *UploadTra
 	p.body = options
 	response, err := crowdin.post(&p)
 
-	if err != nil {
-		crowdin.log(err)
-		return nil, err
-	}
-
 	crowdin.log(string(response))
 
 	if err != nil {
 		crowdin.log(err)
 		return nil, err
 	}
-
-	crowdin.log(string(response))
 
 	var responseAPI ResponseUploadTranslations
 	err = json.Unmarshal(response, &responseAPI)
@@ -170,4 +163,3 @@ func (crowdin *Crowdin) UploadTranslations(LanguageId string, options *UploadTra
 
 	return &responseAPI, nil
 }
-	
