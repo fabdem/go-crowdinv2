@@ -332,7 +332,7 @@ type T_UploadTranslationFileParams struct {
 // Params:
 // 	- File containing the translations to upload
 // 	- File in Crowdin where the translations will end up
-// 	- Langsugage ID as per Crowdin spec and defined as target in the project
+// 	- Language ID as per Crowdin spec and defined as target in the project
 // 	- Defines whether to add translation if it's the same as the source string
 // 	- Mark uploaded translations as approved
 // 	- Allow translations upload to hidden source strings
