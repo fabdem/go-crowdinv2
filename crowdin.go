@@ -98,6 +98,11 @@ func New(token string, projectId int, apiurl string, proxy string) (*Crowdin, er
 	return s, nil
 }
 
+func (crowdin *Crowdin) Close() {
+	crowdin.log(fmt.Sprintf("Close() API\n"))
+	crowdin = nil
+}
+
 
 // Set connection and read/write timeouts
 //  0 means doesn't change value
