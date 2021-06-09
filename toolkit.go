@@ -69,7 +69,7 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, approv
 
 	bo.SkipUntranslatedStrings = translatedOnly
 	if crowdin.config.apiBaseURL == API_CROWDINDOTCOM {
-		bo.ExportApprovedOnly = approvedOnly  // crowdin.com
+		bo.ExportApprovedOnly = approvedOnly // crowdin.com
 	} else {
 		if approvedOnly {
 			bo.ExportWithMinApprovalsCount = 1 // Enterprise
@@ -130,7 +130,6 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (e
 	return err
 }
 
-
 // Lookup fileId in current project
 //    CrowdinFileName required - full Crowdin path to file (To be noted: does not include the project name)
 //		Returns Id and crowdin file name
@@ -142,8 +141,8 @@ func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name strin
 	dirId := 0
 	crowdinFile := strings.Split(CrowdinFileName, "/")
 
-	crowdin.log(fmt.Sprintf("  len=%d\n", len(crowdinFile) ))
-	crowdin.log(fmt.Sprintf("  crowdinFile %v\n", crowdinFile ))
+	crowdin.log(fmt.Sprintf("  len=%d\n", len(crowdinFile)))
+	crowdin.log(fmt.Sprintf("  crowdinFile %v\n", crowdinFile))
 	// crowdin.log(fmt.Sprintf("  crowdinFile[1] %s\n", crowdinFile[1] ))
 
 	switch l := len(crowdinFile); l {
@@ -156,18 +155,18 @@ func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name strin
 		// Get a list of all the project folders
 		listDirs, err := crowdin.ListDirectories(&ListDirectoriesOptions{Limit: 500})
 		if err != nil {
- 			return 0, "", errors.New("LookupFileId() - Error listing project directories.")
+			return 0, "", errors.New("LookupFileId() - Error listing project directories.")
 		}
 		if len(listDirs.Data) > 0 {
 			// Lookup last directory's Id
 			dirId = 0
 			for i, dirName := range crowdinFile { // Go down the directory branch
 				crowdin.log(fmt.Sprintf("  idx %d dirName %s len %d dirId %d", i, dirName, len(crowdinFile), dirId))
-				if i > 0 && i < len(crowdinFile) - 1 { // 1st entry is empty and we're done once we reach the file name (last item of the slice).
+				if i > 0 && i < len(crowdinFile)-1 { // 1st entry is empty and we're done once we reach the file name (last item of the slice).
 					for _, crwdPrjctDirName := range listDirs.Data { // Look up in list of project dirs the right one
 						crowdin.log(fmt.Sprintf("  check -> crwdPrjctDirName.Data.DirectoryId %d crwdPrjctDirName.Data.Name %s", crwdPrjctDirName.Data.DirectoryId, crwdPrjctDirName.Data.Name))
 						if crwdPrjctDirName.Data.DirectoryId == dirId && crwdPrjctDirName.Data.Name == dirName {
-							dirId = crwdPrjctDirName.Data.Id  // Bingo get that Id
+							dirId = crwdPrjctDirName.Data.Id // Bingo get that Id
 							crowdin.log(fmt.Sprintf("  BINGO dirId=%d Crowdin dir name %s", dirId, crwdPrjctDirName.Data.Name))
 							break // Done for that one
 						}
@@ -185,7 +184,7 @@ func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name strin
 		}
 	}
 
-	crowdinFilename := crowdinFile[len(crowdinFile) - 1]   // Get file name
+	crowdinFilename := crowdinFile[len(crowdinFile)-1] // Get file name
 	crowdin.log(fmt.Sprintf("  crowdinFilename %s\n", crowdinFilename))
 
 	// Look up file
@@ -200,7 +199,7 @@ func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name strin
 		if list.Data.Name == crowdinFilename {
 			fileId = list.Data.Id
 			crowdin.log(fmt.Sprintf("  BINGO fileId=%d File name %s", fileId, crowdinFilename))
-			break   // found it
+			break // found it
 		}
 	}
 
@@ -261,7 +260,6 @@ func (crowdin *Crowdin) Update(CrowdinFileName string, LocalFileName string, upd
 	return fileId, revId, nil
 }
 
-
 // Obtain a list of string Ids for a given file of the current project.
 // Use a filter on "identifier" "text" or "context"
 // Parameters:
@@ -272,9 +270,9 @@ func (crowdin *Crowdin) Update(CrowdinFileName string, LocalFileName string, upd
 //	- string IDs in a slice of ints if results found
 //	- err (nil if no error)
 //
-func (crowdin *Crowdin) GetStringIDs(fileName string, filter string, filterType string)(list []int, err error) {
+func (crowdin *Crowdin) GetStringIDs(fileName string, filter string, filterType string) (list []int, err error) {
 
-	crowdin.log(fmt.Sprintf("GetStringIDs(%s, %s, %s)\n",fileName, filter, filterType))
+	crowdin.log(fmt.Sprintf("GetStringIDs(%s, %s, %s)\n", fileName, filter, filterType))
 
 	// Lookup fileId in Crowdin
 	fileId, _, err := crowdin.LookupFileId(fileName)
@@ -286,17 +284,17 @@ func (crowdin *Crowdin) GetStringIDs(fileName string, filter string, filterType 
 	// Get the string IDs
 	limit := 500
 	opt := ListStringsOptions{
-			FileId:	fileId,
-			Scope:	filterType,
-			Filter:	filter,
-			Limit:	limit,
-		}
+		FileId: fileId,
+		Scope:  filterType,
+		Filter: filter,
+		Limit:  limit,
+	}
 
 	// Pull ListStrings as long as it returns data
 	for offset := 0; offset < MAX_RESULTS; offset += limit {
 		opt.Offset = offset
 
-		res,err := crowdin.ListStrings(&opt)
+		res, err := crowdin.ListStrings(&opt)
 		if err != nil {
 			crowdin.log(fmt.Sprintf("  err=%s\n", err))
 			return list, err
@@ -306,26 +304,25 @@ func (crowdin *Crowdin) GetStringIDs(fileName string, filter string, filterType 
 			break
 		}
 
-		crowdin.log(fmt.Sprintf(" - Page of results #%d\n",(offset/limit)+1))
+		crowdin.log(fmt.Sprintf(" - Page of results #%d\n", (offset/limit)+1))
 
-		for _,v := range res.Data {
+		for _, v := range res.Data {
 			list = append(list, v.Data.ID) // Add data to slice
 		}
 	}
 
-	return list,nil
+	return list, nil
 }
 
-
 type T_UploadTranslationFileParams struct {
-	LocalFileName				string	// File containing the translations to upload
-	CrowdinFileName			string	// File in Crowdin where the translations will end up
-	LanguageId					string	// Langugage ID as per Crowdin spec and defined as target in the project
-	ImportEqSuggestions	bool		// Defines whether to add translation if it's the same as the source string
-	AutoApproveImported	bool		// Mark uploaded translations as approved
-	TranslateHidden			bool		// Allow translations upload to hidden source strings
-	ResponseTimeOut			int			// in seconds. The upload operation can take several minutes.
-															// The original TO will be restored after operation finishes (ok or not)
+	LocalFileName       string // File containing the translations to upload
+	CrowdinFileName     string // File in Crowdin where the translations will end up
+	LanguageId          string // Langugage ID as per Crowdin spec and defined as target in the project
+	ImportEqSuggestions bool   // Defines whether to add translation if it's the same as the source string
+	AutoApproveImported bool   // Mark uploaded translations as approved
+	TranslateHidden     bool   // Allow translations upload to hidden source strings
+	ResponseTimeOut     int    // in seconds. The upload operation can take several minutes.
+	// The original TO will be restored after operation finishes (ok or not)
 }
 
 // Upload a translation file
@@ -338,15 +335,15 @@ type T_UploadTranslationFileParams struct {
 // 	- Allow translations upload to hidden source strings
 // 	- in seconds. The upload operation can take several minutes. 0 means no change.
 // 		The original TO will be restored after operation finishes (ok or not)
-//	Returns err != nil if error
-func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFileParams) (err error) {
-	crowdin.log(fmt.Sprintf("UploadTranslationFile(%v)\n",params))
+//	Returns the source fileId (0 if error) and err != nil if error
+func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFileParams) (fileId int, err error) {
+	crowdin.log(fmt.Sprintf("UploadTranslationFile(%v)\n", params))
 
 	// Lookup fileId in Crowdin
 	fileId, crowdinFilename, err := crowdin.LookupFileId(params.CrowdinFileName)
 	if err != nil {
 		crowdin.log(fmt.Sprintf("  err=%s\n", err))
-		return err
+		return fileId, err
 	}
 
 	crowdin.log(fmt.Sprintf("UploadTranslationFile() fileId=%d fileName=%s\n", fileId, crowdinFilename))
@@ -355,7 +352,7 @@ func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFilePara
 	addStor, err := crowdin.AddStorage(&AddStorageOptions{FileName: params.LocalFileName})
 	if err != nil {
 		crowdin.log(fmt.Sprintf("  Error adding file to storage %s\n", err))
-		return errors.New("UploadTranslationFile() - Error adding file to storage.")
+		return fileId, errors.New("UploadTranslationFile() - Error adding file to storage.")
 	}
 	storageId := addStor.Data.Id
 
@@ -363,17 +360,17 @@ func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFilePara
 
 	// Upload file
 	if params.ResponseTimeOut > 0 { // If a specific to has been defined
-		crowdin.PushTimeouts() //  Backup comm timeouts
+		crowdin.PushTimeouts()                         //  Backup comm timeouts
 		crowdin.SetTimeouts(0, params.ResponseTimeOut) // Set new TO for this call
 	}
 	upldres, err := crowdin.UploadTranslations(params.LanguageId,
-																						&UploadTranslationsOptions{
-																							 StorageID:						storageId,
-																							 FileID:							fileId,
-																							 ImportEqSuggestions:	params.ImportEqSuggestions,
-																							 AutoApproveImported:	params.AutoApproveImported,
-																							 TranslateHidden:			params.TranslateHidden,
-																						 })
+		&UploadTranslationsOptions{
+			StorageID:           storageId,
+			FileID:              fileId,
+			ImportEqSuggestions: params.ImportEqSuggestions,
+			AutoApproveImported: params.AutoApproveImported,
+			TranslateHidden:     params.TranslateHidden,
+		})
 	if params.ResponseTimeOut > 0 { // If a specific to has been defined
 		crowdin.PopTimeouts() // Restore current timeouts
 	}
@@ -384,7 +381,7 @@ func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFilePara
 	crowdin.log(fmt.Sprintf("UploadTranslationFile() - uploading %s result %v\n", params.LocalFileName, upldres))
 	if err != nil {
 		crowdin.log(fmt.Sprintf("UploadTranslationFile() - upload error - %s", err))
-		return errors.New("UploadTranslationFile() - Error uploading file.")
+		return fileId, errors.New("UploadTranslationFile() - Error uploading file.")
 	}
 
 	if err1 != nil {
@@ -392,5 +389,25 @@ func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFilePara
 		crowdin.log(fmt.Sprintf("UploadTranslationFile() - error deleting storage %v", err1))
 	}
 
-	return nil
+	return fileId, nil
+}
+
+
+// GetShortLangFileProgress() - Get a simple file completion info for a specific language
+//	 Returns a percentage of completion for both translation and approval (0 if error).
+func (crowdin *Crowdin) GetShortLangFileProgress(fileId int, langId string) (translationProgress int, approvalProgress int, err error) {
+	crowdin.log(fmt.Sprintf("GetShortLangFileProgress()\n"))
+
+	opt := GetFileProgressOptions{FileId: fileId, Limit: 500}
+	res, err := crowdin.GetFileProgress(&opt)
+	if err == nil {
+		// Lookup for language in res
+		for _,v := range res.Data {
+			if v.Data.LanguageId == langId {
+				return v.Data.TranslationProgress, v.Data.ApprovalProgress, nil // found it: done
+			}
+		}
+	}
+	return 0, 0, nil
+
 }

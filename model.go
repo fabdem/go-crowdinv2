@@ -219,8 +219,7 @@ type ResponseDownloadProjectTranslations struct {
 
 // GetFileProgress - options for Language Progress API call
 type GetFileProgressOptions struct {
-	LanguageIds      string
-	HasManagerAccess int
+	FileId		     int
 	Limit            int
 	Offset           int
 }
@@ -229,12 +228,20 @@ type GetFileProgressOptions struct {
 type ResponseGetFileProgress struct {
 	Data []struct {
 		Data struct {
-			LanguageId                int `json:"languageId"`
-			PhrasesCount              int `json:"phrasesCount"`
-			PhrasesTranslatedCount    int `json:"phrasesTranslatedCount"`
-			PhrasesApprovedCount      int `json:"phrasesApprovedCount"`
-			PhrasesTranslatedProgress int `json:"phrasesTranslatedProgress"`
-			PhrasesApprovedProgress   int `json:"phrasesApprovedProgress"`
+			Words struct {
+				Total      int `json:"total"`
+				Translated int `json:"translated"`
+				Approved   int `json:"approved"`
+			} `json:"words"`
+			Phrases struct {
+				Total      int `json:"total"`
+				Translated int `json:"translated"`
+				Approved   int `json:"approved"`
+			} `json:"phrases"`
+			TranslationProgress int    `json:"translationProgress"`
+			ApprovalProgress    int    `json:"approvalProgress"`
+			LanguageId          string `json:"languageId"`
+			ETag                string `json:"eTag"`
 		} `json:"data"`
 	} `json:"data"`
 	Pagination struct {
@@ -242,6 +249,7 @@ type ResponseGetFileProgress struct {
 		Limit  int `json:"limit"`
 	} `json:"pagination"`
 }
+
 
 // BuildProjectTranslationOptions are options for BuildProjectTranslation api call
 type BuildProjectTranslationOptions struct {

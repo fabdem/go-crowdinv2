@@ -6,15 +6,11 @@ import (
 	"strconv"
 )
 
-// GetFileProgress() - Get progress info per language API call
-// {protocol}://{host}/api/v2/projects/{projectId}/languages/progress
+// GetFileProgress() - Get file progress info
+// {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}/languages/progress
 func (crowdin *Crowdin) GetFileProgress(options *GetFileProgressOptions) (*ResponseGetFileProgress, error) {
 	crowdin.log(fmt.Sprintf("GetFileProgress()\n"))
 
-	var languageIds string
-	if len(options.LanguageIds) > 0 {
-		languageIds = options.LanguageIds
-	}
 
 	var limit string
 	if options.Limit >0 {
@@ -27,9 +23,8 @@ func (crowdin *Crowdin) GetFileProgress(options *GetFileProgressOptions) (*Respo
 	}
 
 	response, err := crowdin.get(&getOptions{
-		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/languages/progress", crowdin.config.projectId),
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v/languages/progress", crowdin.config.projectId, options.FileId),
 		params: map[string]string{
-			"languageIds"	: languageIds,
 			"limit"			: limit,
 			"offset"		: offset,
 		},
