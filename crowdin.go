@@ -130,8 +130,7 @@ func (crowdin *Crowdin) GetTimeouts()(connectionTO, rwTO int) {
 
 // Save current timeout values
 func (crowdin *Crowdin) PushTimeouts() {
-	crowdin.config.savConnectionTO	= crowdin.config.currentConnectionTO
-	crowdin.config.savReadwriteTO 	= crowdin.config.currentReadwriteTO
+	crowdin.config.savConnectionTO, crowdin.config.savReadwriteTO	= crowdin.config.currentConnectionTO, crowdin.config.currentReadwriteTO
 }
 
 // Restore saved timeout values
