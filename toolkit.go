@@ -407,7 +407,9 @@ func (crowdin *Crowdin) GetShortLangFileProgress(fileId int, langId string) (tra
 				return v.Data.TranslationProgress, v.Data.ApprovalProgress, nil // found it: done
 			}
 		}
+		crowdin.log(fmt.Sprintf("GetShortLangFileProgress() - language %s not found in %v", langId, res))
+		err = errors.New("GetShortLangFileProgress() - Can't find language in result.")
 	}
-	return 0, 0, nil
+	return 0, 0, err
 
 }
