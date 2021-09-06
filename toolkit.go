@@ -58,8 +58,10 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
 // Options to export:
 //   - translated strings only Y/N
 //   - approved strings only Y/N
+//   - fully translated files only Y/N
+//	"translated strings only" and fully "translated files only" are mutually exclusive.
 // Update buildProgress
-func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, approvedOnly bool) (buildId int, err error) {
+func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, approvedOnly bool, fullyTranslatedFilesOnly bool) (buildId int, err error) {
 	crowdin.log("BuildAllLg()")
 
 	// Invoke build
@@ -67,6 +69,11 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, approv
 	// keep bo.BranchId nil
 	bo.Languages = nil
 
+	if translatedOnly && fullyTranslatedFilesOnly {
+		return buildId, errors.New("\nOption error - Can't have both translatedOnly and fullyTranslatedFilesOnly set to true.")
+	}
+
+	bo.SkipUntranslatedFiles = fullyTranslatedFilesOnly
 	bo.SkipUntranslatedStrings = translatedOnly
 	if crowdin.config.apiBaseURL == API_CROWDINDOTCOM {
 		bo.ExportApprovedOnly = approvedOnly // crowdin.com
