@@ -75,7 +75,7 @@ type ResponseListProjects struct {
 				PluralRules         string   `json:"pluralRules"`
 				PluralExamples      []string `json:"pluralExamples"`
 				TextDirection       string   `json:"textDirection"`
-				DialectOf           int		   `json:"dialectOf"`
+				DialectOf           int      `json:"dialectOf"`
 			} `json:"targetLanguages"`
 		} `json:"data"`
 	} `json:"data"`
@@ -84,7 +84,6 @@ type ResponseListProjects struct {
 		Limit  int `json:"limit"`
 	} `json:"pagination"`
 }
-
 
 // UpdateFile - Update a file API call
 type UpdateFileOptions struct {
@@ -196,8 +195,8 @@ type ResponseCheckProjectBuildStatus struct {
 			TargetLanguageIds           []string `json:"targetLanguageIds,omitempty"`
 			SkipUntranslatedStrings     bool     `json:"skipUntranslatedStrings"`
 			SkipUntranslatedFiles       bool     `json:"skipUntranslatedFiles"`
-			ExportApprovedOnly 			bool	 `json:"exportApprovedOnly,omitempty"`			// crowdin.com
-			ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount,omitempty"`	// Enterprise
+			ExportApprovedOnly          bool     `json:"exportApprovedOnly,omitempty"`          // crowdin.com
+			ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount,omitempty"` // Enterprise
 		} `json:"attributes"`
 	} `json:"data"`
 }
@@ -219,9 +218,9 @@ type ResponseDownloadProjectTranslations struct {
 
 // GetFileProgress - options for Language Progress API call
 type GetFileProgressOptions struct {
-	FileId		     int
-	Limit            int
-	Offset           int
+	FileId int
+	Limit  int
+	Offset int
 }
 
 // GetFileProgress api call
@@ -250,19 +249,18 @@ type ResponseGetFileProgress struct {
 	} `json:"pagination"`
 }
 
-
 // BuildProjectTranslationOptions are options for BuildProjectTranslation api call
 type BuildProjectTranslationOptions struct {
 	// ProjectId int		 // Project Identifier.
 	// Body      struct {
-	BranchId					int			`json:"branchId,omitempty"` // Branch Identifier. - optional
+	BranchId int `json:"branchId,omitempty"` // Branch Identifier. - optional
 	// Specify target languages for build.
 	// Leave this field empty to build all target languages
-	Languages 					[]string	`json:"targetLanguageIds,omitempty"`
-	SkipUntranslatedStrings		bool		`json:"skipUntranslatedStrings"`
-	SkipUntranslatedFiles		bool		`json:"skipUntranslatedFiles"`
-	ExportApprovedOnly			bool		`json:"exportApprovedOnly,omitempty"`  // crowdin.com specific
-	ExportWithMinApprovalsCount int			`json:"exportWithMinApprovalsCount,omitempty"` // Enterprise specific
+	Languages                   []string `json:"targetLanguageIds,omitempty"`
+	SkipUntranslatedStrings     bool     `json:"skipUntranslatedStrings"`
+	SkipUntranslatedFiles       bool     `json:"skipUntranslatedFiles"`
+	ExportApprovedOnly          bool     `json:"exportApprovedOnly,omitempty"`          // crowdin.com specific
+	ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount,omitempty"` // Enterprise specific
 	// }
 }
 
@@ -277,12 +275,11 @@ type ResponseBuildProjectTranslation struct {
 			TargetLanguageIDs           []string `json:"targetLanguageIds"`
 			SkipUntranslatedStrings     bool     `json:"skipUntranslatedStrings"`
 			SkipUntranslatedFiles       bool     `json:"skipUntranslatedFiles"`
-			ExportApprovedOnly       	bool     `json:"exportApprovedOnly"`
+			ExportApprovedOnly          bool     `json:"exportApprovedOnly"`
 			ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount"`
 		} `json:"attributes"`
 	} `json:"data"`
 }
-
 
 // ListStoragesOptions are options for ListStorages api call
 type ListStoragesOptions struct {
@@ -424,8 +421,8 @@ type responseGeneral struct {
 
 // ListFilesOptions are options for ListFileRevisions api call
 type ListFileRevisionsOptions struct {
-	Limit  int  // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset int  // Offset in collection - optional
+	Limit  int // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset int // Offset in collection - optional
 }
 
 // ResponseListFiles are response for ListFiles api call
@@ -461,13 +458,13 @@ type ResponseListFileRevisions struct {
 
 // ListStringsOptions are options for ListStrings api call
 type ListStringsOptions struct {
-	FileId									int
+	FileId                  int
 	DenormalizePlaceholders int
-	LabelIds   							string
-	Filter									string
-	Scope										string
-	Limit       						int // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset      						int // Offset in collection - optional
+	LabelIds                string
+	Filter                  string
+	Scope                   string
+	Limit                   int // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset                  int // Offset in collection - optional
 }
 
 // ResponseGetFileRevision are response for GetFileRevision api call
@@ -521,12 +518,11 @@ type ResponseListStrings struct {
 	} `json:"pagination"`
 }
 
-
 // EditString - Edit a source string API call
 type EditStringsOptions []struct {
-			Value         interface{}	`json:"value"`  // type depends on path value
-			Op						string    	`json:"op"`
-			Path					string			`json:"path"`
+	Value interface{} `json:"value"` // type depends on path value
+	Op    string      `json:"op"`
+	Path  string      `json:"path"`
 }
 
 type ResponseEditStrings struct {
@@ -547,7 +543,6 @@ type ResponseEditStrings struct {
 		UpdatedAt  time.Time `json:"updatedAt"`
 	} `json:"data"`
 }
-
 
 // Upload translations API call
 type UploadTranslationsOptions struct {

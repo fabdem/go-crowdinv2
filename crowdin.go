@@ -10,11 +10,11 @@ import (
 	"github.com/mreiferson/go-httpclient"
 )
 
-const MAX_RESULTS = 1000000  // 1M lines
-const API_CROWDINDOTCOM = "https://crowdin.com/api/v2/"  // url for crowdin.com (non Enterprise version)
+const MAX_RESULTS = 1000000                             // 1M lines
+const API_CROWDINDOTCOM = "https://crowdin.com/api/v2/" // url for crowdin.com (non Enterprise version)
 
-const DEFAULT_CONNEXION_TO = 5	// seconds
-const DEFAULT_RW_TO				= 40 	// seconds
+const DEFAULT_CONNEXION_TO = 5 // seconds
+const DEFAULT_RW_TO = 40       // seconds
 
 var (
 	// Default value for API URL
@@ -25,19 +25,18 @@ var (
 	readwriteTOinSecs  time.Duration = DEFAULT_RW_TO
 )
 
-
 // Crowdin API V2 wrapper
 type Crowdin struct {
 	config struct {
-		apiBaseURL					string
-		token								string
-		projectId						int
-		client							*http.Client
-		currentConnectionTO	int
-		currentReadwriteTO 	int
-		savConnectionTO			int
-		savReadwriteTO 			int
-		proxyUrl						*url.URL
+		apiBaseURL          string
+		token               string
+		projectId           int
+		client              *http.Client
+		currentConnectionTO int
+		currentReadwriteTO  int
+		savConnectionTO     int
+		savReadwriteTO      int
+		proxyUrl            *url.URL
 	}
 	buildProgress int
 	debug         bool
@@ -49,7 +48,6 @@ type Crowdin struct {
 // 	connectionTOinSecs = time.Duration(cnctTOinSecs)
 // 	readwriteTOinSecs = time.Duration(rwTOinSecs)
 // }
-
 
 // Read current build progress status from Crowdin structure
 // That value is updated when a build is running and GetBuildProgress() polled.
@@ -88,12 +86,12 @@ func New(token string, projectId int, apiurl string, proxy string) (*Crowdin, er
 	s.config.projectId = projectId
 	s.config.client = &http.Client{
 		Transport: transport,
-		}
-	s.config.currentConnectionTO	= DEFAULT_CONNEXION_TO
-	s.config.currentReadwriteTO		= DEFAULT_RW_TO
-	s.config.savConnectionTO			= DEFAULT_CONNEXION_TO
-	s.config.savReadwriteTO				= DEFAULT_RW_TO
-	s.config.proxyUrl 						= proxyUrl
+	}
+	s.config.currentConnectionTO = DEFAULT_CONNEXION_TO
+	s.config.currentReadwriteTO = DEFAULT_RW_TO
+	s.config.savConnectionTO = DEFAULT_CONNEXION_TO
+	s.config.savReadwriteTO = DEFAULT_RW_TO
+	s.config.proxyUrl = proxyUrl
 
 	return s, nil
 }
@@ -103,34 +101,37 @@ func (crowdin *Crowdin) Close() {
 	crowdin = nil
 }
 
-
 // Set connection and read/write timeouts
 //  0 means doesn't change value
 func (crowdin *Crowdin) SetTimeouts(connectionTO, rwTO int) {
 
-	if connectionTO > 0 { crowdin.config.currentConnectionTO	= connectionTO }
-	if rwTO > 0 { crowdin.config.currentReadwriteTO 	= rwTO }
+	if connectionTO > 0 {
+		crowdin.config.currentConnectionTO = connectionTO
+	}
+	if rwTO > 0 {
+		crowdin.config.currentReadwriteTO = rwTO
+	}
 
 	transport := &httpclient.Transport{
 		ConnectTimeout:   time.Duration(crowdin.config.currentConnectionTO) * time.Second,
-		ReadWriteTimeout: time.Duration(crowdin.config.currentReadwriteTO)  * time.Second,
+		ReadWriteTimeout: time.Duration(crowdin.config.currentReadwriteTO) * time.Second,
 		Proxy:            http.ProxyURL(crowdin.config.proxyUrl),
 	}
 	defer transport.Close()
 
 	crowdin.config.client = &http.Client{
 		Transport: transport,
-		}
+	}
 }
 
 // Get connection and read/write timeouts
-func (crowdin *Crowdin) GetTimeouts()(connectionTO, rwTO int) {
+func (crowdin *Crowdin) GetTimeouts() (connectionTO, rwTO int) {
 	return crowdin.config.currentConnectionTO, crowdin.config.currentReadwriteTO
 }
 
 // Save current timeout values
 func (crowdin *Crowdin) PushTimeouts() {
-	crowdin.config.savConnectionTO, crowdin.config.savReadwriteTO	= crowdin.config.currentConnectionTO, crowdin.config.currentReadwriteTO
+	crowdin.config.savConnectionTO, crowdin.config.savReadwriteTO = crowdin.config.currentConnectionTO, crowdin.config.currentReadwriteTO
 }
 
 // Restore saved timeout values
@@ -142,7 +143,6 @@ func (crowdin *Crowdin) PopTimeouts() {
 func (crowdin *Crowdin) ResetTimeoutsToDefault() {
 	crowdin.SetTimeouts(DEFAULT_CONNEXION_TO, DEFAULT_RW_TO)
 }
-
 
 // SetDebug - traces errors if it's set to true.
 func (crowdin *Crowdin) SetDebug(debug bool, logWriter io.Writer) {

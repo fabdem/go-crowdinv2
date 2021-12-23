@@ -13,20 +13,20 @@ func (crowdin *Crowdin) ListStorages(options *ListStoragesOptions) (*ResponseLis
 	crowdin.log("\nListStorages()")
 
 	var limit string
-	if options.Limit >0 {
+	if options.Limit > 0 {
 		limit = strconv.Itoa(options.Limit)
 	}
-	
+
 	var offset string
-	if options.Offset >0 {
+	if options.Offset > 0 {
 		offset = strconv.Itoa(options.Offset)
 	}
 
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL + "storages"),
-		params: map[string]string{ 
-			"limit"			: limit,
-			"offset"		: offset,
+		params: map[string]string{
+			"limit":  limit,
+			"offset": offset,
 		},
 	})
 
@@ -110,7 +110,7 @@ func (crowdin *Crowdin) GetStorage(options *GetStorageOptions) (*ResponseGetStor
 // {protocol}://{host}/api/v2/storages/{storageId}
 func (crowdin *Crowdin) DeleteStorage(options *DeleteStorageOptions) error {
 
-	crowdin.log(fmt.Sprintf("\nDeleteStorage() %v",options.StorageId))
+	crowdin.log(fmt.Sprintf("\nDeleteStorage() %v", options.StorageId))
 
 	response, err := crowdin.del(&delOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"storages/%v", options.StorageId)})
 

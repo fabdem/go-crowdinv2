@@ -23,7 +23,7 @@ func (crowdin *Crowdin) EditStrings(options *EditStringsOptions, stringId int) (
 
 	crowdin.log(fmt.Sprintf("EditString()\n"))
 
-	if len(*options) > 0 {  // Need at least 1 set of parameters
+	if len(*options) > 0 { // Need at least 1 set of parameters
 		// Check that the interface underlying type is string, int or boolean.
 		for _, val := range *options {
 			switch t := val.Value.(type) {
@@ -31,7 +31,7 @@ func (crowdin *Crowdin) EditStrings(options *EditStringsOptions, stringId int) (
 			case int:
 			case string:
 			default:
-				crowdin.log(fmt.Sprintf("	Error - param type not allowed:%v\n",t))
+				crowdin.log(fmt.Sprintf("	Error - param type not allowed:%v\n", t))
 				return nil, errors.New("Parameters type not allowed.")
 			}
 		}
@@ -41,8 +41,8 @@ func (crowdin *Crowdin) EditStrings(options *EditStringsOptions, stringId int) (
 	}
 
 	response, err := crowdin.patch(&patchOptions{
-					urlStr:		fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/strings/%v", crowdin.config.projectId, stringId),
-		 			body:			options})
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/strings/%v", crowdin.config.projectId, stringId),
+		body:   options})
 
 	if err != nil {
 		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))

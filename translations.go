@@ -6,7 +6,6 @@ import (
 	"strconv"
 )
 
-
 // CheckProjectBuildStatus - Check Project Build Status api call
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds/{buildId}
 func (crowdin *Crowdin) CheckProjectBuildStatus(options *CheckProjectBuildStatusOptions) (*ResponseCheckProjectBuildStatus, error) {
@@ -34,8 +33,6 @@ func (crowdin *Crowdin) CheckProjectBuildStatus(options *CheckProjectBuildStatus
 
 	return &responseAPI, nil
 }
-
-
 
 // BuildProjectTranslation - Build a project
 // {protocol}://{host}/api/v2/projects/{ProjectId}/translations/builds
@@ -93,27 +90,27 @@ func (crowdin *Crowdin) DownloadProjectTranslations(options *DownloadProjectTran
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds
 func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*ResponseListProjectBuilds, error) {
 
-		var branchId string
-		if options.BranchId >0 {
-			branchId = strconv.Itoa(options.BranchId)
-		}
+	var branchId string
+	if options.BranchId > 0 {
+		branchId = strconv.Itoa(options.BranchId)
+	}
 
-		var limit string
-		if options.Limit >0 {
-			limit = strconv.Itoa(options.Limit)
-		}
+	var limit string
+	if options.Limit > 0 {
+		limit = strconv.Itoa(options.Limit)
+	}
 
-		var offset string
-		if options.Offset >0 {
-			offset = strconv.Itoa(options.Offset)
-		}
+	var offset string
+	if options.Offset > 0 {
+		offset = strconv.Itoa(options.Offset)
+	}
 
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds", crowdin.config.projectId),
 		params: map[string]string{
-			"branchId"		: branchId,
-			"limit"			: limit,
-			"offset"		: offset,
+			"branchId": branchId,
+			"limit":    limit,
+			"offset":   offset,
 		},
 	})
 
@@ -135,11 +132,10 @@ func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*R
 	return &responseAPI, nil
 }
 
-
 // UploadTranslations() - Upload translations into a file API call
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/{languageId}
 func (crowdin *Crowdin) UploadTranslations(LanguageId string, options *UploadTranslationsOptions) (*ResponseUploadTranslations, error) {
-	crowdin.log(fmt.Sprintf("UploadTranslations(%s, %v)\n", LanguageId, options ))
+	crowdin.log(fmt.Sprintf("UploadTranslations(%s, %v)\n", LanguageId, options))
 
 	// Prepare URL and params
 	var p postOptions

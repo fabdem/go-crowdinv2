@@ -57,11 +57,13 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
 // BuildAllLg - Build a project for all languages
 // Options to export:
 //   - translated strings only Y/N
-//   - approved strings only Y/N
+//   - approved strings only integer
+//		Enterprise: min nb of approval steps required to export a string
+//		crowdin.com: 0 means approval not required, diff from 0: approval required 
 //   - fully translated files only Y/N
 //	"translated strings only" and fully "translated files only" are mutually exclusive.
 // Update buildProgress
-func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, approvedOnly bool, fullyTranslatedFilesOnly bool) (buildId int, err error) {
+func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, minApprovalSteps int, fullyTranslatedFilesOnly bool) (buildId int, err error) {
 	crowdin.log("BuildAllLg()")
 
 	// Invoke build
@@ -76,11 +78,9 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, approv
 	bo.SkipUntranslatedFiles = fullyTranslatedFilesOnly
 	bo.SkipUntranslatedStrings = translatedOnly
 	if crowdin.config.apiBaseURL == API_CROWDINDOTCOM {
-		bo.ExportApprovedOnly = approvedOnly // crowdin.com
+		bo.ExportApprovedOnly = (minApprovalSteps != 0) // crowdin.com
 	} else {
-		if approvedOnly {
-			bo.ExportWithMinApprovalsCount = 1 // Enterprise
-		}
+		bo.ExportWithMinApprovalsCount = minApprovalSteps // Enterprise
 	}
 
 	rb, err := crowdin.BuildProjectTranslation(&bo)
@@ -399,7 +399,6 @@ func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFilePara
 	return fileId, nil
 }
 
-
 // GetShortLangFileProgress() - Get a simple file completion info for a specific language
 //	 Returns a percentage of completion for both translation and approval (0 if error).
 func (crowdin *Crowdin) GetShortLangFileProgress(fileId int, langId string) (translationProgress int, approvalProgress int, err error) {
@@ -409,7 +408,7 @@ func (crowdin *Crowdin) GetShortLangFileProgress(fileId int, langId string) (tra
 	res, err := crowdin.GetFileProgress(&opt)
 	if err == nil {
 		// Lookup for language in res
-		for _,v := range res.Data {
+		for _, v := range res.Data {
 			if v.Data.LanguageId == langId {
 				return v.Data.TranslationProgress, v.Data.ApprovalProgress, nil // found it: done
 			}

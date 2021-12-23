@@ -8,16 +8,16 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"path/filepath"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
 
 type postOptions struct {
-	urlStr 		string
-	body   		interface{}
-	fileName 	string
+	urlStr   string
+	body     interface{}
+	fileName string
 }
 
 type delOptions struct {
@@ -38,7 +38,7 @@ type putOptions struct {
 type getOptions struct {
 	urlStr string
 	params map[string]string
-//	body   interface{}
+	//	body   interface{}
 }
 
 // POST request
@@ -46,12 +46,12 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 
 	crowdin.log(fmt.Sprintf("Create POST http request\nBody: %s", options.body))
 
-	var	req *http.Request
-	var	err error
+	var req *http.Request
+	var err error
 
 	buf := new(bytes.Buffer)
 
-	if options.fileName == "" {	// Doesn't include a file to upload
+	if options.fileName == "" { // Doesn't include a file to upload
 		json.NewEncoder(buf).Encode(options.body)
 		req, err = http.NewRequest("POST", options.urlStr, buf)
 		if err != nil {
@@ -64,18 +64,18 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 		req.Header.Set("Content-Type", "application/json")
 
 		crowdin.log(fmt.Sprintf("Headers: %s", req.Header))
-	// DEBUG
-	// dump, err := httputil.DumpRequestOut(req, true)
-	// crowdin.log(dump)
+		// DEBUG
+		// dump, err := httputil.DumpRequestOut(req, true)
+		// crowdin.log(dump)
 
-	} else {   // There is a file to upload
+	} else { // There is a file to upload
 		openfile, err := os.Open(options.fileName)
 		defer openfile.Close()
 		if err != nil {
 			crowdin.log(fmt.Sprintf("Post() - can't open %s", options.fileName))
 			return nil, err
 		}
-		fileStat, _ := openfile.Stat()                     //Get info from file
+		fileStat, _ := openfile.Stat() //Get info from file
 		// fileSize := strconv.FormatInt(fileStat.Size(), 10) //Get file size as a string
 		crowdin.log(fmt.Sprintf("post() - %s size of the file to upload: %d", options.fileName, fileStat.Size()))
 
@@ -107,21 +107,20 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 		return nil, err
 	}
 
-	if response.StatusCode < http.StatusOK || response.StatusCode > http.StatusIMUsed  {
+	if response.StatusCode < http.StatusOK || response.StatusCode > http.StatusIMUsed {
 		return bodyResponse, APIError{What: fmt.Sprintf("Status code: %v", response.StatusCode)}
 	}
 
 	return bodyResponse, nil
 }
 
-
 // PUT request
 func (crowdin *Crowdin) put(options *putOptions) ([]byte, error) {
 
 	crowdin.log(fmt.Sprintf("Create PUT http request\nBody: %s", options.body))
 
-	var	req *http.Request
-	var	err error
+	var req *http.Request
+	var err error
 
 	buf := new(bytes.Buffer)
 
@@ -162,14 +161,13 @@ func (crowdin *Crowdin) put(options *putOptions) ([]byte, error) {
 	return bodyResponse, nil
 }
 
-
 // PATCH request
 func (crowdin *Crowdin) patch(options *patchOptions) ([]byte, error) {
 
 	crowdin.log(fmt.Sprintf("Create PATCH http request\nBody: %s", options.body))
 
-	var	req *http.Request
-	var	err error
+	var req *http.Request
+	var err error
 
 	buf := new(bytes.Buffer)
 
@@ -210,7 +208,6 @@ func (crowdin *Crowdin) patch(options *patchOptions) ([]byte, error) {
 	return bodyResponse, nil
 }
 
-
 // DEl request
 func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 
@@ -246,7 +243,6 @@ func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 
 	return bodyResponse, nil
 }
-
 
 // GET request
 func (crowdin *Crowdin) get(options *getOptions) ([]byte, error) {
@@ -289,7 +285,7 @@ func (crowdin *Crowdin) getResponse(options *getOptions, authorization bool) (*h
 
 	// buf := new(bytes.Buffer)
 	// json.NewEncoder(buf).Encode(options.body)
-	crowdin.log(fmt.Sprintf("url=%s",options.urlStr))
+	crowdin.log(fmt.Sprintf("url=%s", options.urlStr))
 
 	req, err := http.NewRequest("GET", options.urlStr, nil)
 	if err != nil {
@@ -306,8 +302,6 @@ func (crowdin *Crowdin) getResponse(options *getOptions, authorization bool) (*h
 	}
 	return response, nil
 }
-
-
 
 // DownloadFile will download a url and store it in local filepath.
 // No autorization token required here for this operation.
@@ -352,21 +346,21 @@ func (crowdin *Crowdin) log(a interface{}) {
 		if crowdin.logWriter != nil {
 			timestamp := time.Now().Format(time.RFC3339)
 			msg := fmt.Sprintf("%v: %v", timestamp, a)
-			token := "Authorization:[Bearer "  // prefix for key
-			var purged string // Build the purged string in here
-			list1 := strings.Split(msg,token)
+			token := "Authorization:[Bearer " // prefix for key
+			var purged string                 // Build the purged string in here
+			list1 := strings.Split(msg, token)
 			if len(list1) > 1 {
-				for k1,v1 := range list1 {
-					if k1 > 0 {  // The 1st v1 is empty or doesn't include a key
+				for k1, v1 := range list1 {
+					if k1 > 0 { // The 1st v1 is empty or doesn't include a key
 						list2 := strings.Fields(v1) // Split strings seprated by spaces
 						if len(list2) > 0 {
-							v2 := list2[0]  // Supposedly the secret key
-							purgedsubstr := v2[0:2] + strings.Repeat("X",len(v2)-7) + v2[len(v2)-5:len(v2)] // Keep the 1st 2 and last 4 digits and ]
+							v2 := list2[0]                                                                   // Supposedly the secret key
+							purgedsubstr := v2[0:2] + strings.Repeat("X", len(v2)-7) + v2[len(v2)-5:len(v2)] // Keep the 1st 2 and last 4 digits and ]
 							purged += (token + purgedsubstr)
 							for i := 1; i < len(list2); i++ { // Add the remaining of the substrings
 								purged += (" " + list2[i])
 							}
-						}  else {
+						} else {
 							purged += token
 						}
 					} else {
@@ -382,7 +376,6 @@ func (crowdin *Crowdin) log(a interface{}) {
 		}
 	}
 }
-
 
 // APIError holds data of errors returned from the API.
 type APIError struct {

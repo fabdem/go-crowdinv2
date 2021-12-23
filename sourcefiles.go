@@ -20,38 +20,38 @@ func (crowdin *Crowdin) ListDirectories(options *ListDirectoriesOptions) (*Respo
 	crowdin.log(fmt.Sprintf("ListDirectories()\n"))
 
 	var branchId string
-	if options.BranchId >0 {
+	if options.BranchId > 0 {
 		branchId = strconv.Itoa(options.BranchId)
 	}
-	
+
 	var directoryId string
-	if options.DirectoryId >0 {
+	if options.DirectoryId > 0 {
 		directoryId = strconv.Itoa(options.DirectoryId)
 	}
-	
+
 	var recursion string
-	if options.Recursion >0 {
+	if options.Recursion > 0 {
 		recursion = strconv.Itoa(options.Recursion)
 	}
-	
+
 	var limit string
-	if options.Limit >0 {
+	if options.Limit > 0 {
 		limit = strconv.Itoa(options.Limit)
 	}
-	
+
 	var offset string
-	if options.Offset >0 {
+	if options.Offset > 0 {
 		offset = strconv.Itoa(options.Offset)
 	}
 
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/directories", crowdin.config.projectId),
-		params: map[string]string{ 
-			"branchId"		: branchId,
-			"directoryId"	: directoryId,
-			"recursion"		: recursion,
-			"limit"			: limit,
-			"offset"		: offset,
+		params: map[string]string{
+			"branchId":    branchId,
+			"directoryId": directoryId,
+			"recursion":   recursion,
+			"limit":       limit,
+			"offset":      offset,
 		},
 	})
 
@@ -77,38 +77,38 @@ func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles
 	crowdin.log(fmt.Sprintf("ListFiles()\n"))
 
 	var branchId string
-	if options.BranchId >0 {
+	if options.BranchId > 0 {
 		branchId = strconv.Itoa(options.BranchId)
 	}
-	
+
 	var directoryId string
-	if options.DirectoryId >0 {
+	if options.DirectoryId > 0 {
 		directoryId = strconv.Itoa(options.DirectoryId)
 	}
-	
+
 	var recursion string
-	if options.Recursion >0 {
+	if options.Recursion > 0 {
 		recursion = strconv.Itoa(options.Recursion)
 	}
-	
+
 	var limit string
-	if options.Limit >0 {
+	if options.Limit > 0 {
 		limit = strconv.Itoa(options.Limit)
 	}
-	
+
 	var offset string
-	if options.Offset >0 {
+	if options.Offset > 0 {
 		offset = strconv.Itoa(options.Offset)
 	}
 
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files", crowdin.config.projectId),
-		params: map[string]string{ 
-			"branchId"		: branchId,
-			"directoryId"	: directoryId,
-			"recursion"		: recursion,
-			"limit"			: limit,
-			"offset"		: offset,
+		params: map[string]string{
+			"branchId":    branchId,
+			"directoryId": directoryId,
+			"recursion":   recursion,
+			"limit":       limit,
+			"offset":      offset,
 		},
 	})
 
@@ -127,28 +127,27 @@ func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles
 	return &responseAPI, nil
 }
 
-
 // ListFileRevisions - List all revisions for a file in current project
 // {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}/revisions
 func (crowdin *Crowdin) ListFileRevisions(options *ListFileRevisionsOptions, fileId int) (*ResponseListFileRevisions, error) {
 
 	crowdin.log(fmt.Sprintf("ListFileRevisions()\n"))
-	
+
 	var limit string
-	if options.Limit >0 {
+	if options.Limit > 0 {
 		limit = strconv.Itoa(options.Limit)
 	}
-	
+
 	var offset string
-	if options.Offset >0 {
+	if options.Offset > 0 {
 		offset = strconv.Itoa(options.Offset)
 	}
 
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v/revisions", crowdin.config.projectId, fileId),
-		params: map[string]string{ 
-			"limit"			: limit,
-			"offset"		: offset,
+		params: map[string]string{
+			"limit":  limit,
+			"offset": offset,
 		},
 	})
 	if err != nil {
@@ -166,7 +165,6 @@ func (crowdin *Crowdin) ListFileRevisions(options *ListFileRevisionsOptions, fil
 
 	return &responseAPI, nil
 }
-
 
 // GetFileRevision - List a specific revision details for a file in current project
 // {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}/revisions/{revisionId}
@@ -193,22 +191,21 @@ func (crowdin *Crowdin) GetFileRevision(fileId int, revId int) (*ResponseGetFile
 	return &responseAPI, nil
 }
 
-
 // UpdateFile - Update a specific file
 // {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}
 // Default update mode is explicitely clear_translations_and_approvals
 func (crowdin *Crowdin) UpdateFile(fileId int, options *UpdateFileOptions) (*ResponseUpdateFile, error) {
 
 	crowdin.log(fmt.Sprintf("UpdateFile()\n"))
-	
+
 	if len(options.UpdateOption) > 0 {
 		// Check that update options are valid
-		if !(options.UpdateOption == "clear_translations_and_approvals" || options.UpdateOption == "keep_translations"  || options.UpdateOption == "keep_translations_and_approvals") {
-			crowdin.log(fmt.Sprintf("	Error - Update Option is not valid:%s\n",options.UpdateOption ))
+		if !(options.UpdateOption == "clear_translations_and_approvals" || options.UpdateOption == "keep_translations" || options.UpdateOption == "keep_translations_and_approvals") {
+			crowdin.log(fmt.Sprintf("	Error - Update Option is not valid:%s\n", options.UpdateOption))
 			return nil, errors.New("Invalid update option.")
 		}
 	} else {
-		options.UpdateOption = "clear_translations_and_approvals"  // Default behavior
+		options.UpdateOption = "clear_translations_and_approvals" // Default behavior
 	}
 
 	response, err := crowdin.put(&putOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v", crowdin.config.projectId, fileId), body: options})
