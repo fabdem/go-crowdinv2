@@ -561,3 +561,65 @@ type ResponseUploadTranslations struct {
 		FileID     int    `json:"fileId"`
 	} `json:"data"`
 }
+
+//
+// List Translation Approvals API call
+type ListTranslationApprovalsOptions struct {
+	TranslationID       int		`json:"storageId,omitempty"`
+	FileID              int		`json:"fileId,omitempty"`
+	StringID			int		`json:"stringId,omitempty"`
+	LanguageID			int		`json:"languageId,omitempty"`
+	Limit               int		`json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset              int		`json:"offset,omitempty"` // Offset in collection - optional
+}
+
+type ResponseListTranslationApprovals struct {
+	Data []struct {
+		Data struct {
+			ID   int `json:"id"`
+			User struct {
+				ID        int    `json:"id"`
+				Username  string `json:"username"`
+				FullName  string `json:"fullName"`
+				AvatarURL string `json:"avatarUrl"`
+			} `json:"user"`
+			TranslationID  int       `json:"translationId"`
+			StringID       int       `json:"stringId"`
+			LanguageID     string    `json:"languageId"`
+			WorkflowStepID int       `json:"workflowStepId"`
+			CreatedAt      time.Time `json:"createdAt"`
+		} `json:"data"`
+	} `json:"data"`
+	Pagination struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
+}
+
+//
+// List workflow steps API call
+type ListWorkflowsStepsOptions struct {
+	Limit               int		`json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset              int		`json:"offset,omitempty"` // Offset in collection - optional
+}
+
+type ResponseListWorkflowsSteps struct {
+	Data []struct {
+		Data struct {
+			ID        int        `json:"id"`
+			Title     string     `json:"title"`
+			Type      string     `json:"type"`
+			Languages [][]string `json:"languages"`
+			Config    struct {
+				Assignees struct {
+					De []int `json:"de"`
+					It []int `json:"it"`
+				} `json:"assignees"`
+			} `json:"config"`
+		} `json:"data"`
+	} `json:"data"`
+	Pagination struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
+}
