@@ -58,3 +58,29 @@ func (crowdin *Crowdin) ListProjects(options *ListProjectsOptions) (*ResponseLis
 
 	return &responseAPI, nil
 }
+
+
+// GetProject - Read project details
+// {protocol}://{host}/api/v2/projects/{projectId}
+func (crowdin *Crowdin) GetProject() (*ResponseGetProject, error) {
+	crowdin.log(fmt.Sprintf("GetProject(%d)", crowdin.config.projectId))
+
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL + "projects/%v", crowdin.config.projectId),
+		},
+	)
+
+	if err != nil {
+		crowdin.log(err)
+		return nil, err
+	}
+	
+	var responseAPI ResponseGetProject
+	err = json.Unmarshal(response, &responseAPI)
+	if err != nil {
+		crowdin.log(err)
+		return nil, err
+	}
+
+	return &responseAPI, nil
+}

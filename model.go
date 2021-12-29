@@ -568,7 +568,7 @@ type ListTranslationApprovalsOptions struct {
 	TranslationID       int		`json:"storageId,omitempty"`
 	FileID              int		`json:"fileId,omitempty"`
 	StringID			int		`json:"stringId,omitempty"`
-	LanguageID			int		`json:"languageId,omitempty"`
+	LanguageID			string	`json:"languageId,omitempty"`
 	Limit               int		`json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
 	Offset              int		`json:"offset,omitempty"` // Offset in collection - optional
 }
@@ -603,23 +603,65 @@ type ListWorkflowsStepsOptions struct {
 	Offset              int		`json:"offset,omitempty"` // Offset in collection - optional
 }
 
+
 type ResponseListWorkflowsSteps struct {
 	Data []struct {
 		Data struct {
 			ID        int        `json:"id"`
 			Title     string     `json:"title"`
 			Type      string     `json:"type"`
-			Languages [][]string `json:"languages"`
-			Config    struct {
-				Assignees struct {
-					De []int `json:"de"`
-					It []int `json:"it"`
-				} `json:"assignees"`
-			} `json:"config"`
+			Languages []string	 `json:"languages"`
+			Config    interface{}`json:"config, omitempty"`
+//			Config    struct {
+//				MinRelevant			string	`json:"minRelevant,omitempty"`
+//				AutoSubstitution	int		`json:"autoSubstitution,omitempty"`
+//				Assignees interface{} `json:"assignees,omitempty"`
+//			} `json:"config"`
 		} `json:"data"`
 	} `json:"data"`
 	Pagination struct {
 		Offset int `json:"offset"`
 		Limit  int `json:"limit"`
 	} `json:"pagination"`
+}
+
+//
+// Get Project details API call
+type ResponseGetProject struct {
+	Data struct {
+		ID                int       `json:"id"`
+		GroupID           int       `json:"groupId"`
+		UserID            int       `json:"userId"`
+		SourceLanguageID  string    `json:"sourceLanguageId"`
+		TargetLanguageIds []string  `json:"targetLanguageIds"`
+		Name              string    `json:"name"`
+		Identifier        string    `json:"identifier"`
+		Description       string    `json:"description"`
+		Logo              string    `json:"logo"`
+		Background        string    `json:"background"`
+		IsExternal        bool      `json:"isExternal"`
+		ExternalType      string    `json:"externalType"`
+		WorkflowID        int       `json:"workflowId"`
+		HasCrowdsourcing  bool      `json:"hasCrowdsourcing"`
+		PublicDownloads   bool      `json:"publicDownloads"`
+		CreatedAt         time.Time `json:"createdAt"`
+		UpdatedAt         time.Time `json:"updatedAt"`
+		LastActivity      time.Time `json:"lastActivity"`
+		TargetLanguages   []struct {
+			ID                  string   `json:"id"`
+			Name                string   `json:"name"`
+			EditorCode          string   `json:"editorCode"`
+			TwoLettersCode      string   `json:"twoLettersCode"`
+			ThreeLettersCode    string   `json:"threeLettersCode"`
+			Locale              string   `json:"locale"`
+			AndroidCode         string   `json:"androidCode"`
+			OsxCode             string   `json:"osxCode"`
+			OsxLocale           string   `json:"osxLocale"`
+			PluralCategoryNames []string `json:"pluralCategoryNames"`
+			PluralRules         string   `json:"pluralRules"`
+			PluralExamples      []string `json:"pluralExamples"`
+			TextDirection       string   `json:"textDirection"`
+			DialectOf           string   `json:"dialectOf"`
+		} `json:"targetLanguages"`
+	} `json:"data"`
 }
