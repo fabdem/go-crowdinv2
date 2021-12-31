@@ -134,7 +134,7 @@ func (crowdin *Crowdin) PushTimeouts() {
 	crowdin.config.savConnectionTO, crowdin.config.savReadwriteTO = crowdin.config.currentConnectionTO, crowdin.config.currentReadwriteTO
 }
 
-// Restore saved timeout values
+// Restore previously saved timeout values
 func (crowdin *Crowdin) PopTimeouts() {
 	crowdin.SetTimeouts(crowdin.config.savConnectionTO, crowdin.config.savReadwriteTO)
 }
@@ -148,4 +148,9 @@ func (crowdin *Crowdin) ResetTimeoutsToDefault() {
 func (crowdin *Crowdin) SetDebug(debug bool, logWriter io.Writer) {
 	crowdin.debug = debug
 	crowdin.logWriter = logWriter
+}
+
+// GetDebugWriter - get writer
+func (crowdin *Crowdin) GetDebugWriter() (logWriter io.Writer) {
+	return(crowdin.logWriter)
 }

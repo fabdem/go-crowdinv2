@@ -419,3 +419,75 @@ func (crowdin *Crowdin) GetShortLangFileProgress(fileId int, langId string) (tra
 	return 0, 0, err
 
 }
+
+// Get steps of all approved transactions from a given project.
+//    
+//		Returns a map of all ADMIN approved transactions along with their approval steps.
+//
+func (crowdin *Crowdin) GetStepsApprovTransId() (listTrans map[int][]int, err error) {
+	crowdin.log(fmt.Sprintf("GetStepsApprovTransId() %d\n", crowdin.config.projectId))
+
+	// Get the project language IDs
+	listProjDetails, err := crowdin.GetProject()
+	if err != nil {
+		fmt.Printf("ERREUR: %s\n", err)
+		return listTrans, err
+	}
+	var targetLanguageIDs []string
+	targetLanguageIDs = listProjDetails.Data.TargetLanguageIds
+	crowdin.log(fmt.Sprintf("Target language Ids: %s\n", targetLanguageIDs))
+
+	// Get all the file ids from a project
+	listFiles, err := crowdin.ListFiles(&ListFilesOptions{Limit: 500})
+	if err != nil {
+		fmt.Printf("ERREUR: %s\n", err)
+		return listTrans, err
+	}
+
+	crowdin.log(fmt.Sprintf("Files to process:\n"))
+	fileIDs := make(map[string]int)
+	for _, f := range listFiles.Data {
+		fileIDs[f.Data.Name] = f.Data.Id
+		crowdin.log(fmt.Sprintf("Target language Ids: %s - %d\n", f.Data.Name, f.Data.Id))
+	}
+
+	const REC_PULLED_NB = 500
+	listTrans = make(map[int][]int) 
+	
+	// Process each file
+	for _, fileID := range fileIDs {
+		crowdin.log(fmt.Sprintf("Processing file %d\n", fileID))
+		// Process each language
+		for _, langID := range targetLanguageIDs {
+			crowdin.log(fmt.Sprintf("Processing lang %s\n", langID))
+			// Get all translation approvals for this file/lang
+			idx := 0
+			for {
+				approv, err := crowdin.ListTranslationApprovals(&ListTranslationApprovalsOptions{
+				FileID:fileID,
+				LanguageID:langID,
+				Limit:REC_PULLED_NB,
+				Offset:idx})
+				if err != nil {
+					fmt.Printf("ERREUR: %s\n", err)
+					return listTrans, err
+				}
+				crowdin.log(fmt.Sprintf("Processing %d records\n", len(approv.Data)))
+				
+				// Store translation IDs in map
+				for _, rec := range approv.Data {
+					transId := rec.Data.TranslationID
+					workflwId := rec.Data.WorkflowStepID
+					listTrans[transId] = append(listTrans[transId], workflwId)
+				}
+				
+				// if len(approv.Data) < REC_PULLED_NB || idx > 7250 {
+				if len(approv.Data) < REC_PULLED_NB  {
+					break	// Nothing left to read
+				}
+				idx += REC_PULLED_NB  // next page
+			}	
+		}
+	}
+	return listTrans, err
+}

@@ -565,7 +565,7 @@ type ResponseUploadTranslations struct {
 //
 // List Translation Approvals API call
 type ListTranslationApprovalsOptions struct {
-	TranslationID       int		`json:"storageId,omitempty"`
+	TranslationID       int		`json:"translationId,omitempty"`
 	FileID              int		`json:"fileId,omitempty"`
 	StringID			int		`json:"stringId,omitempty"`
 	LanguageID			string	`json:"languageId,omitempty"`
@@ -663,5 +663,52 @@ type ResponseGetProject struct {
 			TextDirection       string   `json:"textDirection"`
 			DialectOf           string   `json:"dialectOf"`
 		} `json:"targetLanguages"`
+	} `json:"data"`
+}
+
+//
+// List workflow steps API call
+type GetTranslationOptions struct {
+	TranslationID       	int	`json:"translationID,omitempty"`
+	DenormalizePlaceholders int `json:"denormalizePlaceholders, omitempty"`
+}
+
+type ResponseGetTranslation struct {
+	Data struct {
+		ID                 int    `json:"id"`
+		Text               string `json:"text"`
+		PluralCategoryName string `json:"pluralCategoryName"`
+		User               struct {
+			ID        int    `json:"id"`
+			Username  string `json:"username"`
+			FullName  string `json:"fullName"`
+			AvatarURL string `json:"avatarUrl"`
+		} `json:"user"`
+		Rating    int       `json:"rating"`
+		CreatedAt time.Time `json:"createdAt"`
+	} `json:"data"`
+}
+
+
+//
+// Add Approval API call
+type AddApprovalOptions struct {
+	TranslationID       	int	`json:"translationId,omitempty"`
+}
+
+type ResponseAddApproval struct {
+	Data struct {
+		ID   int `json:"id"`
+		User struct {
+			ID        int    `json:"id"`
+			Username  string `json:"username"`
+			FullName  string `json:"fullName"`
+			AvatarURL string `json:"avatarUrl"`
+		} `json:"user"`
+		TranslationID  int       `json:"translationId"`
+		StringID       int       `json:"stringId"`
+		LanguageID     string    `json:"languageId"`
+		WorkflowStepID int       `json:"workflowStepId"`
+		CreatedAt      time.Time `json:"createdAt"`
 	} `json:"data"`
 }
