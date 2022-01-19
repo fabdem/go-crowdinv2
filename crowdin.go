@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/mreiferson/go-httpclient"
+	// "go-httpclient"
 )
 
 const MAX_RESULTS = 1000000                             // 1M lines
@@ -44,10 +45,10 @@ type Crowdin struct {
 }
 
 // Set connection and read/write timeouts for the subsequent new connections
-// func SetTimeouts(cnctTOinSecs, rwTOinSecs int) {
-// 	connectionTOinSecs = time.Duration(cnctTOinSecs)
-// 	readwriteTOinSecs = time.Duration(rwTOinSecs)
-// }
+func SetDefaultTimeouts(cnctTOinSecs, rwTOinSecs int) {
+	connectionTOinSecs = time.Duration(cnctTOinSecs)
+	readwriteTOinSecs = time.Duration(rwTOinSecs)
+}
 
 // Read current build progress status from Crowdin structure
 // That value is updated when a build is running and GetBuildProgress() polled.
