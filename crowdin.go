@@ -22,8 +22,8 @@ var (
 	apiBaseURL = API_CROWDINDOTCOM
 
 	// Default values for timeouts in seconds
-	connectionTOinSecs time.Duration = DEFAULT_CONNEXION_TO
-	readwriteTOinSecs  time.Duration = DEFAULT_RW_TO
+	connectionTO = time.Duration(DEFAULT_CONNEXION_TO) * time.Second
+	readwriteTO  = time.Duration(DEFAULT_RW_TO) * time.Second
 )
 
 // Crowdin API V2 wrapper
@@ -33,10 +33,10 @@ type Crowdin struct {
 		token               string
 		projectId           int
 		client              *http.Client
-		currentConnectionTO int
-		currentReadwriteTO  int
-		savConnectionTO     int
-		savReadwriteTO      int
+		currentConnectionTO time.Duration
+		currentReadwriteTO  time.Duration
+		savConnectionTO     time.Duration
+		savReadwriteTO      time.Duration
 		proxyUrl            *url.URL
 	}
 	buildProgress int
@@ -45,9 +45,9 @@ type Crowdin struct {
 }
 
 // Set connection and read/write timeouts for the subsequent new connections
-func SetDefaultTimeouts(cnctTOinSecs, rwTOinSecs int) {
-	connectionTOinSecs = time.Duration(cnctTOinSecs)
-	readwriteTOinSecs = time.Duration(rwTOinSecs)
+func SetDefaultTimeouts(cnctTO, rwTO time.Duration) {
+	connectionTO = cnctTO
+	readwriteTO  = rwTO
 }
 
 // Read current build progress status from Crowdin structure
@@ -75,8 +75,8 @@ func New(token string, projectId int, apiurl string, proxy string) (*Crowdin, er
 	}
 
 	transport := &httpclient.Transport{
-		ConnectTimeout:   DEFAULT_CONNEXION_TO * time.Second,
-		ReadWriteTimeout: DEFAULT_RW_TO * time.Second,
+		ConnectTimeout:   connectionTO,
+		ReadWriteTimeout: readwriteTO,
 		Proxy:            http.ProxyURL(proxyUrl),
 	}
 	defer transport.Close()
@@ -88,10 +88,10 @@ func New(token string, projectId int, apiurl string, proxy string) (*Crowdin, er
 	s.config.client = &http.Client{
 		Transport: transport,
 	}
-	s.config.currentConnectionTO = DEFAULT_CONNEXION_TO
-	s.config.currentReadwriteTO = DEFAULT_RW_TO
-	s.config.savConnectionTO = DEFAULT_CONNEXION_TO
-	s.config.savReadwriteTO = DEFAULT_RW_TO
+	s.config.currentConnectionTO = connectionTO
+	s.config.currentReadwriteTO  = readwriteTO
+	s.config.savConnectionTO 	 = connectionTO
+	s.config.savReadwriteTO      = readwriteTO
 	s.config.proxyUrl = proxyUrl
 
 	return s, nil
@@ -104,7 +104,7 @@ func (crowdin *Crowdin) Close() {
 
 // Set connection and read/write timeouts
 //  0 means doesn't change value
-func (crowdin *Crowdin) SetTimeouts(connectionTO, rwTO int) {
+func (crowdin *Crowdin) SetTimeouts(connectionTO, rwTO time.Duration) {
 
 	if connectionTO > 0 {
 		crowdin.config.currentConnectionTO = connectionTO
@@ -114,8 +114,8 @@ func (crowdin *Crowdin) SetTimeouts(connectionTO, rwTO int) {
 	}
 
 	transport := &httpclient.Transport{
-		ConnectTimeout:   time.Duration(crowdin.config.currentConnectionTO) * time.Second,
-		ReadWriteTimeout: time.Duration(crowdin.config.currentReadwriteTO) * time.Second,
+		ConnectTimeout:   crowdin.config.currentConnectionTO,
+		ReadWriteTimeout: crowdin.config.currentReadwriteTO,
 		Proxy:            http.ProxyURL(crowdin.config.proxyUrl),
 	}
 	defer transport.Close()
@@ -126,7 +126,7 @@ func (crowdin *Crowdin) SetTimeouts(connectionTO, rwTO int) {
 }
 
 // Get connection and read/write timeouts
-func (crowdin *Crowdin) GetTimeouts() (connectionTO, rwTO int) {
+func (crowdin *Crowdin) GetTimeouts() (connectionTO, rwTO time.Duration) {
 	return crowdin.config.currentConnectionTO, crowdin.config.currentReadwriteTO
 }
 
@@ -142,7 +142,7 @@ func (crowdin *Crowdin) PopTimeouts() {
 
 // Reset communication timeouts to their default values
 func (crowdin *Crowdin) ResetTimeoutsToDefault() {
-	crowdin.SetTimeouts(DEFAULT_CONNEXION_TO, DEFAULT_RW_TO)
+	crowdin.SetTimeouts(time.Duration(DEFAULT_CONNEXION_TO) * time.Second, time.Duration(DEFAULT_RW_TO) * time.Second)
 }
 
 // SetDebug - traces errors if it's set to true.

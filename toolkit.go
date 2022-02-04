@@ -63,7 +63,7 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
 //   - fully translated files only Y/N
 //	"translated strings only" and fully "translated files only" are mutually exclusive.
 // Update buildProgress
-func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, minApprovalSteps int, fullyTranslatedFilesOnly bool) (buildId int, err error) {
+func (crowdin *Crowdin) BuildAllLg(buildTO time.Duration, translatedOnly bool, minApprovalSteps int, fullyTranslatedFilesOnly bool) (buildId int, err error) {
 	crowdin.log("BuildAllLg()")
 
 	// Invoke build
@@ -92,7 +92,7 @@ func (crowdin *Crowdin) BuildAllLg(buildTOinSec int, translatedOnly bool, minApp
 
 	// Poll build status with a timeout
 	crowdin.log("	Poll build status crowdin.CheckProjectBuildStatus()")
-	timer := time.NewTimer(time.Duration(buildTOinSec) * time.Second)
+	timer := time.NewTimer(buildTO * time.Second)
 	defer timer.Stop()
 	rp := &ResponseCheckProjectBuildStatus{}
 	for rp.Data.Status = rb.Data.Status; rp.Data.Status != "finished" && rp.Data.Status != "canceled"; { // initial value is read from previous API call
@@ -322,13 +322,13 @@ func (crowdin *Crowdin) GetStringIDs(fileName string, filter string, filterType 
 }
 
 type T_UploadTranslationFileParams struct {
-	LocalFileName       string // File containing the translations to upload
-	CrowdinFileName     string // File in Crowdin where the translations will end up
-	LanguageId          string // Langugage ID as per Crowdin spec and defined as target in the project
-	ImportEqSuggestions bool   // Defines whether to add translation if it's the same as the source string
-	AutoApproveImported bool   // Mark uploaded translations as approved
-	TranslateHidden     bool   // Allow translations upload to hidden source strings
-	ResponseTimeOut     int    // in seconds. The upload operation can take several minutes.
+	LocalFileName       string           // File containing the translations to upload
+	CrowdinFileName     string           // File in Crowdin where the translations will end up
+	LanguageId          string           // Langugage ID as per Crowdin spec and defined as target in the project
+	ImportEqSuggestions bool             // Defines whether to add translation if it's the same as the source string
+	AutoApproveImported bool             // Mark uploaded translations as approved
+	TranslateHidden     bool             // Allow translations upload to hidden source strings
+	ResponseTimeOut     time.Duration    // in seconds. The upload operation can take several minutes.
 	// The original TO will be restored after operation finishes (ok or not)
 }
 
