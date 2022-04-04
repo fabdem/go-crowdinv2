@@ -90,7 +90,7 @@ func (crowdin *Crowdin) BuildDirectoryTranslation(directoryId int, options *Buil
 }
 
 
-// BuildFileTranslation - Build a directory
+// BuildFileTranslation - Build a file
 //{host}/api/v2/projects/{projectId}/translations/builds/files/{fileId}
 func (crowdin *Crowdin) BuildFileTranslation(fileId int, options *BuildFileTranslationOptions) (*ResponseBuildFileTranslation, error) {
 

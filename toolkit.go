@@ -390,9 +390,7 @@ func (crowdin *Crowdin) GetStringIDs(fileName string, filter string, filterType 
 
 		crowdin.log(fmt.Sprintf(" - Page of results #%d\n", (offset/limit)+1))
 
-		list.Data = append(list.Data, res.Data...)
-
-		for _, v := range res.Data {  
+		for _, v := range res.Data {
 			list = append(list, v.Data.ID) // Add data to slice
 		}
 	}
