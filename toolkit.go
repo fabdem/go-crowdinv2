@@ -138,7 +138,7 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (e
 }
 
 // Lookup fileId in current project
-//    CrowdinFileName required - full Crowdin path to file (To be noted: does not include the project name)
+//    CrowdinFileName required - full Crowdin path to file.
 //		Returns Id and crowdin file name
 func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name string, err error) {
 
@@ -216,6 +216,83 @@ func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name strin
 
 	crowdin.log(fmt.Sprintf("  fileId=%d\n", fileId))
 	return fileId, crowdinFilename, nil
+}
+
+
+// Lookup directoryId in current project
+//    CrowdinDirName required - full Crowdin path to directory.
+//		Returns Id and crowdin dir name
+func (crowdin *Crowdin) LookupDirId(CrowdinDirName string) (id int, name string, err error) {
+
+	crowdin.log(fmt.Sprintf("LookupDirId()\n"))
+
+	// Lookup directoryId in Crowdin
+	dirId := 0
+	crowdinDirs := strings.Split(CrowdinDirName, "/")
+
+	crowdin.log(fmt.Sprintf("  len=%d\n", len(crowdinDirs)))
+	crowdin.log(fmt.Sprintf("  crowdinDir %v\n", crowdinDirs))
+	// crowdin.log(fmt.Sprintf("  crowdinDirs[1] %s\n", crowdinDirs[1] ))
+
+	switch l := len(crowdinDirs); l {
+	case 0:
+		return 0, "", errors.New("LookupDirId() - Crowdin directory name should not be null.")
+	// case 1: // no directory so dirId is 0 - value is like "a_file_name"
+	// case 2: // no directory so dirId is 0 - value is like "/a_file_name"
+	default: // l >= 1
+		// Lookup end directoryId
+		// Get a list of all the project's directories
+		limit := 500 // 500 is the max allowed by api
+		page := 0
+		var listDirs ResponseListDirectories
+		for offset := 0; offset < MAX_RESULTS; offset += limit {
+			lst, err := crowdin.ListDirectories(&ListDirectoriesOptions{Offset: offset, Limit: limit})
+			if err != nil {
+				return 0, "", errors.New(fmt.Sprintf("LookupFileId() - Error listing project directories. Page %d", page))
+			}
+			
+			if len(lst.Data) <= 0 {  // Reached the end
+				break
+			}
+			
+			page++
+			listDirs.Data = append(listDirs.Data, lst.Data...)
+
+			crowdin.log(fmt.Sprintf(" - Page of results #%d\n", page))
+		}
+		
+		//listDirs, err := crowdin.ListDirectories(&ListDirectoriesOptions{Limit: 500})
+		//if err != nil {
+		//	return 0, "", errors.New("LookupFileId() - Error listing project directories.")
+		//}
+		if len(listDirs.Data) > 0 {
+			// Lookup last directory's Id
+			dirId = 0
+			for i, dirName := range crowdinDirs { // Go down the directory branch
+				crowdin.log(fmt.Sprintf("  idx %d dirName %s len %d dirId %d", i, dirName, len(crowdinDirs), dirId))
+				found := false
+				if i > 0 && i < len(crowdinDirs) { // 1st entry is empty and we're done once we reach the last directory name.
+					for _, crwdPrjctDirName := range listDirs.Data { // Look up in list of project dirs the right one
+						crowdin.log(fmt.Sprintf("  check -> crwdPrjctDirName.Data.DirectoryId %d crwdPrjctDirName.Data.Name |%s|", crwdPrjctDirName.Data.DirectoryId, crwdPrjctDirName.Data.Name))
+						if crwdPrjctDirName.Data.DirectoryId == dirId && crwdPrjctDirName.Data.Name == dirName {
+							dirId = crwdPrjctDirName.Data.Id // Bingo get that Id
+							name = dirName
+							found = true
+							crowdin.log(fmt.Sprintf("  BINGO dirId=%d Crowdin dir name %s", dirId, crwdPrjctDirName.Data.Name))
+							break // Done for that one
+						}
+					}
+					if !found {
+						return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Error: can't match directory names with Crowdin path."))
+					}
+				}
+			}
+		} else {
+			return 0, "", errors.New("UpdateFile() - Error: mismatch between # of folder found and # of folder expected.")
+		}
+	}
+
+	return dirId, name, nil
 }
 
 // Update a file of the current project
@@ -313,7 +390,9 @@ func (crowdin *Crowdin) GetStringIDs(fileName string, filter string, filterType 
 
 		crowdin.log(fmt.Sprintf(" - Page of results #%d\n", (offset/limit)+1))
 
-		for _, v := range res.Data {
+		list.Data = append(list.Data, res.Data...)
+
+		for _, v := range res.Data {  
 			list = append(list, v.Data.ID) // Add data to slice
 		}
 	}

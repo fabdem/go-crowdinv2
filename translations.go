@@ -61,6 +61,63 @@ func (crowdin *Crowdin) BuildProjectTranslation(options *BuildProjectTranslation
 	return &responseAPI, nil
 }
 
+
+// BuildDirectoryTranslation - Build a directory
+// {protocol}://{host}/api/v2/projects/{projectId}/translations/builds/directories/{directoryId}
+func (crowdin *Crowdin) BuildDirectoryTranslation(directoryId int, options *BuildDirectoryTranslationOptions) (*ResponseBuildDirectoryTranslation, error) {
+
+	// Prepare URL and params
+	var p postOptions
+	p.urlStr = fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds/directories/%v", crowdin.config.projectId, directoryId)
+	p.body = options
+	response, err := crowdin.post(&p)
+
+	if err != nil {
+		crowdin.log(err)
+		return nil, err
+	}
+
+	crowdin.log(string(response))
+
+	var responseAPI ResponseBuildDirectoryTranslation
+	err = json.Unmarshal(response, &responseAPI)
+	if err != nil {
+		crowdin.log(err)
+		return nil, err
+	}
+
+	return &responseAPI, nil
+}
+
+
+// BuildFileTranslation - Build a directory
+//{host}/api/v2/projects/{projectId}/translations/builds/files/{fileId}
+func (crowdin *Crowdin) BuildFileTranslation(fileId int, options *BuildFileTranslationOptions) (*ResponseBuildFileTranslation, error) {
+
+	// Prepare URL and params
+	var p postOptions
+	p.urlStr = fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/translations/builds/files/%v", crowdin.config.projectId, fileId)
+	p.body = options
+	response, err := crowdin.post(&p)
+
+	if err != nil {
+		crowdin.log(err)
+		return nil, err
+	}
+
+	crowdin.log(string(response))
+
+	var responseAPI ResponseBuildFileTranslation
+	err = json.Unmarshal(response, &responseAPI)
+	if err != nil {
+		crowdin.log(err)
+		return nil, err
+	}
+
+	return &responseAPI, nil
+}
+
+
 // DownloadProjectTranslations - Download Project Translations api call
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/builds/{buildId}/download
 func (crowdin *Crowdin) DownloadProjectTranslations(options *DownloadProjectTranslationsOptions) (*ResponseDownloadProjectTranslations, error) {

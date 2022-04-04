@@ -251,8 +251,6 @@ type ResponseGetFileProgress struct {
 
 // BuildProjectTranslationOptions are options for BuildProjectTranslation api call
 type BuildProjectTranslationOptions struct {
-	// ProjectId int		 // Project Identifier.
-	// Body      struct {
 	BranchId int `json:"branchId,omitempty"` // Branch Identifier. - optional
 	// Specify target languages for build.
 	// Leave this field empty to build all target languages
@@ -261,7 +259,6 @@ type BuildProjectTranslationOptions struct {
 	SkipUntranslatedFiles       bool     `json:"skipUntranslatedFiles"`
 	ExportApprovedOnly          bool     `json:"exportApprovedOnly,omitempty"`          // crowdin.com specific
 	ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount,omitempty"` // Enterprise specific
-	// }
 }
 
 type ResponseBuildProjectTranslation struct {
@@ -278,6 +275,48 @@ type ResponseBuildProjectTranslation struct {
 			ExportApprovedOnly          bool     `json:"exportApprovedOnly"`
 			ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount"`
 		} `json:"attributes"`
+	} `json:"data"`
+}
+
+
+// BuildDirectoryTranslationOptions are options for BuildDirectoryTranslation api call
+type BuildDirectoryTranslationOptions struct {
+	TargetLanguageIds           []string `json:"targetLanguageIds"`
+	SkipUntranslatedStrings     bool     `json:"skipUntranslatedStrings"`
+	SkipUntranslatedFiles       bool     `json:"skipUntranslatedFiles"`
+	ExportApprovedOnly      	bool     `json:"exportApprovedOnly,omitempty"`	// crowdin.com specific
+	ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount"` 	// Enterprise specific
+	PreserveFolderHierarchy     bool     `json:"preserveFolderHierarchy"`
+}
+
+type ResponseBuildDirectoryTranslation struct {
+	Data struct {
+		ID         int       `json:"id"`
+		ProjectID  int       `json:"projectId"`
+		Status     string    `json:"status"`
+		Progress   int       `json:"progress"`
+		CreatedAt  time.Time `json:"createdAt"`
+		UpdatedAt  time.Time `json:"updatedAt"`
+		FinishedAt time.Time `json:"finishedAt"`
+	} `json:"data"`
+}
+
+
+// BuildDirectoryFileOptions are options for BuildFileTranslation api call
+type BuildFileTranslationOptions struct {
+	TargetLanguageID            string `json:"targetLanguageId"`
+	ExportAsXliff               bool   `json:"exportAsXliff"`
+	SkipUntranslatedStrings     bool   `json:"skipUntranslatedStrings"`
+	SkipUntranslatedFiles       bool   `json:"skipUntranslatedFiles"`
+	ExportApprovedOnly          bool   `json:"exportApprovedOnly,omitempty"`	// crowdin.com specific
+	ExportWithMinApprovalsCount int    `json:"exportWithMinApprovalsCount"`		// Enterprise specific
+}
+
+type ResponseBuildFileTranslation struct {
+	Data struct {
+		URL      string    `json:"url"`
+		ExpireIn time.Time `json:"expireIn"`
+		Etag     string    `json:"etag"`
 	} `json:"data"`
 }
 

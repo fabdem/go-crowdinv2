@@ -11,7 +11,7 @@ import (
 	// "go-httpclient"
 )
 
-const MAX_RESULTS = 1000000                             // 1M lines
+const MAX_RESULTS = 1000000                             // 1M lines maximum for any api responses
 const API_CROWDINDOTCOM = "https://crowdin.com/api/v2/" // url for crowdin.com (non Enterprise version)
 
 const DEFAULT_CONNEXION_TO = 5 // seconds
