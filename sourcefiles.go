@@ -70,6 +70,37 @@ func (crowdin *Crowdin) ListDirectories(options *ListDirectoriesOptions) (*Respo
 	return &responseAPI, nil
 }
 
+
+// ListAllDirectories - Helper function: list all directories in a given project (all pages)
+// Ignore offset and limit in options.
+//
+func (crowdin *Crowdin) ListAllDirectories(options *ListDirectoriesOptions) (*ResponseListDirectories, error) {
+
+	crowdin.log(fmt.Sprintf("ListAllDirectories()\n"))
+
+	limit := MAX_RES_PER_PAGE // nb max results returned by call per page.
+	page := 0
+	var listDirs ResponseListDirectories
+	for offset := 0; offset < MAX_RESULTS; offset += limit {
+		lst, err := crowdin.ListDirectories(&ListDirectoriesOptions{Offset: offset, Limit: limit})
+		if err != nil {
+			return &listDirs, errors.New(fmt.Sprintf("LookupFileId() - Error listing project directories. Page %d", page))
+		}
+		
+		if len(lst.Data) <= 0 {  // Reached the end
+			break
+		}
+		
+		page++
+		listDirs.Data = append(listDirs.Data, lst.Data...)
+
+		crowdin.log(fmt.Sprintf(" - Page of results #%d\n", page))
+	}
+
+	return &listDirs, nil
+}
+
+
 // ListFiles - List files in a given project
 // {protocol}://{host}/api/v2/projects/{projectId}/files
 func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles, error) {

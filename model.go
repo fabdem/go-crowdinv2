@@ -22,10 +22,13 @@ type ResponseListProjectBuilds struct {
 			Status     string `json:"status"`
 			Progress   int    `json:"progress"`
 			Attributes struct {
-				BranchId             int   `json:"branchId,omitempty"`
-				TargetLanguageIds    []int `json:"targetLanguageIds,omitempty"`
-				ExportTranslatedOnly bool  `json:"exportTranslatedOnly"`
-				ExportApprovedOnly   bool  `json:"exportApprovedOnly"`
+				BranchId             		int   		`json:"branchId,omitempty"`
+				TargetLanguageIds    		[]string 	`json:"targetLanguageIds,omitempty"`
+				SkipUntranslatedStrings 	bool		`json:"SkipUntranslatedStrings,omitempty"`
+				SkipUntranslatedFiles		bool		`json:"SkipUntranslatedFiles,omitempty"`
+				ExportWithMinApprovalsCount	int			`json:"ExportWithMinApprovalsCount,omitempty"`
+				ExportTranslatedOnly 		bool  		`json:"exportTranslatedOnly,omitempty"`
+				ExportApprovedOnly   		bool  		`json:"exportApprovedOnly,omitempty"`
 			} `json:"attributes"`
 		} `json:"data"`
 	} `json:"data"`

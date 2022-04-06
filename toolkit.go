@@ -9,7 +9,7 @@ import (
 
 // Publicly available high level functions generally combining several API calls
 
-const polldelaysec = 5 // Defines delay between each api call when polling a progress status
+const polldelaysec = 5 // Defines delay in seconds between each api call when polling a progress status
 
 // Lookup buildId for current project
 func (crowdin *Crowdin) GetBuildId() (buildId int, err error) {
@@ -54,8 +54,10 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
 	return projectId, nil
 }
 
-// BuildAllLg - Build a project for all languages
+
+// BuildTranslationsAllLg - Build transaltions for a project or folder for all languages
 // Options to export:
+//   - project Id and optionaly folder Id
 //   - translated strings only Y/N
 //   - approved strings only integer
 //		Enterprise: min nb of approval steps required to export a string
@@ -63,39 +65,78 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
 //   - fully translated files only Y/N
 //	"translated strings only" and fully "translated files only" are mutually exclusive.
 // Update buildProgress
-func (crowdin *Crowdin) BuildAllLg(buildTO time.Duration, translatedOnly bool, minApprovalSteps int, fullyTranslatedFilesOnly bool) (buildId int, err error) {
-	crowdin.log("BuildAllLg()")
+
+type BuildTranslationAllLgOptions struct {
+	BuildTO						time.Duration
+	TranslatedOnly				bool
+	MinApprovalSteps 			int
+	FullyTranslatedFilesOnly	bool
+	FolderName					string		// Optional - if not empty and valid build a folder
+}
+
+func (crowdin *Crowdin) BuildTranslationAllLg(opt BuildTranslationAllLgOptions) (buildId int, err error) {
+	crowdin.log("BuildTranslationAllLg()")
 
 	// Invoke build
-	var bo BuildProjectTranslationOptions
-	// keep bo.BranchId nil
-	bo.Languages = nil
-
-	if translatedOnly && fullyTranslatedFilesOnly {
-		return buildId, errors.New("\nOption error - Can't have both translatedOnly and fullyTranslatedFilesOnly set to true.")
+	var dirId int
+	var status string
+	
+	if opt.TranslatedOnly && opt.FullyTranslatedFilesOnly {
+		return buildId, errors.New("\nOption error - Can't have both TranslatedOnly and FullyTranslatedFilesOnly set to true.")
 	}
 
-	bo.SkipUntranslatedFiles = fullyTranslatedFilesOnly
-	bo.SkipUntranslatedStrings = translatedOnly
-	if crowdin.config.apiBaseURL == API_CROWDINDOTCOM {
-		bo.ExportApprovedOnly = (minApprovalSteps != 0) // crowdin.com
+	// Look up the dir Id  if we need to do a folder build
+	if len(opt.FolderName) > 0 {
+		// ---- DIRECTORY BUILD ------
+		crowdin.log(fmt.Sprintf("Building folder: %s",opt.FolderName))
+		dirId, _, err = crowdin.LookupDirId(opt.FolderName)
+		if err != nil {
+			return buildId, err
+		}			
+		var bo BuildDirectoryTranslationOptions
+		bo.TargetLanguageIds = nil
+		bo.SkipUntranslatedFiles = opt.FullyTranslatedFilesOnly
+		bo.SkipUntranslatedStrings = opt.TranslatedOnly
+		if crowdin.config.apiBaseURL == API_CROWDINDOTCOM {
+			bo.ExportApprovedOnly = (opt.MinApprovalSteps != 0) // crowdin.com
+		} else {
+			bo.ExportWithMinApprovalsCount = opt.MinApprovalSteps // Enterprise
+		}
+		rb, err := crowdin.BuildDirectoryTranslation(dirId, &bo)
+		if err != nil {
+			return buildId, errors.New("\nBuild Err.")
+		}
+		buildId = rb.Data.ID
+		status = rb.Data.Status
+
 	} else {
-		bo.ExportWithMinApprovalsCount = minApprovalSteps // Enterprise
+		// ---- PROJECT BUILD ------
+		crowdin.log(fmt.Sprintf("Building project: %d", crowdin.config.projectId))
+		var bo BuildProjectTranslationOptions
+		bo.Languages = nil
+		bo.SkipUntranslatedFiles = opt.FullyTranslatedFilesOnly
+		bo.SkipUntranslatedStrings = opt.TranslatedOnly
+		if crowdin.config.apiBaseURL == API_CROWDINDOTCOM {
+			bo.ExportApprovedOnly = (opt.MinApprovalSteps != 0) // crowdin.com
+		} else {
+			bo.ExportWithMinApprovalsCount = opt.MinApprovalSteps // Enterprise
+		}
+		rb, err := crowdin.BuildProjectTranslation(&bo)
+		if err != nil {
+			return buildId, errors.New("\nBuild Err.")
+		}
+		buildId = rb.Data.Id
+		status = rb.Data.Status
 	}
 
-	rb, err := crowdin.BuildProjectTranslation(&bo)
-	if err != nil {
-		return buildId, errors.New("\nBuild Err.")
-	}
-	buildId = rb.Data.Id
 	crowdin.log(fmt.Sprintf("	BuildId=%d", buildId))
 
 	// Poll build status with a timeout
 	crowdin.log("	Poll build status crowdin.CheckProjectBuildStatus()")
-	timer := time.NewTimer(buildTO * time.Second)
+	timer := time.NewTimer(opt.BuildTO)
 	defer timer.Stop()
 	rp := &ResponseCheckProjectBuildStatus{}
-	for rp.Data.Status = rb.Data.Status; rp.Data.Status != "finished" && rp.Data.Status != "canceled"; { // initial value is read from previous API call
+	for rp.Data.Status = status; rp.Data.Status != "finished" && rp.Data.Status != "canceled"; { // initial value is read from previous API call
 		time.Sleep(polldelaysec * time.Second) // delay between each call
 		rp, err = crowdin.CheckProjectBuildStatus(&CheckProjectBuildStatusOptions{BuildId: buildId})
 		if err != nil {
@@ -114,6 +155,35 @@ func (crowdin *Crowdin) BuildAllLg(buildTO time.Duration, translatedOnly bool, m
 	if rp.Data.Status != "finished" {
 		err = errors.New(fmt.Sprintf("	Build Error:%s", rp.Data.Status))
 	}
+	return buildId, err
+}
+	
+
+// BuildAllLg - Build a project for all languages. Kept to maintain compatibility with older versions.
+// Options to export:
+//   - translated strings only Y/N
+//   - approved strings only integer
+//		Enterprise: min nb of approval steps required to export a string
+//		crowdin.com: 0 means approval not required, diff from 0: approval required 
+//   - fully translated files only Y/N
+//	"translated strings only" and fully "translated files only" are mutually exclusive.
+// Update buildProgress
+func (crowdin *Crowdin) BuildAllLg(buildTO time.Duration, translatedOnly bool, minApprovalSteps int, fullyTranslatedFilesOnly bool) (buildId int, err error) {
+	crowdin.log("BuildAllLg()")
+
+	opt := BuildTranslationAllLgOptions{
+		BuildTO	:				    buildTO,
+		TranslatedOnly:				translatedOnly,
+		MinApprovalSteps: 			minApprovalSteps,
+		FullyTranslatedFilesOnly:	fullyTranslatedFilesOnly,
+		FolderName:					"",
+	}
+
+	buildId, err =  crowdin.BuildTranslationAllLg(opt)
+	if err != nil {
+		return buildId, err
+	}
+
 	return buildId, err
 }
 
@@ -160,7 +230,7 @@ func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name strin
 	default: // l > 1
 		// Lookup end directoryId
 		// Get a list of all the project folders
-		listDirs, err := crowdin.ListDirectories(&ListDirectoriesOptions{Limit: 500})
+		listDirs, err := crowdin.ListAllDirectories(&ListDirectoriesOptions{})
 		if err != nil {
 			return 0, "", errors.New("LookupFileId() - Error listing project directories.")
 		}
@@ -242,29 +312,11 @@ func (crowdin *Crowdin) LookupDirId(CrowdinDirName string) (id int, name string,
 	default: // l >= 1
 		// Lookup end directoryId
 		// Get a list of all the project's directories
-		limit := 500 // 500 is the max allowed by api
-		page := 0
-		var listDirs ResponseListDirectories
-		for offset := 0; offset < MAX_RESULTS; offset += limit {
-			lst, err := crowdin.ListDirectories(&ListDirectoriesOptions{Offset: offset, Limit: limit})
-			if err != nil {
-				return 0, "", errors.New(fmt.Sprintf("LookupFileId() - Error listing project directories. Page %d", page))
-			}
-			
-			if len(lst.Data) <= 0 {  // Reached the end
-				break
-			}
-			
-			page++
-			listDirs.Data = append(listDirs.Data, lst.Data...)
-
-			crowdin.log(fmt.Sprintf(" - Page of results #%d\n", page))
+		listDirs, err := crowdin.ListAllDirectories(&ListDirectoriesOptions{})
+		if err != nil {
+			return 0, "", errors.New("LookupDirId() - Error listing project directories.")
 		}
 		
-		//listDirs, err := crowdin.ListDirectories(&ListDirectoriesOptions{Limit: 500})
-		//if err != nil {
-		//	return 0, "", errors.New("LookupFileId() - Error listing project directories.")
-		//}
 		if len(listDirs.Data) > 0 {
 			// Lookup last directory's Id
 			dirId = 0

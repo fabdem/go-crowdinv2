@@ -12,6 +12,7 @@ import (
 )
 
 const MAX_RESULTS = 1000000                             // 1M lines maximum for any api responses
+const MAX_RES_PER_PAGE = 500                            // Max nber of lines per page returned by API calls.
 const API_CROWDINDOTCOM = "https://crowdin.com/api/v2/" // url for crowdin.com (non Enterprise version)
 
 const DEFAULT_CONNEXION_TO = 5 // seconds
