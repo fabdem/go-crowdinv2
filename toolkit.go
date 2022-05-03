@@ -136,7 +136,7 @@ func (crowdin *Crowdin) BuildTranslationAllLg(opt BuildTranslationAllLgOptions) 
 	timer := time.NewTimer(opt.BuildTO)
 	defer timer.Stop()
 	rp := &ResponseCheckProjectBuildStatus{}
-	for rp.Data.Status = status; rp.Data.Status != "finished" && rp.Data.Status != "canceled"; { // initial value is read from previous API call
+	for rp.Data.Status = status; rp.Data.Status == "inProgress"; { // initial value is read from previous API call
 		time.Sleep(polldelaysec * time.Second) // delay between each call
 		rp, err = crowdin.CheckProjectBuildStatus(&CheckProjectBuildStatusOptions{BuildId: buildId})
 		if err != nil {
