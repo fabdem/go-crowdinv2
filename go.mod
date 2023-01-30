@@ -1,4 +1,4 @@
-module crowdin
+module github.com/fabdem/go-crowdinv2
 
 go 1.17
 
