@@ -257,11 +257,12 @@ type BuildProjectTranslationOptions struct {
 	BranchId int `json:"branchId,omitempty"` // Branch Identifier. - optional
 	// Specify target languages for build.
 	// Leave this field empty to build all target languages
-	Languages                   []string `json:"targetLanguageIds,omitempty"`
-	SkipUntranslatedStrings     bool     `json:"skipUntranslatedStrings"`
-	SkipUntranslatedFiles       bool     `json:"skipUntranslatedFiles"`
-	ExportApprovedOnly          bool     `json:"exportApprovedOnly,omitempty"`          // crowdin.com specific
-	ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount,omitempty"` // Enterprise specific
+	Languages                   	[]string `json:"targetLanguageIds,omitempty"`
+	SkipUntranslatedStrings     	bool     `json:"skipUntranslatedStrings,omitempty"`
+	SkipUntranslatedFiles       	bool     `json:"skipUntranslatedFiles,omitempty"`
+	ExportApprovedOnly          	bool     `json:"exportApprovedOnly,omitempty"`          // crowdin.com specific
+	ExportWithMinApprovalsCount 	int      `json:"exportWithMinApprovalsCount,omitempty"` // Enterprise specific
+	ExportStringsThatPassedWorkflow bool     `json:"exportStringsThatPassedWorkflow,omitempty"`
 }
 
 type ResponseBuildProjectTranslation struct {
@@ -271,12 +272,13 @@ type ResponseBuildProjectTranslation struct {
 		Status     string `json:"status"`
 		Progress   int    `json:"progress"`
 		Attributes struct {
-			BranchID                    int      `json:"branchId"`
-			TargetLanguageIDs           []string `json:"targetLanguageIds"`
-			SkipUntranslatedStrings     bool     `json:"skipUntranslatedStrings"`
-			SkipUntranslatedFiles       bool     `json:"skipUntranslatedFiles"`
-			ExportApprovedOnly          bool     `json:"exportApprovedOnly"`
-			ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount"`
+			BranchID                    	int      `json:"branchId"`
+			TargetLanguageIDs           	[]string `json:"targetLanguageIds"`
+			SkipUntranslatedStrings     	bool     `json:"skipUntranslatedStrings"`
+			SkipUntranslatedFiles       	bool     `json:"skipUntranslatedFiles"`
+			ExportApprovedOnly          	bool     `json:"exportApprovedOnly"`
+			ExportWithMinApprovalsCount 	int      `json:"exportWithMinApprovalsCount"`
+			ExportStringsThatPassedWorkflow bool     `json:"exportStringsThatPassedWorkflow"`
 		} `json:"attributes"`
 	} `json:"data"`
 }
@@ -284,12 +286,13 @@ type ResponseBuildProjectTranslation struct {
 
 // BuildDirectoryTranslationOptions are options for BuildDirectoryTranslation api call
 type BuildDirectoryTranslationOptions struct {
-	TargetLanguageIds           []string `json:"targetLanguageIds"`
-	SkipUntranslatedStrings     bool     `json:"skipUntranslatedStrings"`
-	SkipUntranslatedFiles       bool     `json:"skipUntranslatedFiles"`
-	ExportApprovedOnly      	bool     `json:"exportApprovedOnly,omitempty"`	// crowdin.com specific
-	ExportWithMinApprovalsCount int      `json:"exportWithMinApprovalsCount"` 	// Enterprise specific
-	PreserveFolderHierarchy     bool     `json:"preserveFolderHierarchy"`
+	TargetLanguageIds           	[]string `json:"targetLanguageIds,omitempty"`
+	SkipUntranslatedStrings     	bool     `json:"skipUntranslatedStrings,omitempty"`
+	SkipUntranslatedFiles       	bool     `json:"skipUntranslatedFiles,omitempty"`
+	ExportApprovedOnly      		bool     `json:"exportApprovedOnly,omitempty"`			// crowdin.com specific
+	ExportWithMinApprovalsCount 	int      `json:"exportWithMinApprovalsCount,omitempty"` // Enterprise specific
+	PreserveFolderHierarchy     	bool     `json:"preserveFolderHierarchy,omitempty"`
+	ExportStringsThatPassedWorkflow bool     `json:"exportStringsThatPassedWorkflow,omitempty"`
 }
 
 type ResponseBuildDirectoryTranslation struct {
@@ -307,12 +310,13 @@ type ResponseBuildDirectoryTranslation struct {
 
 // BuildDirectoryFileOptions are options for BuildFileTranslation api call
 type BuildFileTranslationOptions struct {
-	TargetLanguageID            string `json:"targetLanguageId"`
-	ExportAsXliff               bool   `json:"exportAsXliff"`
-	SkipUntranslatedStrings     bool   `json:"skipUntranslatedStrings"`
-	SkipUntranslatedFiles       bool   `json:"skipUntranslatedFiles"`
-	ExportApprovedOnly          bool   `json:"exportApprovedOnly,omitempty"`	// crowdin.com specific
-	ExportWithMinApprovalsCount int    `json:"exportWithMinApprovalsCount"`		// Enterprise specific
+	TargetLanguageID            	string `json:"targetLanguageId"`
+	ExportAsXliff               	bool   `json:"exportAsXliff"`
+	SkipUntranslatedStrings     	bool   `json:"skipUntranslatedStrings"`
+	SkipUntranslatedFiles       	bool   `json:"skipUntranslatedFiles"`
+	ExportApprovedOnly          	bool   `json:"exportApprovedOnly,omitempty"`			// crowdin.com specific
+	ExportWithMinApprovalsCount 	int    `json:"exportWithMinApprovalsCount,omitempty"`	// Enterprise specific
+	ExportStringsThatPassedWorkflow bool   `json:"exportStringsThatPassedWorkflow,omitempty"`
 }
 
 type ResponseBuildFileTranslation struct {

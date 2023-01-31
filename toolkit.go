@@ -63,6 +63,7 @@ func (crowdin *Crowdin) GetProjectId(projectName string) (projectId int, err err
 //		Enterprise: min nb of approval steps required to export a string
 //		crowdin.com: 0 means approval not required, diff from 0: approval required 
 //   - fully translated files only Y/N
+//   - only strings that have passed their workflow Y/N
 //	"translated strings only" and fully "translated files only" are mutually exclusive.
 // Update buildProgress
 
@@ -71,7 +72,8 @@ type BuildTranslationAllLgOptions struct {
 	TranslatedOnly				bool
 	MinApprovalSteps 			int
 	FullyTranslatedFilesOnly	bool
-	FolderName					string		// Optional - if not empty and valid build a folder
+	ExportStringsThatPassedWkfl	bool
+	FolderName					string		// Optional - if not empty and valid, build a folder
 }
 
 func (crowdin *Crowdin) BuildTranslationAllLg(opt BuildTranslationAllLgOptions) (buildId int, err error) {
@@ -97,6 +99,7 @@ func (crowdin *Crowdin) BuildTranslationAllLg(opt BuildTranslationAllLgOptions) 
 		bo.TargetLanguageIds = nil
 		bo.SkipUntranslatedFiles = opt.FullyTranslatedFilesOnly
 		bo.SkipUntranslatedStrings = opt.TranslatedOnly
+		bo.ExportStringsThatPassedWorkflow = opt.ExportStringsThatPassedWkfl
 		if crowdin.config.apiBaseURL == API_CROWDINDOTCOM {
 			bo.ExportApprovedOnly = (opt.MinApprovalSteps != 0) // crowdin.com
 		} else {
@@ -116,6 +119,7 @@ func (crowdin *Crowdin) BuildTranslationAllLg(opt BuildTranslationAllLgOptions) 
 		bo.Languages = nil
 		bo.SkipUntranslatedFiles = opt.FullyTranslatedFilesOnly
 		bo.SkipUntranslatedStrings = opt.TranslatedOnly
+		bo.ExportStringsThatPassedWorkflow = opt.ExportStringsThatPassedWkfl
 		if crowdin.config.apiBaseURL == API_CROWDINDOTCOM {
 			bo.ExportApprovedOnly = (opt.MinApprovalSteps != 0) // crowdin.com
 		} else {
@@ -249,15 +253,15 @@ func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name strin
 						}
 					}
 					if dirId == 0 {
-						return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Error: can't match directory names with Crowdin path."))
+						return 0, "", errors.New(fmt.Sprintf("LookupFileId() - Error: can't match directory names with Crowdin path."))
 					}
 				}
 			}
 			if dirId == 0 {
-				return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Error: can't match directory names with Crowdin path."))
+				return 0, "", errors.New(fmt.Sprintf("LookupFileId() - Error: can't match directory names with Crowdin path."))
 			}
 		} else {
-			return 0, "", errors.New("UpdateFile() - Error: mismatch between # of folder found and # of folder expected.")
+			return 0, "", errors.New("LookupFileId() - Error: mismatch between # of folder found and # of folder expected.")
 		}
 	}
 
@@ -267,7 +271,7 @@ func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name strin
 	// Look up file
 	listFiles, err := crowdin.ListFiles(&ListFilesOptions{DirectoryId: dirId, Limit: 500})
 	if err != nil {
-		return 0, "", errors.New("UpdateFile() - Error listing files.")
+		return 0, "", errors.New("LookupFileId() - Error listing files.")
 	}
 
 	fileId := 0
@@ -281,7 +285,7 @@ func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name strin
 	}
 
 	if fileId == 0 {
-		return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Can't find file %s in Crowdin.", crowdinFilename))
+		return 0, "", errors.New(fmt.Sprintf("LookupFileId() - Can't find file %s in Crowdin.", crowdinFilename))
 	}
 
 	crowdin.log(fmt.Sprintf("  fileId=%d\n", fileId))
@@ -335,12 +339,12 @@ func (crowdin *Crowdin) LookupDirId(CrowdinDirName string) (id int, name string,
 						}
 					}
 					if !found {
-						return 0, "", errors.New(fmt.Sprintf("UpdateFile() - Error: can't match directory names with Crowdin path."))
+						return 0, "", errors.New(fmt.Sprintf("LookupDirId() - Error: can't match directory names with Crowdin path."))
 					}
 				}
 			}
 		} else {
-			return 0, "", errors.New("UpdateFile() - Error: mismatch between # of folder found and # of folder expected.")
+			return 0, "", errors.New("LookupDirId() - Error: mismatch between # of folder found and # of folder expected.")
 		}
 	}
 
@@ -368,7 +372,7 @@ func (crowdin *Crowdin) Update(CrowdinFileName string, LocalFileName string, upd
 	// Send local file to storageId
 	addStor, err := crowdin.AddStorage(&AddStorageOptions{FileName: LocalFileName})
 	if err != nil {
-		return 0, 0, errors.New("UpdateFile() - Error adding file to storage.")
+		return 0, 0, errors.New("Update() - Error adding file to storage.")
 	}
 	storageId := addStor.Data.Id
 
@@ -381,17 +385,17 @@ func (crowdin *Crowdin) Update(CrowdinFileName string, LocalFileName string, upd
 	err1 := crowdin.DeleteStorage(&DeleteStorageOptions{StorageId: storageId})
 
 	if err != nil {
-		crowdin.log(fmt.Sprintf("UpdateFile() - error updating file %v", updres))
-		return 0, 0, errors.New("UpdateFile() - Error updating file.") //
+		crowdin.log(fmt.Sprintf("Update() - error updating file %v", updres))
+		return 0, 0, errors.New("Update() - Error updating file.") //
 	}
 
 	if err1 != nil {
-		crowdin.log(fmt.Sprintf("UpdateFile() - error deleting storage %v", err1))
+		crowdin.log(fmt.Sprintf("Update() - error deleting storage %v", err1))
 	}
 
 	revId = updres.Data.RevisionId
 
-	crowdin.log(fmt.Sprintf("UpdateFile() - result %v", updres))
+	crowdin.log(fmt.Sprintf("Update() - result %v", updres))
 
 	return fileId, revId, nil
 }
