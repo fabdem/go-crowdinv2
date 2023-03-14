@@ -339,13 +339,16 @@ func (crowdin *Crowdin) DownloadFile(url string, filepath string) error {
 	return nil
 }
 
+
+
 // Log writer
 // Hide keys by overwriting with XXX
+//
 func (crowdin *Crowdin) log(a interface{}) {
 	if crowdin.debug {
 		if crowdin.logWriter != nil {
 			timestamp := time.Now().Format(time.RFC3339)
-			msg := fmt.Sprintf("%v: %v", timestamp, a)
+			msg := fmt.Sprintf("%v-%d: %v", timestamp, a)
 			token := "Authorization:[Bearer " // prefix for key
 			var purged string                 // Build the purged string in here
 			list1 := strings.Split(msg, token)

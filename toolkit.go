@@ -624,3 +624,66 @@ func (crowdin *Crowdin) GetStepsApprovTransId() (listTrans map[int][]int, err er
 	}
 	return listTrans, err
 }
+
+
+
+// List (bash ls) all the files with details from the current project
+//		Convert in paths "\/" -> "/"    
+//		Returns a map of all path/files -> details (file ID, revision etc.)
+
+type T_FileDetails struct {
+	FileID       		int
+	CrowdinFileName     string
+	ExportPattern		string
+	Path				string
+	Type        		string    
+	RevisionId  		int       
+	Status      		string
+	CreatedAt     		time.Time
+	UpdatedAt     		time.Time 
+}
+
+func (crowdin *Crowdin) LS() (mapFiles map[string]T_FileDetails, err error) {
+
+	crowdin.log(fmt.Sprintf("LS()\n"))
+
+	 mapFiles = make(map[string]T_FileDetails)
+
+	// Get all files that belong to the project
+	// Pull files as long as it returns data
+	limit := 500
+	for offset := 0; offset < MAX_RESULTS; offset += limit {
+
+		res, err := crowdin.ListFiles(&ListFilesOptions{Offset: offset, Limit: limit})
+		if err != nil {
+			crowdin.log(fmt.Sprintf("  err=%s\n", err))
+			return mapFiles, err
+		}
+
+		if len(res.Data) <= 0 {
+			break
+		}
+
+		crowdin.log(fmt.Sprintf(" - Page of results #%d\n", (offset/limit)+1))
+
+		// Add page's data in a map
+		for _, v := range res.Data {
+			filename := strings.ReplaceAll(v.Data.Path,`\/`, `/`)
+			path := filename[0: strings.LastIndex(filename, "/")+1] // keep the path only
+			details := T_FileDetails {
+				FileID:				v.Data.Id,
+				CrowdinFileName:    v.Data.Name,
+				ExportPattern:		v.Data.ExportOptions.ExportPattern,
+				Path:				path,				
+				Type:        		v.Data.Type,      
+				RevisionId:  		v.Data.RevisionId, 
+				Status:      		v.Data.Status,   
+				CreatedAt:     		v.Data.CreatedAt,
+				UpdatedAt:     		v.Data.UpdatedAt, 
+			}
+			mapFiles[filename] = details // Add data to the map
+		}
+	}
+
+	return mapFiles, nil
+}

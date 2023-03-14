@@ -422,16 +422,17 @@ type ListFilesOptions struct {
 type ResponseListFiles struct {
 	Data []struct {
 		Data struct {
-			Id          int    `json:"id"`
-			ProjectId   int    `json:"projectId"`
-			BranchId    int    `json:"branchId"`
-			DirectoryId int    `json:"directoryId"`
-			Name        string `json:"name"`
-			Title       string `json:"title"`
-			Type        string `json:"type"`
-			RevisionId  int    `json:"revisionId"`
-			Status      string `json:"status"`
-			Priority    string `json:"priority"`
+			Id          int       `json:"id"`
+			ProjectId   int       `json:"projectId"`
+			BranchId    int       `json:"branchId"`
+			DirectoryId int       `json:"directoryId"`
+			Name        string    `json:"name"`
+			Title       string    `json:"title"`
+			Type        string    `json:"type"`
+			RevisionId  int       `json:"revisionId"`
+			Status      string    `json:"status"`
+			Priority    string    `json:"priority"`
+			Path     	string    `json:"path"`
 			Attributes  struct {
 				MimeType string `json:"mimeType"`
 				FileSize int    `json:"fileSize"`
@@ -452,7 +453,7 @@ type ResponseListFiles struct {
 			ExportPattern string    `json:"exportPattern"`
 			CreatedAt     time.Time `json:"createdAt"`
 			UpdatedAt     time.Time `json:"updatedAt"`
-			Revision      int       `json:"revision"`
+			// Revision      int       `json:"revision"`
 		} `json:"data"`
 	} `json:"data"`
 	Pagination struct {
