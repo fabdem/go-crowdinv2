@@ -759,3 +759,33 @@ type ResponseAddApproval struct {
 		CreatedAt      time.Time `json:"createdAt"`
 	} `json:"data"`
 }
+
+
+
+
+//
+// Add a directory
+type AddDirectoryOptions struct {
+	Name					string `json:"name"`				// New directory name
+	DirectoryID       		int	`json:"directoryId,omitempty"`	// Parent directory - omit if root is parent
+	BranchID       			int	`json:"branchId,omitempty"`
+	Title					string `json:"title,omitempty"`		// Directory name as seens by translators
+	ExportPattern			string `json:"exportPattern,omitempty"`
+	Priority				string `json:"priority,omitempty"`
+}
+
+type ResponseAddDirectory struct {
+	Data struct {
+		ID            int       `json:"id"`
+		ProjectID     int       `json:"projectId"`
+		BranchID      int       `json:"branchId"`
+		DirectoryID   any       `json:"directoryId"`
+		Name          string    `json:"name"`
+		Title         string    `json:"title"`
+		ExportPattern string    `json:"exportPattern"`
+		Path          string    `json:"path"`
+		Priority      string    `json:"priority"`
+		CreatedAt     time.Time `json:"createdAt"`
+		UpdatedAt     time.Time `json:"updatedAt"`
+	} `json:"data"`
+}
