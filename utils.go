@@ -3,6 +3,7 @@ package crowdin
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -53,6 +54,7 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 
 	if options.fileName == "" { // Doesn't include a file to upload
 		json.NewEncoder(buf).Encode(options.body)
+
 		req, err = http.NewRequest("POST", options.urlStr, buf)
 		if err != nil {
 			crowdin.log(fmt.Sprintf("Post() - can't create a http request %s", req))
@@ -307,15 +309,18 @@ func (crowdin *Crowdin) getResponse(options *getOptions, authorization bool) (*h
 // No autorization token required here for this operation.
 // Writes to the destination file as it downloads it, without
 // loading the entire file into memory.
-func (crowdin *Crowdin) DownloadFile(url string, filepath string) error {
+//
+// Returns nil if no error + timeout flag
+//
+func (crowdin *Crowdin) DownloadFile(url string, filepath string) (err error, timeout bool) {
 
-	crowdin.log(fmt.Sprintf("DownloadFile() %s", filepath))
+	crowdin.log(fmt.Sprintf("DownloadFile() %s with a %s timeout", filepath, crowdin.GetDownloadTimeouts()))
 
 	// Create the file
 	out, err := os.Create(filepath)
 	if err != nil {
 		crowdin.log(fmt.Sprintf("	Download error - open file error:\n %s\n"))
-		return err
+		return err, false
 	}
 	defer out.Close()
 
@@ -324,19 +329,33 @@ func (crowdin *Crowdin) DownloadFile(url string, filepath string) error {
 	// resp, err := http.Get(url)
 	if err != nil {
 		//fmt.Printf("\nDownload error:%s\n",resp)
-		crowdin.log(fmt.Sprintf("	Download error - Get retunrs:\n %s \n", err.Error()))
-		return err
+		crowdin.log(fmt.Sprintf("	Download error - Get returns:\n %s \n", err.Error()))
+		return err, false
 	}
 	defer resp.Body.Close()
 
-	// Write body to file
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		// log.Println("	Download error\n", resp)
-		crowdin.log(fmt.Sprintf("	Download error - write to file error:\n %s \n", err.Error()))
-		return err
+	// timout protected download of the zip file
+	toChannel := make(chan error, 1)
+	go func() {
+		// Write body to file
+		_, err := io.Copy(out, resp.Body)
+		if err != nil {
+			crowdin.log(fmt.Sprintf("	Download error - write to file error:\n %s \n", err.Error()))
+			toChannel <- err
+		}
+		toChannel <- nil
+	}()
+
+	select {
+		case msg := <- toChannel:
+			crowdin.log(fmt.Sprintf("	Download complete"))
+			return msg, false
+		case <- time.After(crowdin.GetDownloadTimeouts()):
+			crowdin.log(fmt.Sprintf("	Download error - timeout %s", crowdin.GetDownloadTimeouts()))
+			return errors.New(fmt.Sprintf("Download Timeout %s.", crowdin.GetDownloadTimeouts())), true
 	}
-	return nil
+
+	return nil, false
 }
 
 

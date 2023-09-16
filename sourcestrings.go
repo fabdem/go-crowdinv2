@@ -113,3 +113,39 @@ func (crowdin *Crowdin) ListStrings(options *ListStringsOptions) (*ResponseListS
 
 	return &responseAPI, nil
 }
+
+
+// GetSourceString 
+// {protocol}://{host}/api/v2/projects/{projectId}/strings/{stringId}
+func (crowdin *Crowdin) GetSourceString(options *GetSourceStringOptions) (*ResponseGetSourceString, error) {
+
+	stringId := strconv.Itoa(options.StringID)
+
+	crowdin.log(fmt.Sprintf("GetSourceString(%d)", stringId))
+
+	denormalizePlaceholders := "0"
+	if options.DenormalizePlaceholders {
+		denormalizePlaceholders = "1"
+	}
+
+	response, err := crowdin.get(&getOptions{
+		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/strings/%v", crowdin.config.projectId, stringId),
+		params: map[string]string{
+			"denormalizePlaceholders": denormalizePlaceholders,
+		},
+	})
+
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - response:%s\n%s\n", response, err))
+		return nil, err
+	}
+
+	var responseAPI ResponseGetSourceString
+	err = json.Unmarshal(response, &responseAPI)
+	if err != nil {
+		crowdin.log(fmt.Sprintf("	Error - unmarshalling:%s\n%s\n", response, err))
+		return nil, err
+	}
+
+	return &responseAPI, nil
+}

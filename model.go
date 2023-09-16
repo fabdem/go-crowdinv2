@@ -6,12 +6,9 @@ import (
 
 // ListProjectBuilds - List Project Build API call
 type ListProjectBuildsOptions struct {
-	// ProjectId 			int
-	// Body struct {
 	BranchId int
 	Limit    int
 	Offset   int
-	//}
 }
 
 type ResponseListProjectBuilds struct {
@@ -22,13 +19,13 @@ type ResponseListProjectBuilds struct {
 			Status     string `json:"status"`
 			Progress   int    `json:"progress"`
 			Attributes struct {
-				BranchId             		int   		`json:"branchId,omitempty"`
-				TargetLanguageIds    		[]string 	`json:"targetLanguageIds,omitempty"`
-				SkipUntranslatedStrings 	bool		`json:"SkipUntranslatedStrings,omitempty"`
-				SkipUntranslatedFiles		bool		`json:"SkipUntranslatedFiles,omitempty"`
-				ExportWithMinApprovalsCount	int			`json:"ExportWithMinApprovalsCount,omitempty"`
-				ExportTranslatedOnly 		bool  		`json:"exportTranslatedOnly,omitempty"`
-				ExportApprovedOnly   		bool  		`json:"exportApprovedOnly,omitempty"`
+				BranchId                    int      `json:"branchId,omitempty"`
+				TargetLanguageIds           []string `json:"targetLanguageIds,omitempty"`
+				SkipUntranslatedStrings     bool     `json:"SkipUntranslatedStrings,omitempty"`
+				SkipUntranslatedFiles       bool     `json:"SkipUntranslatedFiles,omitempty"`
+				ExportWithMinApprovalsCount int      `json:"ExportWithMinApprovalsCount,omitempty"`
+				ExportTranslatedOnly        bool     `json:"exportTranslatedOnly,omitempty"`
+				ExportApprovedOnly          bool     `json:"exportApprovedOnly,omitempty"`
 			} `json:"attributes"`
 		} `json:"data"`
 	} `json:"data"`
@@ -78,7 +75,7 @@ type ResponseListProjects struct {
 				PluralRules         string   `json:"pluralRules"`
 				PluralExamples      []string `json:"pluralExamples"`
 				TextDirection       string   `json:"textDirection"`
-				DialectOf           int      `json:"dialectOf"`
+				DialectOf           string   `json:"dialectOf"`
 			} `json:"targetLanguages"`
 		} `json:"data"`
 	} `json:"data"`
@@ -116,14 +113,15 @@ type ResponseUpdateFile struct {
 		Status        string `json:"status"`
 		Priority      string `json:"priority"`
 		ImportOptions struct {
-			FirstLineContainsHeader bool `json:"firstLineContainsHeader"`
-			ImportTranslations      bool `json:"importTranslations"`
-			Scheme                  struct {
-				Identifier   int `json:"identifier"`
-				SourcePhrase int `json:"sourcePhrase"`
-				En           int `json:"en"`
-				De           int `json:"de"`
-			} `json:"scheme"`
+			FirstLineContainsHeader bool           `json:"firstLineContainsHeader"`
+			ImportTranslations      bool           `json:"importTranslations"`
+			Scheme                  map[string]int `json:"scheme"`
+			// Scheme                  struct {
+			// 	Identifier   int `json:"identifier"`
+			// 	SourcePhrase int `json:"sourcePhrase"`
+			// 	En           int `json:"en"`
+			// 	De           int `json:"de"`
+			// } `json:"scheme"`
 		} `json:"importOptions"`
 		ExportOptions struct {
 			ExportPattern string `json:"exportPattern"`
@@ -146,14 +144,15 @@ type ResponseUpdate struct {
 		Status        string `json:"status"`
 		Priority      string `json:"priority"`
 		ImportOptions struct {
-			FirstLineContainsHeader bool `json:"firstLineContainsHeader"`
-			ImportTranslations      bool `json:"importTranslations"`
-			Scheme                  struct {
-				Identifier   int `json:"identifier"`
-				SourcePhrase int `json:"sourcePhrase"`
-				En           int `json:"en"`
-				De           int `json:"de"`
-			} `json:"scheme"`
+			FirstLineContainsHeader bool           `json:"firstLineContainsHeader"`
+			ImportTranslations      bool           `json:"importTranslations"`
+			Scheme                  map[string]int `json:"scheme"`
+			// Scheme                  struct {
+			// 	Identifier   int `json:"identifier"`
+			// 	SourcePhrase int `json:"sourcePhrase"`
+			// 	En           int `json:"en"`
+			// 	De           int `json:"de"`
+			// } `json:"scheme"`
 		} `json:"importOptions"`
 		ExportOptions struct {
 			ExportPattern string `json:"exportPattern"`
@@ -169,23 +168,6 @@ type CheckProjectBuildStatusOptions struct {
 	// ProjectId int
 	BuildId int
 }
-
-// {"data":{"id":47,"projectId":17,"status":"inProgress","progress":11,"attributes":{"branchId":null,"targetLanguageIds":[],"exportTranslatedOnly":false,"exportApprovedOnly":false}}}
-/* type ResponseCheckProjectBuildStatus struct {
-	Data struct {
-		Id         int    `json:"id"`
-		ProjectId  int    `json:"projectId"`
-		Status     string `json:"status"`
-		Progress   int    `json:"progress"`
-		Attributes struct {
-			BranchId             int   `json:"branchId,omitempty"`
-			TargetLanguageIds    []int `json:"targetLanguageIds,omitempty"`
-			ExportTranslatedOnly bool  `json:"exportTranslatedOnly"`
-			ExportApprovedOnly   bool  `json:"exportApprovedOnly"`
-		} `json:"attributes"`
-	} `json:"data"`
-}
-*/
 
 type ResponseCheckProjectBuildStatus struct {
 	Data struct {
@@ -257,11 +239,11 @@ type BuildProjectTranslationOptions struct {
 	BranchId int `json:"branchId,omitempty"` // Branch Identifier. - optional
 	// Specify target languages for build.
 	// Leave this field empty to build all target languages
-	Languages                   	[]string `json:"targetLanguageIds,omitempty"`
-	SkipUntranslatedStrings     	bool     `json:"skipUntranslatedStrings,omitempty"`
-	SkipUntranslatedFiles       	bool     `json:"skipUntranslatedFiles,omitempty"`
-	ExportApprovedOnly          	bool     `json:"exportApprovedOnly,omitempty"`          // crowdin.com specific
-	ExportWithMinApprovalsCount 	int      `json:"exportWithMinApprovalsCount,omitempty"` // Enterprise specific
+	Languages                       []string `json:"targetLanguageIds,omitempty"`
+	SkipUntranslatedStrings         bool     `json:"skipUntranslatedStrings,omitempty"`
+	SkipUntranslatedFiles           bool     `json:"skipUntranslatedFiles,omitempty"`
+	ExportApprovedOnly              bool     `json:"exportApprovedOnly,omitempty"`          // crowdin.com specific
+	ExportWithMinApprovalsCount     int      `json:"exportWithMinApprovalsCount,omitempty"` // Enterprise specific
 	ExportStringsThatPassedWorkflow bool     `json:"exportStringsThatPassedWorkflow,omitempty"`
 }
 
@@ -272,26 +254,25 @@ type ResponseBuildProjectTranslation struct {
 		Status     string `json:"status"`
 		Progress   int    `json:"progress"`
 		Attributes struct {
-			BranchID                    	int      `json:"branchId"`
-			TargetLanguageIDs           	[]string `json:"targetLanguageIds"`
-			SkipUntranslatedStrings     	bool     `json:"skipUntranslatedStrings"`
-			SkipUntranslatedFiles       	bool     `json:"skipUntranslatedFiles"`
-			ExportApprovedOnly          	bool     `json:"exportApprovedOnly"`
-			ExportWithMinApprovalsCount 	int      `json:"exportWithMinApprovalsCount"`
+			BranchID                        int      `json:"branchId"`
+			TargetLanguageIDs               []string `json:"targetLanguageIds"`
+			SkipUntranslatedStrings         bool     `json:"skipUntranslatedStrings"`
+			SkipUntranslatedFiles           bool     `json:"skipUntranslatedFiles"`
+			ExportApprovedOnly              bool     `json:"exportApprovedOnly"`
+			ExportWithMinApprovalsCount     int      `json:"exportWithMinApprovalsCount"`
 			ExportStringsThatPassedWorkflow bool     `json:"exportStringsThatPassedWorkflow"`
 		} `json:"attributes"`
 	} `json:"data"`
 }
 
-
 // BuildDirectoryTranslationOptions are options for BuildDirectoryTranslation api call
 type BuildDirectoryTranslationOptions struct {
-	TargetLanguageIds           	[]string `json:"targetLanguageIds,omitempty"`
-	SkipUntranslatedStrings     	bool     `json:"skipUntranslatedStrings,omitempty"`
-	SkipUntranslatedFiles       	bool     `json:"skipUntranslatedFiles,omitempty"`
-	ExportApprovedOnly      		bool     `json:"exportApprovedOnly,omitempty"`			// crowdin.com specific
-	ExportWithMinApprovalsCount 	int      `json:"exportWithMinApprovalsCount,omitempty"` // Enterprise specific
-	PreserveFolderHierarchy     	bool     `json:"preserveFolderHierarchy,omitempty"`
+	TargetLanguageIds               []string `json:"targetLanguageIds,omitempty"`
+	SkipUntranslatedStrings         bool     `json:"skipUntranslatedStrings,omitempty"`
+	SkipUntranslatedFiles           bool     `json:"skipUntranslatedFiles,omitempty"`
+	ExportApprovedOnly              bool     `json:"exportApprovedOnly,omitempty"`          // crowdin.com specific
+	ExportWithMinApprovalsCount     int      `json:"exportWithMinApprovalsCount,omitempty"` // Enterprise specific
+	PreserveFolderHierarchy         bool     `json:"preserveFolderHierarchy,omitempty"`
 	ExportStringsThatPassedWorkflow bool     `json:"exportStringsThatPassedWorkflow,omitempty"`
 }
 
@@ -307,15 +288,14 @@ type ResponseBuildDirectoryTranslation struct {
 	} `json:"data"`
 }
 
-
 // BuildDirectoryFileOptions are options for BuildFileTranslation api call
 type BuildFileTranslationOptions struct {
-	TargetLanguageID            	string `json:"targetLanguageId"`
-	ExportAsXliff               	bool   `json:"exportAsXliff"`
-	SkipUntranslatedStrings     	bool   `json:"skipUntranslatedStrings"`
-	SkipUntranslatedFiles       	bool   `json:"skipUntranslatedFiles"`
-	ExportApprovedOnly          	bool   `json:"exportApprovedOnly,omitempty"`			// crowdin.com specific
-	ExportWithMinApprovalsCount 	int    `json:"exportWithMinApprovalsCount,omitempty"`	// Enterprise specific
+	TargetLanguageID                string `json:"targetLanguageId"`
+	ExportAsXliff                   bool   `json:"exportAsXliff"`
+	SkipUntranslatedStrings         bool   `json:"skipUntranslatedStrings"`
+	SkipUntranslatedFiles           bool   `json:"skipUntranslatedFiles"`
+	ExportApprovedOnly              bool   `json:"exportApprovedOnly,omitempty"`          // crowdin.com specific
+	ExportWithMinApprovalsCount     int    `json:"exportWithMinApprovalsCount,omitempty"` // Enterprise specific
 	ExportStringsThatPassedWorkflow bool   `json:"exportStringsThatPassedWorkflow,omitempty"`
 }
 
@@ -422,30 +402,31 @@ type ListFilesOptions struct {
 type ResponseListFiles struct {
 	Data []struct {
 		Data struct {
-			Id          int       `json:"id"`
-			ProjectId   int       `json:"projectId"`
-			BranchId    int       `json:"branchId"`
-			DirectoryId int       `json:"directoryId"`
-			Name        string    `json:"name"`
-			Title       string    `json:"title"`
-			Type        string    `json:"type"`
-			RevisionId  int       `json:"revisionId"`
-			Status      string    `json:"status"`
-			Priority    string    `json:"priority"`
-			Path     	string    `json:"path"`
+			Id          int    `json:"id"`
+			ProjectId   int    `json:"projectId"`
+			BranchId    int    `json:"branchId"`
+			DirectoryId int    `json:"directoryId"`
+			Name        string `json:"name"`
+			Title       string `json:"title"`
+			Type        string `json:"type"`
+			RevisionId  int    `json:"revisionId"`
+			Status      string `json:"status"`
+			Priority    string `json:"priority"`
+			Path        string `json:"path"`
 			Attributes  struct {
 				MimeType string `json:"mimeType"`
 				FileSize int    `json:"fileSize"`
 			} `json:"attributes"`
 			ImportOptions struct {
-				FirstLineContainsHeader bool `json:"firstLineContainsHeader"`
-				ImportTranslations      bool `json:"importTranslations"`
-				Scheme                  struct {
-					Identifier   int `json:"identifier"`
-					SourcePhrase int `json:"sourcePhrase"`
-					En           int `json:"en"`
-					De           int `json:"de"`
-				} `json:"scheme"`
+				FirstLineContainsHeader bool           `json:"firstLineContainsHeader"`
+				ImportTranslations      bool           `json:"importTranslations"`
+				Scheme                  map[string]int `json:"scheme"`
+				// Scheme                  struct {
+				// 	Identifier   int `json:"identifier"`
+				// 	SourcePhrase int `json:"sourcePhrase"`
+				// 	En           int `json:"en"`
+				// 	De           int `json:"de"`
+				// } `json:"scheme"`
 			} `json:"importOptions"`
 			ExportOptions struct {
 				ExportPattern string `json:"exportPattern"`
@@ -612,12 +593,12 @@ type ResponseUploadTranslations struct {
 //
 // List Translation Approvals API call
 type ListTranslationApprovalsOptions struct {
-	TranslationID       int		`json:"translationId,omitempty"`
-	FileID              int		`json:"fileId,omitempty"`
-	StringID			int		`json:"stringId,omitempty"`
-	LanguageID			string	`json:"languageId,omitempty"`
-	Limit               int		`json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset              int		`json:"offset,omitempty"` // Offset in collection - optional
+	TranslationID int    `json:"translationId,omitempty"`
+	FileID        int    `json:"fileId,omitempty"`
+	StringID      int    `json:"stringId,omitempty"`
+	LanguageID    string `json:"languageId,omitempty"`
+	Limit         int    `json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset        int    `json:"offset,omitempty"` // Offset in collection - optional
 }
 
 type ResponseListTranslationApprovals struct {
@@ -646,24 +627,23 @@ type ResponseListTranslationApprovals struct {
 //
 // List workflow steps API call
 type ListWorkflowsStepsOptions struct {
-	Limit               int		`json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset              int		`json:"offset,omitempty"` // Offset in collection - optional
+	Limit  int `json:"limit,omitempty"`  // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset int `json:"offset,omitempty"` // Offset in collection - optional
 }
-
 
 type ResponseListWorkflowsSteps struct {
 	Data []struct {
 		Data struct {
-			ID        int        `json:"id"`
-			Title     string     `json:"title"`
-			Type      string     `json:"type"`
-			Languages []string	 `json:"languages"`
-			Config    interface{}`json:"config, omitempty"`
-//			Config    struct {
-//				MinRelevant			string	`json:"minRelevant,omitempty"`
-//				AutoSubstitution	int		`json:"autoSubstitution,omitempty"`
-//				Assignees interface{} `json:"assignees,omitempty"`
-//			} `json:"config"`
+			ID        int         `json:"id"`
+			Title     string      `json:"title"`
+			Type      string      `json:"type"`
+			Languages []string    `json:"languages"`
+			Config    interface{} `json:"config, omitempty"`
+			//			Config    struct {
+			//				MinRelevant			string	`json:"minRelevant,omitempty"`
+			//				AutoSubstitution	int		`json:"autoSubstitution,omitempty"`
+			//				Assignees interface{} `json:"assignees,omitempty"`
+			//			} `json:"config"`
 		} `json:"data"`
 	} `json:"data"`
 	Pagination struct {
@@ -716,7 +696,7 @@ type ResponseGetProject struct {
 //
 // List workflow steps API call
 type GetTranslationOptions struct {
-	TranslationID       	int	`json:"translationID,omitempty"`
+	TranslationID           int `json:"translationID,omitempty"`
 	DenormalizePlaceholders int `json:"denormalizePlaceholders, omitempty"`
 }
 
@@ -736,11 +716,10 @@ type ResponseGetTranslation struct {
 	} `json:"data"`
 }
 
-
 //
 // Add Approval API call
 type AddApprovalOptions struct {
-	TranslationID       	int	`json:"translationId,omitempty"`
+	TranslationID int `json:"translationId,omitempty"`
 }
 
 type ResponseAddApproval struct {
@@ -760,32 +739,121 @@ type ResponseAddApproval struct {
 	} `json:"data"`
 }
 
-
-
-
-//
-// Add a directory
-type AddDirectoryOptions struct {
-	Name					string `json:"name"`				// New directory name
-	DirectoryID       		int	`json:"directoryId,omitempty"`	// Parent directory - omit if root is parent
-	BranchID       			int	`json:"branchId,omitempty"`
-	Title					string `json:"title,omitempty"`		// Directory name as seens by translators
-	ExportPattern			string `json:"exportPattern,omitempty"`
-	Priority				string `json:"priority,omitempty"`
+// ListLanguageTranslationsOptions are options for ListLanguageTranslations api call
+type ListLanguageTranslationsOptions struct {
+	LanguageID              string
+	StringIDs               string
+	LabelIDs                string
+	FileID                  int
+	Croql                   string
+	DenormalizePlaceholders int
+	Limit                   int // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset                  int // Offset in collection - optional
 }
 
-type ResponseAddDirectory struct {
+type ResponseListLanguageTranslations struct {
+	Data []struct {
+		Data struct {
+			StringID      int    `json:"stringId,omitempty"`
+			ContentType   string `json:"contentType,omitempty"`
+			TranslationID int    `json:"translationId,omitempty"`
+			Text          string `json:"text,omitempty"`
+			User          struct {
+				ID        int    `json:"id,omitempty"`
+				Username  string `json:"username,omitempty"`
+				FullName  string `json:"fullName,omitempty"`
+				AvatarURL string `json:"avatarUrl,omitempty"`
+			} `json:"user,omitempty"`
+			CreatedAt time.Time `json:"createdAt,omitempty"`
+		} `json:"data,omitempty"`
+	} `json:"data,omitempty"`
+	Pagination struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
+}
+
+// ListMTsOptions are options for ListMTs api call
+type ListMTsOptions struct {
+	GroupID int
+	Limit   int // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset  int // Offset in collection - optional
+}
+
+type ResponseListMTs struct {
+	Data []struct {
+		Data struct {
+			ID          int    `json:"id,omitempty"`
+			GroupID     int    `json:"groupId,omitempty"`
+			Name        string `json:"name,omitempty"`
+			Type        string `json:"type,omitempty"`
+			Credentials map[string]string `json:"credentials,omitempty"`
+			// Credentials struct {
+			// 	CrowdinNmt                  int `json:"crowdin_nmt,omitempty"`
+			// 	CrowdinNmtMultiTranslations int `json:"crowdin_nmt_multi_translations,omitempty"`
+			// } `json:"credentials,omitempty"`
+			SupportedLanguageIds   []string          `json:"supportedLanguageIds,omitempty"`
+			SupportedLanguagePairs map[string][]string `json:"supportedLanguagePairs,omitempty"`
+			// SupportedLanguagePairs struct {
+			// 	En   []string `json:"en,omitempty"`
+			// 	Fr   []string `json:"fr,omitempty"`
+			// 	ZhCN []string `json:"zh-CN,omitempty"`
+			// } `json:"supportedLanguagePairs,omitempty"`
+			ProjectIds []int `json:"projectIds,omitempty"`
+		} `json:"data,omitempty"`
+	} `json:"data,omitempty"`
+	Pagination struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+	} `json:"pagination"`
+}
+
+
+// TranslateViaMTOptions are options for ListMTs api call
+type TranslateViaMTOptions struct {
+	LanguageRecognitionProvider string    `json:"languageRecognitionProvider,omitempty"`
+	SourceLanguageId            string    `json:"sourceLanguageId,omitempty"`
+	TargetLanguageId            string    `json:"targetLanguageId,omitempty"`
+	Strings                     []string  `json:"strings,omitempty"`
+}
+
+type ResponseTranslateViaMT struct {
 	Data struct {
-		ID            int       `json:"id"`
-		ProjectID     int       `json:"projectId"`
-		BranchID      int       `json:"branchId"`
-		DirectoryID   any       `json:"directoryId"`
-		Name          string    `json:"name"`
-		Title         string    `json:"title"`
-		ExportPattern string    `json:"exportPattern"`
-		Path          string    `json:"path"`
-		Priority      string    `json:"priority"`
-		CreatedAt     time.Time `json:"createdAt"`
-		UpdatedAt     time.Time `json:"updatedAt"`
+		SourceLanguageID string   		`json:"sourceLanguageId,omitempty"`
+		TargetLanguageID string   		`json:"targetLanguageId",omitempty`
+		Strings          []string 		`json:"strings",omitempty`
+		Translations     interface{}	`json:"translations",omitempty` // They come in 2 diff flavors array of strings or list of objects
 	} `json:"data"`
+}
+
+
+// GetSourceStringsOptions are options for GetSourceStrings api call
+type GetSourceStringOptions struct {
+	StringID				int
+	DenormalizePlaceholders bool
+}
+
+
+type ResponseGetSourceString struct {
+	Data struct {
+		ID             int       `json:"id,omitempty"`
+		ProjectID      int       `json:"projectId,omitempty"`
+		FileID         int       `json:"fileId,omitempty"`
+		BranchID       int       `json:"branchId,omitempty"`
+		DirectoryID    int       `json:"directoryId,omitempty"`
+		Identifier     string    `json:"identifier,omitempty"`
+		Text           string    `json:"text,omitempty"`
+		Type           string    `json:"type,omitempty"`
+		Context        string    `json:"context,omitempty"`
+		MaxLength      int       `json:"maxLength,omitempty"`
+		IsHidden       bool      `json:"isHidden,omitempty"`
+		IsDuplicate    bool      `json:"isDuplicate,omitempty"`
+		MasterStringID int       `json:"masterStringId,omitempty"`
+		Revision       int       `json:"revision,omitempty"`
+		HasPlurals     bool      `json:"hasPlurals,omitempty"`
+		IsIcu          bool      `json:"isIcu,omitempty"`
+		LabelIds       []int     `json:"labelIds,omitempty"`
+		CreatedAt      time.Time `json:"createdAt,omitempty"`
+		UpdatedAt      time.Time `json:"updatedAt,omitempty"`
+	} `json:"data,omitempty"`
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"net/url"
 )
 
 // Publicly available high level functions generally combining several API calls
@@ -206,7 +207,7 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (e
 	url := rd.Data.Url
 
 	// Actual downloading
-	err = crowdin.DownloadFile(url, outputFileNamePath)
+	err, _ = crowdin.DownloadFile(url, outputFileNamePath)
 
 	return err
 }
@@ -686,4 +687,78 @@ func (crowdin *Crowdin) LS() (mapFiles map[string]T_FileDetails, err error) {
 	}
 
 	return mapFiles, nil
+}
+
+
+
+// ListTranslations(project Id, Language Id, crowdin query)
+//	List all translations from a project for a given language and matching a croql query.
+//  The croql is converted to url form by the function.
+//	Returns a slice of type T_TranslationDetails.
+type T_TranslationDetails struct {
+	StringId		int
+	TranslationId	int
+	Text			string
+	UserName		string
+	UserID			int
+	CreatedAt		time.Time
+}
+
+func (crowdin *Crowdin) ListTranslations(projectId int, languageId string, croql string) (results []T_TranslationDetails, err error) {
+
+	crowdin.log(fmt.Sprintf("ListTranslations(%d, %s)", projectId, languageId))
+
+	var opt ListLanguageTranslationsOptions
+	opt.Limit = 500
+	opt.LanguageID = languageId
+	opt.Croql = url.QueryEscape(croql)
+
+	// Get all translations from the project
+	// Pull translations as long as there are some
+	for offset := 0; offset < MAX_RESULTS; offset += opt.Limit {
+		opt.Offset = offset
+		res, err := crowdin.ListLanguageTranslations(&opt)
+		if err != nil {
+			crowdin.log(fmt.Sprintf("  err=%s\n", err))
+			return results, err
+		} else {
+
+			if len(res.Data) <= 0 {
+				break
+			}
+			for _, translation := range res.Data {
+				results = append(results,T_TranslationDetails {
+										StringId:		translation.Data.StringID,
+										TranslationId:	translation.Data.TranslationID,
+										Text:			translation.Data.Text,
+										UserName:		translation.Data.User.Username,
+										UserID:			translation.Data.User.ID,
+										CreatedAt:		translation.Data.CreatedAt,
+										})
+			}
+		}
+	}
+	return results, nil
+}
+
+
+
+
+// GetProjectLangIds(project Id)
+//	Returns in a map of the languages defined for a project.
+
+func (crowdin *Crowdin) GetProjectLangIds() (languageIds map[string]bool, err error) {
+
+	crowdin.log(fmt.Sprintf("GetProjectLangIds() for project %d", crowdin.config.projectId))
+
+	rl, err := crowdin.GetProject()  // Read project details
+	if err != nil {
+		return languageIds, err
+	}
+	
+	languageIds = make(map[string]bool)	
+	for _, tlid := range rl.Data.TargetLanguageIds {
+		languageIds[tlid] = true
+	}
+	return languageIds, nil
 }

@@ -11,20 +11,21 @@ import (
 	// "go-httpclient"
 )
 
-const MAX_RESULTS = 1000000                             // 1M lines maximum for any api responses
-const MAX_RES_PER_PAGE = 500                            // Max nber of lines per page returned by API calls.
+const MAX_RESULTS       = 1000000                       // 1M lines maximum for any api responses
+const MAX_RES_PER_PAGE  = 500                           // Max nber of lines per page returned by API calls.
 const API_CROWDINDOTCOM = "https://crowdin.com/api/v2/" // url for crowdin.com (non Enterprise version)
 
-const DEFAULT_CONNEXION_TO = 5 // seconds
-const DEFAULT_RW_TO = 40       // seconds
+const DEFAULT_CONNEXION_TO_S = 5  // seconds
+const DEFAULT_RW_TO_S        = 40 // seconds
+const DEFAULT_DOWNLOAD_TO_S  = 10 // seconds
 
 var (
 	// Default value for API URL
 	apiBaseURL = API_CROWDINDOTCOM
-
-	// Default values for timeouts in seconds
-	connectionTO = time.Duration(DEFAULT_CONNEXION_TO) * time.Second
-	readwriteTO  = time.Duration(DEFAULT_RW_TO) * time.Second
+	
+	// Modifiable (yuck - hence the deprecated fcts at the bottom of file) default values for timeouts in seconds
+	DEFAULT_connectionTO = time.Duration(DEFAULT_CONNEXION_TO_S) * time.Second
+	DEFAULT_readwriteTO  = time.Duration(DEFAULT_RW_TO_S)        * time.Second
 )
 
 // Crowdin API V2 wrapper
@@ -36,8 +37,10 @@ type Crowdin struct {
 		client              *http.Client
 		currentConnectionTO time.Duration
 		currentReadwriteTO  time.Duration
+		currentDownloadTO   time.Duration
 		savConnectionTO     time.Duration
 		savReadwriteTO      time.Duration
+		savDownloadTO      	time.Duration
 		proxyUrl            *url.URL
 	}
 	buildProgress int
@@ -45,23 +48,15 @@ type Crowdin struct {
 	logWriter     io.Writer
 }
 
-// Set connection and read/write timeouts for the subsequent new connections
-func SetDefaultTimeouts(cnctTO, rwTO time.Duration) {
-	connectionTO = cnctTO
-	readwriteTO  = rwTO
-}
-
-// Read current build progress status from Crowdin structure
-// That value is updated when a build is running and GetBuildProgress() polled.
-func (crowdin *Crowdin) GetPercentBuildProgress() int {
-	return crowdin.buildProgress
-}
-
 // New - a create new instance of Crowdin API V2.
 func New(token string, projectId int, apiurl string, proxy string) (*Crowdin, error) {
 
 	var proxyUrl *url.URL
 	var err error
+
+	// Default values for timeouts in seconds
+	var connectionTO = DEFAULT_connectionTO
+	var readwriteTO  = DEFAULT_readwriteTO 
 
 	if len(apiurl) > 0 { // If a specific URL is defined (Crowdin Enterprise) insert it in the URL
 		apiBaseURL = apiurl
@@ -91,9 +86,11 @@ func New(token string, projectId int, apiurl string, proxy string) (*Crowdin, er
 	}
 	s.config.currentConnectionTO = connectionTO
 	s.config.currentReadwriteTO  = readwriteTO
+	s.config.currentDownloadTO	 = time.Duration(DEFAULT_DOWNLOAD_TO_S) * time.Second
 	s.config.savConnectionTO 	 = connectionTO
 	s.config.savReadwriteTO      = readwriteTO
-	s.config.proxyUrl = proxyUrl
+	s.config.savDownloadTO       = s.config.currentDownloadTO
+	s.config.proxyUrl            = proxyUrl
 
 	return s, nil
 }
@@ -103,12 +100,18 @@ func (crowdin *Crowdin) Close() {
 	crowdin = nil
 }
 
+// Read current build progress status from Crowdin structure
+// That value is updated when a build is running and GetBuildProgress() polled.
+func (crowdin *Crowdin) GetPercentBuildProgress() int {
+	return crowdin.buildProgress
+}
+
 // Set connection and read/write timeouts
 //  0 means doesn't change value
-func (crowdin *Crowdin) SetTimeouts(connectionTO, rwTO time.Duration) {
+func (crowdin *Crowdin) SetSessionTimeouts(cnctTO, rwTO time.Duration) {
 
-	if connectionTO > 0 {
-		crowdin.config.currentConnectionTO = connectionTO
+	if cnctTO > 0 {
+		crowdin.config.currentConnectionTO = cnctTO
 	}
 	if rwTO > 0 {
 		crowdin.config.currentReadwriteTO = rwTO
@@ -127,23 +130,37 @@ func (crowdin *Crowdin) SetTimeouts(connectionTO, rwTO time.Duration) {
 }
 
 // Get connection and read/write timeouts
-func (crowdin *Crowdin) GetTimeouts() (connectionTO, rwTO time.Duration) {
+func (crowdin *Crowdin) GetSessionTimeouts() (cnctTO, rwTO time.Duration) {
 	return crowdin.config.currentConnectionTO, crowdin.config.currentReadwriteTO
 }
 
-// Save current timeout values
+// Set download timeouts
+func (crowdin *Crowdin) SetDownloadTimeout(dwnldTO time.Duration) {
+	if dwnldTO > time.Duration(0) {
+		crowdin.config.currentDownloadTO = dwnldTO
+	}
+}
+
+// Get download timeout
+func (crowdin *Crowdin) GetDownloadTimeouts() (dwnldTO time.Duration) {
+	return crowdin.config.currentDownloadTO
+}
+
+// Save all timeout values
 func (crowdin *Crowdin) PushTimeouts() {
-	crowdin.config.savConnectionTO, crowdin.config.savReadwriteTO = crowdin.config.currentConnectionTO, crowdin.config.currentReadwriteTO
+	crowdin.config.savConnectionTO, crowdin.config.savReadwriteTO, crowdin.config.savDownloadTO = crowdin.config.currentConnectionTO, crowdin.config.currentReadwriteTO, crowdin.config.currentDownloadTO
 }
 
 // Restore previously saved timeout values
 func (crowdin *Crowdin) PopTimeouts() {
-	crowdin.SetTimeouts(crowdin.config.savConnectionTO, crowdin.config.savReadwriteTO)
+	crowdin.SetSessionTimeouts(crowdin.config.savConnectionTO, crowdin.config.savReadwriteTO)
+	crowdin.SetDownloadTimeout(crowdin.config.savDownloadTO)	
 }
 
-// Reset communication timeouts to their default values
+// Reset communication (connection and read/write) timeouts to their default values
 func (crowdin *Crowdin) ResetTimeoutsToDefault() {
-	crowdin.SetTimeouts(time.Duration(DEFAULT_CONNEXION_TO) * time.Second, time.Duration(DEFAULT_RW_TO) * time.Second)
+	crowdin.SetSessionTimeouts(time.Duration(DEFAULT_CONNEXION_TO_S) * time.Second, time.Duration(DEFAULT_RW_TO_S) * time.Second)
+	crowdin.SetDownloadTimeout(time.Duration(DEFAULT_DOWNLOAD_TO_S) * time.Second)
 }
 
 // SetDebug - traces errors if it's set to true.
@@ -155,4 +172,25 @@ func (crowdin *Crowdin) SetDebug(debug bool, logWriter io.Writer) {
 // GetDebugWriter - get writer
 func (crowdin *Crowdin) GetDebugWriter() (logWriter io.Writer) {
 	return(crowdin.logWriter)
+}
+
+
+
+// DEPRECATED Set connection and read/write timeouts for the subsequent new connections 
+func SetDefaultTimeouts(cnctTO, rwTO time.Duration) {
+	DEFAULT_connectionTO = cnctTO
+	DEFAULT_readwriteTO  = rwTO
+}
+
+
+// DEPRECATED Set connection and read/write timeouts
+//  0 means doesn't change value
+func (crowdin *Crowdin) SetTimeouts(cnctTO, rwTO time.Duration) {
+	crowdin.SetSessionTimeouts(cnctTO, rwTO)
+}
+
+
+// DEPRECATED Get connection and read/write timeouts
+func (crowdin *Crowdin) GetTimeouts() (connectionTO, rwTO time.Duration) {
+	return crowdin.GetSessionTimeouts()
 }
