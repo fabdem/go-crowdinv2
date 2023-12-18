@@ -762,3 +762,42 @@ func (crowdin *Crowdin) GetProjectLangIds() (languageIds map[string]bool, err er
 	}
 	return languageIds, nil
 }
+
+
+
+// RenameFile(file Id, newName)
+//	Rename a file.
+
+func (crowdin *Crowdin) RenameFile(fileId int, newName string) (err error) {
+
+	crowdin.log(fmt.Sprintf("RenameFile(%d, %s) for project %d", fileId, newName, crowdin.config.projectId))
+
+	opt := make(EditFileOptions, 1)	
+	opt[0] = EditFileSingle{
+		Op: "replace",
+		Path:"/name",
+		Value:newName,}
+
+	_, err = crowdin.EditFile(&opt, fileId)
+
+	return err
+}
+
+
+// SetFileTitle(path, title)
+//	Add/edit a file.
+
+func (crowdin *Crowdin) SetFileTitle(fileId int, title string) (err error) {
+
+	crowdin.log(fmt.Sprintf("SetFileTitle(%d, %s) for project %d", fileId, title, crowdin.config.projectId))
+
+	opt := make(EditFileOptions, 1)	
+	opt[0] = EditFileSingle{
+		Op: "replace",
+		Path:"/title",
+		Value:title,}
+
+	_, err = crowdin.EditFile(&opt, fileId)
+
+	return err
+}

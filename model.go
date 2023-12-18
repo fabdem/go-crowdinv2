@@ -857,3 +857,56 @@ type ResponseGetSourceString struct {
 		UpdatedAt      time.Time `json:"updatedAt,omitempty"`
 	} `json:"data,omitempty"`
 }
+
+// EditFile - Edit a source File API call
+type EditFileSingle struct {
+	Op    string      `json:"op"`
+	Path  string      `json:"path"`
+	Value interface{} `json:"value"` // type depends on path value
+}
+type EditFileOptions []EditFileSingle
+
+type ResponseEditFile struct {
+	Data struct {
+		ID            int    `json:"id,omitempty"`
+		ProjectID     int    `json:"projectId,omitempty"`
+		BranchID      int    `json:"branchId,omitempty"`
+		DirectoryID   int    `json:"directoryId,omitempty"`
+		Name          string `json:"name,omitempty"`
+		Title         string `json:"title,omitempty"`
+		Context       string `json:"context,omitempty"`
+		Type          string `json:"type,omitempty"`
+		Path          string `json:"path,omitempty"`
+		Status        string `json:"status,omitempty"`
+		RevisionID    int    `json:"revisionId,omitempty"`
+		Priority      string `json:"priority,omitempty"`
+		ImportOptions struct {
+			ImportTranslations      bool `json:"importTranslations,omitempty"`
+			FirstLineContainsHeader bool `json:"firstLineContainsHeader,omitempty"`
+			ContentSegmentation     bool `json:"contentSegmentation,omitempty"`
+			CustomSegmentation      bool `json:"customSegmentation,omitempty"`
+			Scheme                  map[string] int `json:"scheme,omitempty"`
+			// Scheme                  struct {
+			// 	Identifier   int `json:"identifier,omitempty"`
+			// 	SourcePhrase int `json:"sourcePhrase,omitempty"`
+			// 	En           int `json:"en,omitempty"`
+			// 	De           int `json:"de,omitempty"`
+			// } `json:"scheme,omitempty"`
+		} `json:"importOptions,omitempty"`
+		ExportOptions struct {
+			ExportPattern string `json:"exportPattern,omitempty"`
+		} `json:"exportOptions,omitempty"`
+		ExcludedTargetLanguages []string  `json:"excludedTargetLanguages,omitempty"`
+		ParserVersion           int       `json:"parserVersion,omitempty"`
+		CreatedAt               time.Time `json:"createdAt,omitempty"`
+		UpdatedAt               time.Time `json:"updatedAt,omitempty"`
+	} `json:"data"`
+}
+
+type ResponseDeleteFile struct {
+	Error struct {
+		Message          string `json:"message,omitempty"`
+		Code             int    `json:"code,omitempty"`
+	}
+
+}
