@@ -11,10 +11,10 @@ import (
 // {protocol}://{host}/api/v2/projects/{projectId}/approvals
 // 
 func (crowdin *Crowdin) ListTranslationApprovals(options *ListTranslationApprovalsOptions) (*ResponseListTranslationApprovals, error) {
-	crowdin.log(fmt.Sprintf("ListTranslationApprovals(%d)\n", crowdin.config.projectId))
+	crowdin.log(fmt.Sprintf("ListTranslationApprovals(%d)", crowdin.config.projectId))
 
 	if !(options.TranslationID > 0 || (len(options.LanguageID) > 0 && (options.FileID > 0 || options.StringID > 0))) { // required
-		crowdin.log(fmt.Sprintf("	Error - Minimum nb of parameters not met.\n"))
+		crowdin.log(fmt.Sprintf("	Error - Minimum nb of parameters not met."))
 		return nil, errors.New("insufficient parameters.")
 	}
 
@@ -80,7 +80,7 @@ func (crowdin *Crowdin) ListTranslationApprovals(options *ListTranslationApprova
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/{translationId}
 // 
 func (crowdin *Crowdin) GetTranslation(options *GetTranslationOptions) (*ResponseGetTranslation, error) {
-	crowdin.log(fmt.Sprintf("GetTranslation(%d)\n", options.TranslationID))
+	crowdin.log(fmt.Sprintf("GetTranslation(%d)", options.TranslationID))
 
 	if options.TranslationID <= 0 { // required
 		crowdin.log(fmt.Sprintf("	Error - Need a non 0 TransactionID.\n"))
@@ -117,7 +117,7 @@ func (crowdin *Crowdin) GetTranslation(options *GetTranslationOptions) (*Respons
 // AddApproval - Add Approval API call. Set proofread approval to a translation.
 // {protocol}://{host}/api/v2/storages
 func (crowdin *Crowdin) AddApproval(options *AddApprovalOptions) (*ResponseAddApproval, error) {
-	crowdin.log("\nAddApproval()")
+	crowdin.log("AddApproval()")
 
 	// Prepare URL and params
 	var p postOptions

@@ -9,7 +9,7 @@ import (
 // GetFileProgress() - Get file progress info
 // {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}/languages/progress
 func (crowdin *Crowdin) GetFileProgress(options *GetFileProgressOptions) (*ResponseGetFileProgress, error) {
-	crowdin.log(fmt.Sprintf("GetFileProgress()\n"))
+	crowdin.log(fmt.Sprintf("GetFileProgress()"))
 
 	var limit string
 	if options.Limit > 0 {

@@ -45,7 +45,7 @@ type getOptions struct {
 // POST request
 func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 
-	crowdin.log(fmt.Sprintf("Create POST http request\nBody: %s", options.body))
+	crowdin.log(fmt.Sprintf("Create POST http request\nBody: %v", options.body))
 
 	var req *http.Request
 	var err error
@@ -119,7 +119,7 @@ func (crowdin *Crowdin) post(options *postOptions) ([]byte, error) {
 // PUT request
 func (crowdin *Crowdin) put(options *putOptions) ([]byte, error) {
 
-	crowdin.log(fmt.Sprintf("Create PUT http request\nBody: %s", options.body))
+	crowdin.log(fmt.Sprintf("Create PUT http request\nBody: %v", options.body))
 
 	var req *http.Request
 	var err error
@@ -166,7 +166,7 @@ func (crowdin *Crowdin) put(options *putOptions) ([]byte, error) {
 // PATCH request
 func (crowdin *Crowdin) patch(options *patchOptions) ([]byte, error) {
 
-	crowdin.log(fmt.Sprintf("Create PATCH http request\nBody: %s", options.body))
+	crowdin.log(fmt.Sprintf("Create PATCH http request\nBody: %v", options.body))
 
 	var req *http.Request
 	var err error
@@ -213,7 +213,7 @@ func (crowdin *Crowdin) patch(options *patchOptions) ([]byte, error) {
 // DEl request
 func (crowdin *Crowdin) del(options *delOptions) ([]byte, error) {
 
-	crowdin.log(fmt.Sprintf("Create DEL http request\nBody: %s", options.body))
+	crowdin.log(fmt.Sprintf("Create DEL http request\nBody: %v", options.body))
 
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(options.body)
@@ -367,7 +367,7 @@ func (crowdin *Crowdin) log(a interface{}) {
 	if crowdin.debug {
 		if crowdin.logWriter != nil {
 			timestamp := time.Now().Format(time.RFC3339)
-			msg := fmt.Sprintf("%v: %v", timestamp, a)
+			msg := fmt.Sprintf("%v: crowdin - %v", timestamp, a)
 			token := "Authorization:[Bearer " // prefix for key
 			var purged string                 // Build the purged string in here
 			list1 := strings.Split(msg, token)

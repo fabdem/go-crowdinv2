@@ -192,7 +192,7 @@ func (crowdin *Crowdin) ListProjectBuilds(options *ListProjectBuildsOptions) (*R
 // UploadTranslations() - Upload translations into a file API call
 // {protocol}://{host}/api/v2/projects/{projectId}/translations/{languageId}
 func (crowdin *Crowdin) UploadTranslations(LanguageId string, options *UploadTranslationsOptions) (*ResponseUploadTranslations, error) {
-	crowdin.log(fmt.Sprintf("UploadTranslations(%s, %v)\n", LanguageId, options))
+	crowdin.log(fmt.Sprintf("UploadTranslations(%s, %v)", LanguageId, options))
 
 	// Prepare URL and params
 	var p postOptions

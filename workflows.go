@@ -13,7 +13,7 @@ import (
 // 
 // 
 func (crowdin *Crowdin) ListWorkflowsSteps(options *ListWorkflowsStepsOptions) (*ResponseListWorkflowsSteps, error) {
-	crowdin.log(fmt.Sprintf("ListWorkflowsSteps(%d)\n", crowdin.config.projectId))
+	crowdin.log(fmt.Sprintf("ListWorkflowsSteps(%d)", crowdin.config.projectId))
 
 	var limit string
 	if options.Limit > 0 {

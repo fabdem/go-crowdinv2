@@ -17,7 +17,7 @@ import (
 // {protocol}://{host}/api/v2/projects/{projectId}/files
 func (crowdin *Crowdin) ListDirectories(options *ListDirectoriesOptions) (*ResponseListDirectories, error) {
 
-	crowdin.log(fmt.Sprintf("ListDirectories()\n"))
+	crowdin.log(fmt.Sprintf("ListDirectories()"))
 
 	var branchId string
 	if options.BranchId > 0 {
@@ -76,7 +76,7 @@ func (crowdin *Crowdin) ListDirectories(options *ListDirectoriesOptions) (*Respo
 //
 func (crowdin *Crowdin) ListAllDirectories(options *ListDirectoriesOptions) (*ResponseListDirectories, error) {
 
-	crowdin.log(fmt.Sprintf("ListAllDirectories()\n"))
+	crowdin.log(fmt.Sprintf("ListAllDirectories()"))
 
 	limit := MAX_RES_PER_PAGE // nb max results returned by call per page.
 	page := 0
@@ -105,7 +105,7 @@ func (crowdin *Crowdin) ListAllDirectories(options *ListDirectoriesOptions) (*Re
 // {protocol}://{host}/api/v2/projects/{projectId}/files
 func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles, error) {
 
-	crowdin.log(fmt.Sprintf("ListFiles()\n"))
+	crowdin.log(fmt.Sprintf("ListFiles()"))
 
 	var branchId string
 	if options.BranchId > 0 {
@@ -166,7 +166,7 @@ func (crowdin *Crowdin) ListFiles(options *ListFilesOptions) (*ResponseListFiles
 //
 func (crowdin *Crowdin) ListAllFiles() (*ResponseListFiles, error) {
 
-	crowdin.log(fmt.Sprintf("ListAllFiles()\n"))
+	crowdin.log(fmt.Sprintf("ListAllFiles()"))
 
 	limit := MAX_RES_PER_PAGE // nb max results returned by call per page.
 	page := 0
@@ -195,7 +195,7 @@ func (crowdin *Crowdin) ListAllFiles() (*ResponseListFiles, error) {
 // {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}/revisions
 func (crowdin *Crowdin) ListFileRevisions(options *ListFileRevisionsOptions, fileId int) (*ResponseListFileRevisions, error) {
 
-	crowdin.log(fmt.Sprintf("ListFileRevisions()\n"))
+	crowdin.log(fmt.Sprintf("ListFileRevisions()"))
 
 	var limit string
 	if options.Limit > 0 {
@@ -234,7 +234,7 @@ func (crowdin *Crowdin) ListFileRevisions(options *ListFileRevisionsOptions, fil
 // {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}/revisions/{revisionId}
 func (crowdin *Crowdin) GetFileRevision(fileId int, revId int) (*ResponseGetFileRevision, error) {
 
-	crowdin.log(fmt.Sprintf("GetFileRevision()\n"))
+	crowdin.log(fmt.Sprintf("GetFileRevision()"))
 
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v/revisions/%v", crowdin.config.projectId, fileId, revId),
@@ -260,7 +260,7 @@ func (crowdin *Crowdin) GetFileRevision(fileId int, revId int) (*ResponseGetFile
 // Default update mode is explicitely clear_translations_and_approvals
 func (crowdin *Crowdin) UpdateFile(fileId int, options *UpdateFileOptions) (*ResponseUpdateFile, error) {
 
-	crowdin.log(fmt.Sprintf("UpdateFile()\n"))
+	crowdin.log(fmt.Sprintf("UpdateFile()"))
 
 	if len(options.UpdateOption) > 0 {
 		// Check that update options are valid
@@ -298,7 +298,7 @@ func (crowdin *Crowdin) UpdateFile(fileId int, options *UpdateFileOptions) (*Res
 
 func (crowdin *Crowdin) EditFile(options *EditFileOptions, fileId int) (*ResponseEditFile, error) {
 
-	crowdin.log(fmt.Sprintf("EditFile()\n"))
+	crowdin.log(fmt.Sprintf("EditFile()"))
 
 	if len(*options) > 0 { // Need at least 1 set of parameters
 		// Check that the interface underlying type is string, int or arrays of strings or ints.
@@ -314,7 +314,7 @@ func (crowdin *Crowdin) EditFile(options *EditFileOptions, fileId int) (*Respons
 			}
 		}
 	} else { // No params?!
-		crowdin.log(fmt.Sprintf("	Error - at least one set of parameters is needed\n"))
+		crowdin.log(fmt.Sprintf("	Error - at least one set of parameters is needed"))
 		return nil, errors.New("No parameters found.")
 	}
 
@@ -343,10 +343,11 @@ func (crowdin *Crowdin) EditFile(options *EditFileOptions, fileId int) (*Respons
 // DeleteFile - Delete a File
 // {protocol}://{host}/api/v2/projects/{projectId}/files/{fileId}
 //
+// Empty response content if the deletion worked.
 
 func (crowdin *Crowdin) DeleteFile(fileId int) (*ResponseDeleteFile, error) {
 
-	crowdin.log(fmt.Sprintf("DeleteFile()\n"))
+	crowdin.log(fmt.Sprintf("DeleteFile()"))
 
 	response, err := crowdin.del(&delOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/files/%v", crowdin.config.projectId, fileId),
@@ -358,10 +359,12 @@ func (crowdin *Crowdin) DeleteFile(fileId int) (*ResponseDeleteFile, error) {
 	}
 
 	var responseAPI ResponseDeleteFile
-	err = json.Unmarshal(response, &responseAPI)
-	if err != nil {
-		crowdin.log(fmt.Sprintf("	Error - unmarshalling:%s\n%s\n", response, err))
-		return nil, err
+	if len(response) > 0 {
+		err = json.Unmarshal(response, &responseAPI)
+		if err != nil {
+			crowdin.log(fmt.Sprintf("	Error - unmarshalling:%s\n%s\n", response, err))
+			return nil, err
+		}
 	}
 
 	return &responseAPI, nil

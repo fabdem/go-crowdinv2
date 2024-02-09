@@ -217,7 +217,7 @@ func (crowdin *Crowdin) DownloadBuild(outputFileNamePath string, buildId int) (e
 //		Returns Id and crowdin file name
 func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name string, err error) {
 
-	crowdin.log(fmt.Sprintf("LookupFileId()\n"))
+	crowdin.log(fmt.Sprintf("LookupFileId()"))
 
 	// Lookup fileId in Crowdin
 	dirId := 0
@@ -299,7 +299,7 @@ func (crowdin *Crowdin) LookupFileId(CrowdinFileName string) (id int, name strin
 //		Returns Id and crowdin dir name
 func (crowdin *Crowdin) LookupDirId(CrowdinDirName string) (id int, name string, err error) {
 
-	crowdin.log(fmt.Sprintf("LookupDirId()\n"))
+	crowdin.log(fmt.Sprintf("LookupDirId()"))
 
 	// Lookup directoryId in Crowdin
 	dirId := 0
@@ -359,7 +359,7 @@ func (crowdin *Crowdin) LookupDirId(CrowdinDirName string) (id int, name string,
 //		Returns file Id and rev
 func (crowdin *Crowdin) Update(CrowdinFileName string, LocalFileName string, updateOption string) (fileId int, revId int, err error) {
 
-	crowdin.log(fmt.Sprintf("Update()\n"))
+	crowdin.log(fmt.Sprintf("Update()"))
 
 	// Lookup fileId in Crowdin
 	fileId, crowdinFilename, err := crowdin.LookupFileId(CrowdinFileName)
@@ -413,7 +413,7 @@ func (crowdin *Crowdin) Update(CrowdinFileName string, LocalFileName string, upd
 //
 func (crowdin *Crowdin) GetStringIDs(fileName string, filter string, filterType string) (list []int, err error) {
 
-	crowdin.log(fmt.Sprintf("GetStringIDs(%s, %s, %s)\n", fileName, filter, filterType))
+	crowdin.log(fmt.Sprintf("GetStringIDs(%s, %s, %s)", fileName, filter, filterType))
 
 	// Lookup fileId in Crowdin
 	fileId, _, err := crowdin.LookupFileId(fileName)
@@ -478,7 +478,7 @@ type T_UploadTranslationFileParams struct {
 // 		The original TO will be restored after operation finishes (ok or not)
 //	Returns the source fileId (0 if error) and err != nil if error
 func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFileParams) (fileId int, err error) {
-	crowdin.log(fmt.Sprintf("UploadTranslationFile(%v)\n", params))
+	crowdin.log(fmt.Sprintf("UploadTranslationFile(%v)", params))
 
 	// Lookup fileId in Crowdin
 	fileId, crowdinFilename, err := crowdin.LookupFileId(params.CrowdinFileName)
@@ -536,7 +536,7 @@ func (crowdin *Crowdin) UploadTranslationFile(params T_UploadTranslationFilePara
 // GetShortLangFileProgress() - Get a simple file completion info for a specific language
 //	 Returns a percentage of completion for both translation and approval (0 if error).
 func (crowdin *Crowdin) GetShortLangFileProgress(fileId int, langId string) (translationProgress int, approvalProgress int, err error) {
-	crowdin.log(fmt.Sprintf("GetShortLangFileProgress()\n"))
+	crowdin.log(fmt.Sprintf("GetShortLangFileProgress()"))
 
 	opt := GetFileProgressOptions{FileId: fileId, Limit: 500}
 	res, err := crowdin.GetFileProgress(&opt)
@@ -559,7 +559,7 @@ func (crowdin *Crowdin) GetShortLangFileProgress(fileId int, langId string) (tra
 //		Returns a map of all ADMIN approved transactions along with their approval steps.
 //
 func (crowdin *Crowdin) GetStepsApprovTransId() (listTrans map[int][]int, err error) {
-	crowdin.log(fmt.Sprintf("GetStepsApprovTransId() %d\n", crowdin.config.projectId))
+	crowdin.log(fmt.Sprintf("GetStepsApprovTransId() %d", crowdin.config.projectId))
 
 	// Get the project language IDs
 	listProjDetails, err := crowdin.GetProject()
@@ -646,7 +646,7 @@ type T_FileDetails struct {
 
 func (crowdin *Crowdin) LS() (mapFiles map[string]T_FileDetails, err error) {
 
-	crowdin.log(fmt.Sprintf("LS()\n"))
+	crowdin.log(fmt.Sprintf("LS()"))
 
 	 mapFiles = make(map[string]T_FileDetails)
 

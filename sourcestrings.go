@@ -21,7 +21,7 @@ import (
 
 func (crowdin *Crowdin) EditStrings(options *EditStringsOptions, stringId int) (*ResponseEditStrings, error) {
 
-	crowdin.log(fmt.Sprintf("EditString()\n"))
+	crowdin.log(fmt.Sprintf("EditString()"))
 
 	if len(*options) > 0 { // Need at least 1 set of parameters
 		// Check that the interface underlying type is string, int or boolean.
@@ -64,7 +64,7 @@ func (crowdin *Crowdin) EditStrings(options *EditStringsOptions, stringId int) (
 // {protocol}://{host}/api/v2/projects/{projectId}/strings
 func (crowdin *Crowdin) ListStrings(options *ListStringsOptions) (*ResponseListStrings, error) {
 
-	crowdin.log(fmt.Sprintf("ListDirectories()\n"))
+	crowdin.log(fmt.Sprintf("ListDirectories()"))
 
 	var fileId string
 	if options.FileId > 0 {

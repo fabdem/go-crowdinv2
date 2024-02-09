@@ -10,7 +10,7 @@ import (
 // {protocol}://{host}/api/v2/storages
 func (crowdin *Crowdin) ListStorages(options *ListStoragesOptions) (*ResponseListStorages, error) {
 
-	crowdin.log("\nListStorages()")
+	crowdin.log("ListStorages()")
 
 	var limit string
 	if options.Limit > 0 {
@@ -52,7 +52,7 @@ func (crowdin *Crowdin) ListStorages(options *ListStoragesOptions) (*ResponseLis
 // {protocol}://{host}/api/v2/storages
 func (crowdin *Crowdin) AddStorage(options *AddStorageOptions) (*ResponseAddStorage, error) {
 
-	crowdin.log("\nAddStorage()")
+	crowdin.log("AddStorage()")
 
 	// Prepare URL and params
 	var p postOptions
@@ -82,7 +82,7 @@ func (crowdin *Crowdin) AddStorage(options *AddStorageOptions) (*ResponseAddStor
 // {protocol}://{host}/api/v2/storages/{storageId}
 func (crowdin *Crowdin) GetStorage(options *GetStorageOptions) (*ResponseGetStorage, error) {
 
-	crowdin.log("\nGetStorage()")
+	crowdin.log("GetStorage()")
 
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"storages/%v", options.StorageId),
@@ -110,7 +110,7 @@ func (crowdin *Crowdin) GetStorage(options *GetStorageOptions) (*ResponseGetStor
 // {protocol}://{host}/api/v2/storages/{storageId}
 func (crowdin *Crowdin) DeleteStorage(options *DeleteStorageOptions) error {
 
-	crowdin.log(fmt.Sprintf("\nDeleteStorage() %v", options.StorageId))
+	crowdin.log(fmt.Sprintf("DeleteStorage() %v", options.StorageId))
 
 	response, err := crowdin.del(&delOptions{urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"storages/%v", options.StorageId)})
 
