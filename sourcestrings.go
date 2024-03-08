@@ -64,11 +64,21 @@ func (crowdin *Crowdin) EditStrings(options *EditStringsOptions, stringId int) (
 // {protocol}://{host}/api/v2/projects/{projectId}/strings
 func (crowdin *Crowdin) ListStrings(options *ListStringsOptions) (*ResponseListStrings, error) {
 
-	crowdin.log(fmt.Sprintf("ListDirectories()"))
+	crowdin.log(fmt.Sprintf("ListStrings()"))
 
 	var fileId string
 	if options.FileId > 0 {
 		fileId = strconv.Itoa(options.FileId)
+	}
+
+	var branchId string
+	if options.BranchId > 0 {
+		fileId = strconv.Itoa(options.BranchId)
+	}
+
+	var directoryId string
+	if options.DirectoryId > 0 {
+		fileId = strconv.Itoa(options.DirectoryId)
 	}
 
 	var denormalizePlaceholders string
@@ -89,13 +99,16 @@ func (crowdin *Crowdin) ListStrings(options *ListStringsOptions) (*ResponseListS
 	response, err := crowdin.get(&getOptions{
 		urlStr: fmt.Sprintf(crowdin.config.apiBaseURL+"projects/%v/strings", crowdin.config.projectId),
 		params: map[string]string{
-			"fileId":                  fileId,
-			"denormalizePlaceholders": denormalizePlaceholders,
-			"labelIds":                options.LabelIds,
-			"filter":                  options.Filter,
-			"scope":                   options.Scope,
-			"limit":                   limit,
-			"offset":                  offset,
+			"denormalizePlaceholders":	denormalizePlaceholders,
+			"labelIds":					options.LabelIds,
+			"fileId":					fileId,
+			"branchId":					branchId,
+			"directoryId":				directoryId,
+			"croql":						options.Croql,
+			"filter":					options.Filter,
+			"scope":					options.Scope,
+			"limit":					limit,
+			"offset":					offset,
 		},
 	})
 

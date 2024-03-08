@@ -484,17 +484,6 @@ type ResponseListFileRevisions struct {
 	} `json:"pagination"`
 }
 
-// ListStringsOptions are options for ListStrings api call
-type ListStringsOptions struct {
-	FileId                  int
-	DenormalizePlaceholders int
-	LabelIds                string
-	Filter                  string
-	Scope                   string
-	Limit                   int // Maximum number of items to retrieve (25 default, max 500) - optional
-	Offset                  int // Offset in collection - optional
-}
-
 // ResponseGetFileRevision are response for GetFileRevision api call
 type ResponseGetFileRevision struct {
 	Data struct {
@@ -520,24 +509,46 @@ type ResponseGetFileRevision struct {
 	} `json:"data"`
 }
 
+// ListStringsOptions are options for ListStrings api call
+type ListStringsOptions struct {
+	DenormalizePlaceholders int
+	LabelIds                string
+	FileId                  int
+	BranchId                int
+	DirectoryId             int
+	Croql                   string
+	Filter                  string
+	Scope                   string
+	Limit                   int // Maximum number of items to retrieve (25 default, max 500) - optional
+	Offset                  int // Offset in collection - optional
+}
+
 // ResponseListStrings are response for ListStrings api call
 type ResponseListStrings struct {
 	Data []struct {
 		Data struct {
-			ID         int       `json:"id"`
-			ProjectID  int       `json:"projectId"`
-			FileID     int       `json:"fileId"`
-			Identifier string    `json:"identifier"`
-			Text       string    `json:"text"`
-			Type       string    `json:"type"`
-			Context    string    `json:"context"`
-			MaxLength  int       `json:"maxLength"`
-			IsHidden   bool      `json:"isHidden"`
-			Revision   int       `json:"revision"`
-			HasPlurals bool      `json:"hasPlurals"`
-			IsIcu      bool      `json:"isIcu"`
-			CreatedAt  time.Time `json:"createdAt"`
-			UpdatedAt  time.Time `json:"updatedAt"`
+			ID             int       `json:"id"`
+			ProjectID      int       `json:"projectId"`
+			BranchID       int       `json:"branchId"`
+			Identifier     string    `json:"identifier"`
+			Text           string    `json:"text"`
+			Type           string    `json:"type"`
+			Context        string    `json:"context"`
+			MaxLength      int       `json:"maxLength"`
+			IsHidden       bool      `json:"isHidden"`
+			IsDuplicate    bool      `json:"isDuplicate"`
+			MasterStringID int       `json:"masterStringId"`
+			HasPlurals     bool      `json:"hasPlurals"`
+			IsIcu          bool      `json:"isIcu"`
+			LabelIds       []int     `json:"labelIds"`
+			CreatedAt      time.Time `json:"createdAt"`
+			UpdatedAt      time.Time `json:"updatedAt"`
+			// Fields         struct {					Seems to return an array?
+			// 	FieldSlug string `json:"fieldSlug"`
+			// } `json:"fields"`
+			FileID      int `json:"fileId"`
+			DirectoryID int `json:"directoryId"`
+			Revision    int `json:"revision"`
 		} `json:"data"`
 	} `json:"data"`
 	Pagination struct {
@@ -545,6 +556,9 @@ type ResponseListStrings struct {
 		Limit  int `json:"limit"`
 	} `json:"pagination"`
 }
+
+
+
 
 // EditString - Edit a source string API call
 type EditStringsOptions []struct {

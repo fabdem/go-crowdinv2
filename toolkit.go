@@ -742,6 +742,38 @@ func (crowdin *Crowdin) ListTranslations(projectId int, languageId string, croql
 }
 
 
+// ListSourceStrings(project Id, crowdin query)
+//	List the source strings from a project matching a croql query.
+//  The croql is converted to url form by the function.
+//	Returns a slice of type ResponseListStrings.
+
+func (crowdin *Crowdin) ListSourceStrings(croql string) (results ResponseListStrings, err error) {
+
+	crowdin.log(fmt.Sprintf("ListSourceStrings(%s)", croql))
+
+	var opt ListStringsOptions
+	opt.Limit = 500
+	opt.Croql = url.QueryEscape(croql)
+
+	// Get all the matching source strings from the project
+	// Pull translations as long as there are some
+	for offset := 0; offset < MAX_RESULTS; offset += opt.Limit {
+		opt.Offset = offset
+		res, err := crowdin.ListStrings(&opt)
+		if err != nil {
+			crowdin.log(fmt.Sprintf("  err=%s\n", err))
+			return results, err
+		} else {
+			if len(res.Data) <= 0 {
+				break
+			}
+			for _, val := range res.Data { // Aggregate all results
+				results.Data = append(results.Data, val)
+			}
+		}
+	}
+	return results, nil
+}
 
 
 // GetProjectLangIds(project Id)
